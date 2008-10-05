@@ -4,15 +4,15 @@ import java.net.URI;
 
 public class ModelFactory {
 
-	public Package makePackage(URI uri) {
-		return new Package(uri);
+	public DLPackage makePackage(URI uri) {
+		return new DLPackage(uri);
 	}
 	
-	public Top makeTop(Package homePackage) {
+	public Top makeTop(DLPackage homePackage) {
 		return new Top(homePackage);
 	}
 	
-	public Atom makeAtom(Package homePackage, URI uri) {
+	public Atom makeAtom(DLPackage homePackage, URI uri) {
 		return new Atom(homePackage, uri);
 	}
 	
@@ -20,7 +20,7 @@ public class ModelFactory {
 		return new Role(uri);
 	}
 	
-	public Not makeNot(Package context, Concept concept) {
+	public Not makeNot(DLPackage context, Concept concept) {
 		return new Not(context, concept);
 	}
 	

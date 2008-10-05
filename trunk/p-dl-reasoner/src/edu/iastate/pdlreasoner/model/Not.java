@@ -3,7 +3,7 @@ package edu.iastate.pdlreasoner.model;
 public class Not extends ContextualizedConcept {
 	protected Concept m_Concept;
 	
-	protected Not(Package context, Concept concept) {
+	protected Not(DLPackage context, Concept concept) {
 		super(context);
 		m_Concept = concept;
 	}

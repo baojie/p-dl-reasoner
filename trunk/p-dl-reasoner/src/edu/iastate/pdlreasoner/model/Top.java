@@ -2,7 +2,7 @@ package edu.iastate.pdlreasoner.model;
 
 public class Top extends ContextualizedConcept {
 
-	protected Top(Package homePackage) {
+	protected Top(DLPackage homePackage) {
 		super(homePackage);
 	}
 	
