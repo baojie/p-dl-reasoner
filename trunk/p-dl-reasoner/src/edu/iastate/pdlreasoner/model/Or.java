@@ -11,4 +11,14 @@ public class Or extends SetOp {
 		visitor.visit(this);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Or) && super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return ~super.hashCode();
+	}
+	
 }

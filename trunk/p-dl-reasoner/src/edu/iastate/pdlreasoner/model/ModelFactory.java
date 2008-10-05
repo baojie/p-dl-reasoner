@@ -39,4 +39,5 @@ public class ModelFactory {
 	public AllValues makeAllValues(Role role, Concept concept) {
 		return new AllValues(role, concept);
 	}
+	
 }

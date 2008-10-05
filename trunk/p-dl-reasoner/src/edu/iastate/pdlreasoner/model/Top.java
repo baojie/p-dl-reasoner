@@ -11,4 +11,13 @@ public class Top extends ContextualizedConcept {
 		visitor.visit(this);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Top) && super.equals(obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

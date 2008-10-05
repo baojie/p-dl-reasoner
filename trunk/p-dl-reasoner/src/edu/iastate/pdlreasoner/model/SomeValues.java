@@ -11,4 +11,14 @@ public class SomeValues extends RoleOp {
 		visitor.visit(this);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof SomeValues) && super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return ~super.hashCode();
+	}
+
 }
