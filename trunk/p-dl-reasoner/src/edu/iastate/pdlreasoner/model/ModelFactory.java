@@ -4,39 +4,39 @@ import java.net.URI;
 
 public class ModelFactory {
 
-	public DLPackage makePackage(URI uri) {
+	public static DLPackage makePackage(URI uri) {
 		return new DLPackage(uri);
 	}
 	
-	public Top makeTop(DLPackage homePackage) {
+	public static Top makeTop(DLPackage homePackage) {
 		return new Top(homePackage);
 	}
 	
-	public Atom makeAtom(DLPackage homePackage, URI uri) {
+	public static Atom makeAtom(DLPackage homePackage, URI uri) {
 		return new Atom(homePackage, uri);
 	}
 	
-	public Role makeRole(URI uri) {
+	public static Role makeRole(URI uri) {
 		return new Role(uri);
 	}
 	
-	public Not makeNot(DLPackage context, Concept concept) {
+	public static Not makeNot(DLPackage context, Concept concept) {
 		return new Not(context, concept);
 	}
 	
-	public And makeAnd(Concept[] concepts) {
+	public static And makeAnd(Concept[] concepts) {
 		return new And(concepts);
 	}
 	
-	public Or makeOr(Concept[] concepts) {
+	public static Or makeOr(Concept[] concepts) {
 		return new Or(concepts);
 	}
 	
-	public SomeValues makeSomeValues(Role role, Concept concept) {
+	public static SomeValues makeSomeValues(Role role, Concept concept) {
 		return new SomeValues(role, concept);
 	}
 
-	public AllValues makeAllValues(Role role, Concept concept) {
+	public static AllValues makeAllValues(Role role, Concept concept) {
 		return new AllValues(role, concept);
 	}
 	
