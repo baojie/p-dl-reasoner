@@ -2,12 +2,11 @@ package edu.iastate.pdlreasoner.model;
 
 import java.net.URI;
 
-public class Atom implements Concept {
-	protected Package m_HomePackage;
+public class Atom extends ContextualizedConcept {
 	protected URI m_URI;
 	
 	protected Atom(Package homePackage, URI uri) {
-		m_HomePackage = homePackage;
+		super(homePackage);
 		m_URI = uri;
 	}
 

@@ -1,11 +1,10 @@
 package edu.iastate.pdlreasoner.model;
 
-public class Not implements Concept {
-	protected Package m_Context;
+public class Not extends ContextualizedConcept {
 	protected Concept m_Concept;
 	
 	protected Not(Package context, Concept concept) {
-		m_Context = context;
+		super(context);
 		m_Concept = concept;
 	}
 

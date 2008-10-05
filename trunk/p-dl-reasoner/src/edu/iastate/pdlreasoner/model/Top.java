@@ -1,10 +1,9 @@
 package edu.iastate.pdlreasoner.model;
 
-public class Top implements Concept {
-	protected Package m_HomePackage;
-	
+public class Top extends ContextualizedConcept {
+
 	protected Top(Package homePackage) {
-		m_HomePackage = homePackage;
+		super(homePackage);
 	}
 	
 	@Override
