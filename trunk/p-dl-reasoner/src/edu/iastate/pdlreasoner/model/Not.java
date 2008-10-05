@@ -2,11 +2,15 @@ package edu.iastate.pdlreasoner.model;
 
 public class Not extends ContextualizedConcept {
 	
-	protected Concept m_Concept;
+	protected Concept m_NegatedConcept;
 	
-	protected Not(DLPackage context, Concept concept) {
+	protected Not(DLPackage context, Concept negatedConcept) {
 		super(context);
-		m_Concept = concept;
+		m_NegatedConcept = negatedConcept;
+	}
+
+	public Concept getNegatedConcept() {
+		return m_NegatedConcept;
 	}
 
 	@Override
@@ -18,12 +22,12 @@ public class Not extends ContextualizedConcept {
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Not) || !super.equals(obj)) return false;
 		Not other = (Not) obj;
-		return m_Concept.equals(other.m_Concept);
+		return m_NegatedConcept.equals(other.m_NegatedConcept);
 	}
 	
 	@Override
 	public int hashCode() {
-		return super.hashCode() ^ m_Concept.hashCode();
+		return super.hashCode() ^ m_NegatedConcept.hashCode();
 	}
 	
 }

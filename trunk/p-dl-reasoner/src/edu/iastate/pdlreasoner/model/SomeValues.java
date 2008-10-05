@@ -1,9 +1,9 @@
 package edu.iastate.pdlreasoner.model;
 
-public class SomeValues extends RoleOp {
+public class SomeValues extends Restriction {
 
-	protected SomeValues(Role role, Concept concept) {
-		super(role, concept);
+	protected SomeValues(Role role, Concept filler) {
+		super(role, filler);
 	}
 
 	@Override

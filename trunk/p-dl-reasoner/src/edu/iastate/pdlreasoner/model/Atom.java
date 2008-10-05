@@ -11,6 +11,10 @@ public class Atom extends ContextualizedConcept {
 		m_URI = uri;
 	}
 
+	public URI getURI() {
+		return m_URI;
+	}
+
 	@Override
 	public void accept(ConceptVisitor visitor) {
 		visitor.visit(this);

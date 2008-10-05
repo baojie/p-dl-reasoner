@@ -8,6 +8,10 @@ public abstract class ContextualizedConcept implements Concept {
 		m_Context = context;
 	}
 	
+	public DLPackage getContext() {
+		return m_Context;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ContextualizedConcept)) return false;

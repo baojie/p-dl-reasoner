@@ -10,6 +10,15 @@ public class Role {
 		m_URI = uri;
 	}
 	
+	public URI getURI() {
+		return m_URI;
+	}
+	
+	@Override
+	public String toString() {
+		return m_URI.toString();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Role)) return false;

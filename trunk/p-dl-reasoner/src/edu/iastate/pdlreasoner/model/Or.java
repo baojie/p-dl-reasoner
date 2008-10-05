@@ -2,8 +2,8 @@ package edu.iastate.pdlreasoner.model;
 
 public class Or extends SetOp {
 
-	protected Or(Concept[] concepts) {
-		super(concepts);
+	protected Or(Concept[] operands) {
+		super(operands);
 	}
 
 	@Override
