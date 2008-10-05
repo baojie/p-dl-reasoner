@@ -19,7 +19,7 @@ public class NNFConverterTest {
 	@Before
 	public void setUp() {
 		m_Factory = new ModelFactory();
-		m_PA = m_Factory.makePackage(URI.create("A.owl"));
+		m_PA = m_Factory.makePackage(URI.create("#packageA"));
 		m_Atoms = new Atom[5];
 		for (int i = 0; i < m_Atoms.length; i++) {
 			m_Atoms[i] = m_Factory.makeAtom(m_PA, URI.create("#atom" + i));

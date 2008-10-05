@@ -1,6 +1,6 @@
 package edu.iastate.pdlreasoner.model;
 
-public abstract class Restriction implements Concept {
+public abstract class Restriction extends Concept {
 	
 	protected Role m_Role;
 	protected Concept m_Filler;

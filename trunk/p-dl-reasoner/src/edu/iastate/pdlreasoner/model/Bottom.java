@@ -1,6 +1,6 @@
 package edu.iastate.pdlreasoner.model;
 
-public class Bottom implements Concept {
+public class Bottom extends Concept {
 	
 	public static Bottom BOTTOM = new Bottom();
 

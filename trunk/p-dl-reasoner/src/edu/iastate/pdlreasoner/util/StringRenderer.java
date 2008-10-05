@@ -8,6 +8,8 @@ import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.ConceptVisitor;
 import edu.iastate.pdlreasoner.model.Not;
 import edu.iastate.pdlreasoner.model.Or;
+import edu.iastate.pdlreasoner.model.Restriction;
+import edu.iastate.pdlreasoner.model.SetOp;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
 
@@ -60,28 +62,51 @@ public class StringRenderer implements ConceptVisitor {
 		m_Builder.append(")");
 	}
 
+	private void visitSetOp(SetOp set) {
+		m_Builder.append("(");
+
+		Concept[] operands = set.getOperands();
+		operands[0].accept(this);
+		for (int i = 1; i < operands.length; i++) {
+			m_Builder.append(", ");
+			operands[i].accept(this);
+		}
+					
+		m_Builder.append(")");
+	}
+
 	@Override
 	public void visit(And and) {
+		m_Builder.append(AND);
+		visitSetOp(and);
 	}
 
 	@Override
 	public void visit(Or or) {
+		m_Builder.append(OR);
+		visitSetOp(or);
 	}
-
-	@Override
-	public void visit(SomeValues someValues) {
-		m_Builder.append(SOME)
-			.append("(")
-			.append(someValues.getRole())
+	
+	private void visitRestriction(Restriction r) {
+		m_Builder.append("(")
+			.append(r.getRole())
 			.append(", ");
 	
-		someValues.getFiller().accept(this);
+		r.getFiller().accept(this);
 		
 		m_Builder.append(")");
 	}
 
 	@Override
+	public void visit(SomeValues someValues) {
+		m_Builder.append(SOME);
+		visitRestriction(someValues);		
+	}
+
+	@Override
 	public void visit(AllValues allValues) {
+		m_Builder.append(ALL);
+		visitRestriction(allValues);
 	}
 
 }

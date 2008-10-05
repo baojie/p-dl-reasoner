@@ -1,6 +1,6 @@
 package edu.iastate.pdlreasoner.model;
 
-public abstract class ContextualizedConcept implements Concept {
+public abstract class ContextualizedConcept extends Concept {
 	
 	protected DLPackage m_Context;
 		

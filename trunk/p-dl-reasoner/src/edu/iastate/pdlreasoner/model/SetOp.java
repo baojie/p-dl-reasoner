@@ -2,7 +2,7 @@ package edu.iastate.pdlreasoner.model;
 
 import java.util.Arrays;
 
-public abstract class SetOp implements Concept {
+public abstract class SetOp extends Concept {
 	
 	protected Concept[] m_Operands;
 
