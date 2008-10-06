@@ -20,24 +20,24 @@ public class ModelFactory {
 		return new Role(uri);
 	}
 	
-	public static Negation makeNegation(DLPackage context, Concept concept) {
-		return new Negation(context, concept);
+	public static Negation makeNegation(DLPackage context, Concept negatedConcept) {
+		return new Negation(context, negatedConcept);
 	}
 	
-	public static And makeAnd(Concept... concepts) {
-		return new And(concepts);
+	public static And makeAnd(Concept... operands) {
+		return new And(operands);
 	}
 	
-	public static Or makeOr(Concept... concepts) {
-		return new Or(concepts);
+	public static Or makeOr(Concept... operands) {
+		return new Or(operands);
 	}
 	
-	public static SomeValues makeSomeValues(Role role, Concept concept) {
-		return new SomeValues(role, concept);
+	public static SomeValues makeSomeValues(Role role, Concept filler) {
+		return new SomeValues(role, filler);
 	}
 
-	public static AllValues makeAllValues(Role role, Concept concept) {
-		return new AllValues(role, concept);
+	public static AllValues makeAllValues(Role role, Concept filler) {
+		return new AllValues(role, filler);
 	}
 	
 }

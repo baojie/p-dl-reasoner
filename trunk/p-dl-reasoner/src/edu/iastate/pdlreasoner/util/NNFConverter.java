@@ -112,6 +112,12 @@ public class NNFConverter {
 			return m_Result;
 		}
 		
+		private void makeAndWithNegationContextTop() {
+			if (!m_NegationContext.equals(m_NNFContext)) {
+				m_Result = ModelFactory.makeAnd(m_NegationContextTop, m_Result);				
+			}
+		}
+
 		@Override
 		public void visit(Bottom bottom) {
 			m_Result = m_NegationContextTop;
@@ -119,9 +125,7 @@ public class NNFConverter {
 
 		private void visitAtomOrTop(Concept c) {
 			m_Result = ModelFactory.makeNegation(m_NNFContext, c);
-			if (!m_NegationContext.equals(m_NNFContext)) {
-				m_Result = ModelFactory.makeAnd(m_NegationContextTop, m_Result);				
-			}
+			makeAndWithNegationContextTop();
 		}
 		
 		@Override
@@ -167,10 +171,20 @@ public class NNFConverter {
 
 		@Override
 		public void visit(SomeValues someValues) {
+			Role role = someValues.getRole();
+			Concept filler = someValues.getFiller();
+			Concept negatedFiller = new NegationPropagator(m_NNFContext).convert(filler);
+			m_Result = ModelFactory.makeAllValues(role, negatedFiller);
+			makeAndWithNegationContextTop();
 		}
 
 		@Override
 		public void visit(AllValues allValues) {
+			Role role = allValues.getRole();
+			Concept filler = allValues.getFiller();
+			Concept negatedFiller = new NegationPropagator(m_NNFContext).convert(filler);
+			m_Result = ModelFactory.makeSomeValues(role, negatedFiller);
+			makeAndWithNegationContextTop();
 		}
 		
 	}
