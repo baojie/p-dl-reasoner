@@ -2,7 +2,7 @@ package edu.iastate.pdlreasoner.model;
 
 public class Bottom extends Concept {
 	
-	public static Bottom BOTTOM = new Bottom();
+	public static Bottom INSTANCE = new Bottom();
 
 	private Bottom() {
 	}

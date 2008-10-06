@@ -2,7 +2,6 @@ package edu.iastate.pdlreasoner.util;
 
 import static org.junit.Assert.assertEquals;
 import static edu.iastate.pdlreasoner.model.ModelFactory.*;
-import static edu.iastate.pdlreasoner.model.Bottom.BOTTOM;
 
 import java.net.URI;
 
@@ -12,8 +11,9 @@ import org.junit.Test;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
+import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;
-import edu.iastate.pdlreasoner.model.Not;
+import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
@@ -23,7 +23,7 @@ public class NNFConverterTest {
 	private DLPackage m_PA;
 	private Top m_PATop;
 	private Atom[] m_Atoms;
-	private Not[] m_NegatedAtoms;
+	private Negation[] m_NegatedAtoms;
 	private Role[] m_Roles;
 	private Or m_Or;
 	private And m_And;
@@ -38,9 +38,9 @@ public class NNFConverterTest {
 		for (int i = 0; i < m_Atoms.length; i++) {
 			m_Atoms[i] = makeAtom(m_PA, URI.create("#atom" + i));
 		}
-		m_NegatedAtoms = new Not[m_Atoms.length];
+		m_NegatedAtoms = new Negation[m_Atoms.length];
 		for (int i = 0; i < m_NegatedAtoms.length; i++) {
-			m_NegatedAtoms[i] = makeNot(m_PA, m_Atoms[0]);
+			m_NegatedAtoms[i] = makeNegation(m_PA, m_Atoms[i]);
 		}
 		
 		m_Roles = new Role[5];
@@ -64,7 +64,7 @@ public class NNFConverterTest {
 		assertEquals(m_SomeR0A0, converter.convert(m_SomeR0A0));
 		assertEquals(m_AllR0A0, converter.convert(m_AllR0A0));
 		
-		Not notA0 = makeNot(m_PA, m_Atoms[0]);
+		Negation notA0 = makeNegation(m_PA, m_Atoms[0]);
 		assertEquals(notA0, converter.convert(notA0));
 	}
 
@@ -72,13 +72,13 @@ public class NNFConverterTest {
 	public void local() {
 		NNFConverter converter = new NNFConverter(m_PA);
 		
-		assertEquals(BOTTOM, converter.convert(makeNot(m_PA, m_PATop)));
-		assertEquals(makeAnd(m_NegatedAtoms), converter.convert(makeNot(m_PA, m_Or)));
-		assertEquals(makeOr(m_NegatedAtoms), converter.convert(makeNot(m_PA, m_And)));
+		assertEquals(Bottom.INSTANCE, converter.convert(makeNegation(m_PA, m_PATop)));
+		assertEquals(makeAnd(m_NegatedAtoms), converter.convert(makeNegation(m_PA, m_Or)));
+		assertEquals(makeOr(m_NegatedAtoms), converter.convert(makeNegation(m_PA, m_And)));
 		
 		AllValues allNotA0 = makeAllValues(m_Roles[0], m_NegatedAtoms[0]);
-		assertEquals(allNotA0, converter.convert(makeNot(m_PA, m_SomeR0A0)));
+		assertEquals(allNotA0, converter.convert(makeNegation(m_PA, m_SomeR0A0)));
 		AllValues someNotA0 = makeAllValues(m_Roles[0], m_NegatedAtoms[0]);
-		assertEquals(someNotA0, converter.convert(makeNot(m_PA, m_AllR0A0)));
+		assertEquals(someNotA0, converter.convert(makeNegation(m_PA, m_AllR0A0)));
 	}
 }

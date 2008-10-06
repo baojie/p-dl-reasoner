@@ -6,7 +6,7 @@ import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.ConceptVisitor;
-import edu.iastate.pdlreasoner.model.Not;
+import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Restriction;
 import edu.iastate.pdlreasoner.model.SetOp;
@@ -51,13 +51,13 @@ public class StringRenderer implements ConceptVisitor {
 	}
 
 	@Override
-	public void visit(Not not) {
+	public void visit(Negation negation) {
 		m_Builder.append(NOT)
 			.append("(")
-			.append(not.getContext())
+			.append(negation.getContext())
 			.append(", ");
 		
-		not.getNegatedConcept().accept(this);
+		negation.getNegatedConcept().accept(this);
 		
 		m_Builder.append(")");
 	}

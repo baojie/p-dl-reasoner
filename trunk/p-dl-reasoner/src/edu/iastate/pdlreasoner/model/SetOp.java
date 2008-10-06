@@ -6,7 +6,7 @@ public abstract class SetOp extends Concept {
 	
 	protected Concept[] m_Operands;
 
-	protected SetOp(Concept[] operands) {
+	protected SetOp(Concept... operands) {
 		m_Operands = operands;
 	}
 	

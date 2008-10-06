@@ -20,15 +20,15 @@ public class ModelFactory {
 		return new Role(uri);
 	}
 	
-	public static Not makeNot(DLPackage context, Concept concept) {
-		return new Not(context, concept);
+	public static Negation makeNegation(DLPackage context, Concept concept) {
+		return new Negation(context, concept);
 	}
 	
-	public static And makeAnd(Concept[] concepts) {
+	public static And makeAnd(Concept... concepts) {
 		return new And(concepts);
 	}
 	
-	public static Or makeOr(Concept[] concepts) {
+	public static Or makeOr(Concept... concepts) {
 		return new Or(concepts);
 	}
 	

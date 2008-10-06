@@ -2,7 +2,7 @@ package edu.iastate.pdlreasoner.model;
 
 public class And extends SetOp {
 
-	protected And(Concept[] operands) {
+	protected And(Concept... operands) {
 		super(operands);
 	}
 
