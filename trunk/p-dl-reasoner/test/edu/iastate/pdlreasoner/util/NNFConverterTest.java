@@ -80,5 +80,7 @@ public class NNFConverterTest {
 		assertEquals(allNotA0, converter.convert(makeNegation(m_PA, m_SomeR0A0)));
 		SomeValues someNotA0 = makeSomeValues(m_Roles[0], m_NegatedAtoms[0]);
 		assertEquals(someNotA0, converter.convert(makeNegation(m_PA, m_AllR0A0)));
+		
+		assertEquals(m_Atoms[0], converter.convert(makeNegation(m_PA, m_NegatedAtoms[0])));
 	}
 }

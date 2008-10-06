@@ -145,6 +145,19 @@ public class NNFConverter {
 
 		@Override
 		public void visit(Negation negation) {
+			DLPackage innerNegationContext = negation.getContext();
+			Concept negatedConcept = negation.getNegatedConcept();
+			
+			m_Result = new NNFConverterImpl().convert(negatedConcept);
+			
+			if (!innerNegationContext.equals(m_NegationContext)) {
+				Concept nnfNegatedConcept = m_Result;
+				visitAtomOrTop(ModelFactory.makeTop(innerNegationContext));
+				Concept negatedTop = m_Result;
+				m_Result = ModelFactory.makeOr(nnfNegatedConcept, negatedTop);
+			}
+			
+			makeAndWithNegationContextTop();
 		}
 
 		private Concept[] visitSetOp(SetOp set) {
