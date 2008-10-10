@@ -9,5 +9,4 @@ import edu.iastate.pdlreasoner.util.NNFConverterTest;
 @Suite.SuiteClasses({
 	NNFConverterTest.class
 })
-public class AllTests {
-}
+public class AllTests {}
