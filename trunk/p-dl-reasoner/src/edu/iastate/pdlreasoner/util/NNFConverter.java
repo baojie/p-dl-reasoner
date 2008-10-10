@@ -151,10 +151,8 @@ public class NNFConverter {
 			m_Result = new NNFConverterImpl().convert(negatedConcept);
 			
 			if (!innerNegationContext.equals(m_NegationContext)) {
-				Concept nnfNegatedConcept = m_Result;
-				visitAtomOrTop(ModelFactory.makeTop(innerNegationContext));
-				Concept negatedTop = m_Result;
-				m_Result = ModelFactory.makeOr(nnfNegatedConcept, negatedTop);
+				Negation negatedTop = ModelFactory.makeNegation(m_NegationContext, ModelFactory.makeTop(innerNegationContext));
+				m_Result = ModelFactory.makeOr(m_Result, negatedTop);
 			}
 			
 			makeAndWithNegationContextTop();
