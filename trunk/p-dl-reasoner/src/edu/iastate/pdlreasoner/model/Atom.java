@@ -2,6 +2,8 @@ package edu.iastate.pdlreasoner.model;
 
 import java.net.URI;
 
+import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
+
 public class Atom extends ContextualizedConcept {
 	
 	protected URI m_URI;

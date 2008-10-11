@@ -1,6 +1,7 @@
 package edu.iastate.pdlreasoner.model;
 
-import edu.iastate.pdlreasoner.util.StringRenderer;
+import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
+import edu.iastate.pdlreasoner.model.visitor.StringRenderer;
 
 public abstract class Concept {
 	

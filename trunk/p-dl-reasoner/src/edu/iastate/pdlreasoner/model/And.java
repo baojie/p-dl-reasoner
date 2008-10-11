@@ -1,5 +1,7 @@
 package edu.iastate.pdlreasoner.model;
 
+import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
+
 public class And extends SetOp {
 
 	protected And(Concept... operands) {

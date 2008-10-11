@@ -1,5 +1,7 @@
 package edu.iastate.pdlreasoner.model;
 
+import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
+
 public class Negation extends ContextualizedConcept {
 	
 	protected Concept m_NegatedConcept;

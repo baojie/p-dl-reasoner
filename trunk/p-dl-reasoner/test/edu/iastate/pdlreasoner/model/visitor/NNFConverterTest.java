@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.util;
+package edu.iastate.pdlreasoner.model.visitor;
 
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAllValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAnd;
@@ -27,6 +27,7 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
+import edu.iastate.pdlreasoner.model.visitor.NNFConverter;
 
 public class NNFConverterTest {
 	private DLPackage[] m_P;

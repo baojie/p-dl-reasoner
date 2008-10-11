@@ -10,4 +10,11 @@ public class Subclass {
 		m_Sup = sup;
 	}
 
+	public Concept getSub() {
+		return m_Sub;
+	}
+	
+	public Concept getSup() {
+		return m_Sup;
+	}
 }
