@@ -39,5 +39,9 @@ public class ModelFactory {
 	public static AllValues makeAllValues(Role role, Concept filler) {
 		return new AllValues(role, filler);
 	}
+
+	public static Subclass makeSub(Concept sub, Concept sup) {
+		return new Subclass(sub, sup);
+	}
 	
 }
