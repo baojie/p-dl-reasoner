@@ -3,6 +3,9 @@ package edu.iastate.pdlreasoner.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Concept;
@@ -14,9 +17,11 @@ import edu.iastate.pdlreasoner.model.Top;
 public class TableauServer {
 	
 	private List<KnowledgeBase> m_KBs;
+	private SimpleDirectedGraph<DLPackage, DefaultEdge> m_Import;
 	
 	public TableauServer() {
 		m_KBs = new ArrayList<KnowledgeBase>();
+		m_Import = new SimpleDirectedGraph<DLPackage, DefaultEdge>(DefaultEdge.class);
 	}
 	
 	public void addKnowledgeBase(KnowledgeBase kb) {
