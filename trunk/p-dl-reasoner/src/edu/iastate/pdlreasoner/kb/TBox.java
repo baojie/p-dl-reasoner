@@ -1,23 +1,15 @@
 package edu.iastate.pdlreasoner.kb;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import edu.iastate.pdlreasoner.model.AllValues;
-import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
-import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.ContextualizedConcept;
 import edu.iastate.pdlreasoner.model.DLPackage;
-import edu.iastate.pdlreasoner.model.Negation;
-import edu.iastate.pdlreasoner.model.Or;
-import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Subclass;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptTraverser;
-import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 
 public class TBox {
