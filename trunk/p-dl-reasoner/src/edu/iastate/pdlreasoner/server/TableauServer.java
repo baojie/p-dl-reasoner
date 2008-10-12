@@ -34,7 +34,7 @@ public class TableauServer {
 			DLPackage homePackage = kb.getPackage();
 			MultiValuedMap<DLPackage, Concept> externalConcepts = kb.getExternalConcepts();
 			for (Entry<DLPackage, Set<Concept>> entry : externalConcepts.entrySet()) {
-				m_Import.addLabels(homePackage, entry.getKey(), entry.getValue());
+				m_Import.addLabels(entry.getKey(), homePackage, entry.getValue());
 			}
 		}
 	}
