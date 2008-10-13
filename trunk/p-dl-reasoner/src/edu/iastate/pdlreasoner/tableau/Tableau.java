@@ -21,15 +21,19 @@ public class Tableau {
 		m_Server = server;
 	}
 
-	public void addNodeWith(Concept c) {
-		
-	}
-	
 	public boolean isComplete() {
 		return false;
 	}
 	
 	public boolean hasClash() {
 		return false;
+	}
+
+	public void addNodeWith(Concept c) {
+		
+	}
+	
+	public void complete() {
+		
 	}
 }

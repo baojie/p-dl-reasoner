@@ -45,7 +45,7 @@ public class TableauServer {
 		makeTableaux();
 		Tableau witTableau = m_Tableaux.get(witness);
 		witTableau.addNodeWith(c);
-		complete();
+		completeAll();
 		return !hasClash();
 	}
 	
@@ -79,13 +79,6 @@ public class TableauServer {
 		}
 	}
 
-	private boolean haveAllComplete() {
-		for (Tableau t : m_Tableaux.values()) {
-			if (!t.isComplete()) return false;
-		}
-		return true;
-	}
-
 	private boolean hasClash() {
 		for (Tableau t : m_Tableaux.values()) {
 			if (!t.hasClash()) return true;
@@ -93,7 +86,17 @@ public class TableauServer {
 		return false;
 	}
 
-	private void complete() {
+	private void completeAll() {
+		boolean hasChanged = true;
+		while (hasChanged) {
+			hasChanged = false;
+			for (Tableau tab : m_Tableaux.values()) {
+				if (!tab.isComplete()) {
+					tab.complete();
+					hasChanged = true;
+				}
+			}
+		}
 	}
 	
 }
