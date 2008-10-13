@@ -4,6 +4,7 @@ import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.tableau.Tableau;
 
 public class KnowledgeBase {
 
@@ -25,7 +26,19 @@ public class KnowledgeBase {
 		m_TBox.addAxiom(ModelFactory.makeSub(sub, sup));
 	}
 	
+	public void init() {
+		m_TBox.init();
+	}
+	
 	public MultiValuedMap<DLPackage, Concept> getExternalConcepts() {
 		return m_TBox.getExternalConcepts();
+	}
+
+	public TBox getTBox() {
+		return m_TBox;
+	}
+	
+	public Tableau getTableau() {
+		return new Tableau(this);
 	}
 }
