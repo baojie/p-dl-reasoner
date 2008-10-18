@@ -8,15 +8,15 @@ import edu.iastate.pdlreasoner.server.TableauServer;
 
 public class TableauManager {
 	
+	private TableauServer m_Server;
 	private DLPackage m_Package;
 	private TBox m_TBox;
-	private TableauServer m_Server;
-	private TableauGraph m_ABox;
+	private TableauGraph m_Graph;
 	
 	public TableauManager(KnowledgeBase kb) {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
-		m_ABox = new TableauGraph();
+		m_Graph = new TableauGraph();
 	}
 	
 	public void setServer(TableauServer server) {
@@ -24,15 +24,15 @@ public class TableauManager {
 	}
 
 	public boolean isComplete() {
-		return false;
+		return m_Graph.getOpenNodes().isEmpty();
 	}
 	
 	public boolean hasClash() {
-		return false;
+		return m_Graph.hasClash();
 	}
 
 	public void addRootWith(Concept c) {
-		Node root = m_ABox.makeRoot();
+		Node root = m_Graph.makeRoot();
 		root.addLabel(c);
 		applyUniversalRestriction(root);
 	}
