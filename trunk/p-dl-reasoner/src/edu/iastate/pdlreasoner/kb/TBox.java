@@ -13,6 +13,7 @@ import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptTraverser;
 import edu.iastate.pdlreasoner.model.visitor.NNFConverter;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TBox {
 
@@ -23,7 +24,7 @@ public class TBox {
 	
 	public TBox(KnowledgeBase homeKB) {
 		m_HomeKB = homeKB;
-		m_Axioms = new ArrayList<Subclass>();
+		m_Axioms = CollectionUtil.makeList();
 	}
 
 	public void addAxiom(Subclass axiom) {
@@ -33,7 +34,7 @@ public class TBox {
 	public void init() {
 		normalizeAxioms();
 		
-		m_UC = new ArrayList<Concept>();
+		m_UC = CollectionUtil.makeList();
 		DLPackage homePackage = m_HomeKB.getPackage();
 		NNFConverter converter = new NNFConverter(homePackage);
 		for (Subclass subclass : m_Axioms) {

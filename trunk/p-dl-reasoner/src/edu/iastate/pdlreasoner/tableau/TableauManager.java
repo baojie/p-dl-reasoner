@@ -6,15 +6,17 @@ import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.server.TableauServer;
 
-public class Tableau {
+public class TableauManager {
 	
 	private DLPackage m_Package;
 	private TBox m_TBox;
 	private TableauServer m_Server;
+	private ABox m_ABox;
 	
-	public Tableau(KnowledgeBase kb) {
+	public TableauManager(KnowledgeBase kb) {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
+		m_ABox = new ABox();
 	}
 	
 	public void setServer(TableauServer server) {
@@ -30,10 +32,11 @@ public class Tableau {
 	}
 
 	public void addNodeWith(Concept c) {
-		
+		m_ABox.addNodeWith(c);
 	}
 	
 	public void complete() {
 		
 	}
+	
 }

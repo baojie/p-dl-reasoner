@@ -1,6 +1,5 @@
 package edu.iastate.pdlreasoner.server;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,16 +15,17 @@ import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.struct.ImportGraph;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
-import edu.iastate.pdlreasoner.tableau.Tableau;
+import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
 	
 	private List<KnowledgeBase> m_KBs;
 	private ImportGraph m_Import;
-	private Map<DLPackage, Tableau> m_Tableaux;
+	private Map<DLPackage, TableauManager> m_Tableaux;
 	
 	public TableauServer() {
-		m_KBs = new ArrayList<KnowledgeBase>();
+		m_KBs = CollectionUtil.makeList();
 		m_Import = new ImportGraph();
 	}
 	
@@ -43,7 +43,7 @@ public class TableauServer {
 	
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
 		makeTableaux();
-		Tableau witTableau = m_Tableaux.get(witness);
+		TableauManager witTableau = m_Tableaux.get(witness);
 		witTableau.addNodeWith(c);
 		completeAll();
 		return !hasClash();
@@ -71,16 +71,16 @@ public class TableauServer {
 	}
 	
 	private void makeTableaux() {
-		m_Tableaux = new HashMap<DLPackage, Tableau>();
+		m_Tableaux = new HashMap<DLPackage, TableauManager>();
 		for (KnowledgeBase kb : m_KBs) {
-			Tableau tableau = kb.getTableau();
+			TableauManager tableau = kb.getTableau();
 			tableau.setServer(this);
 			m_Tableaux.put(kb.getPackage(), tableau);
 		}
 	}
 
 	private boolean hasClash() {
-		for (Tableau t : m_Tableaux.values()) {
+		for (TableauManager t : m_Tableaux.values()) {
 			if (!t.hasClash()) return true;
 		}
 		return false;
@@ -90,7 +90,7 @@ public class TableauServer {
 		boolean hasChanged = true;
 		while (hasChanged) {
 			hasChanged = false;
-			for (Tableau tab : m_Tableaux.values()) {
+			for (TableauManager tab : m_Tableaux.values()) {
 				if (!tab.isComplete()) {
 					tab.complete();
 					hasChanged = true;
