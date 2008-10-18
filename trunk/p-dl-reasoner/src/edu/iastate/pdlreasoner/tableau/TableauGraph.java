@@ -2,19 +2,20 @@ package edu.iastate.pdlreasoner.tableau;
 
 import java.util.Set;
 
-import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
-public class ABox {
+public class TableauGraph {
 
-	private Set<Concept> m_Roots;
+	private Set<Node> m_Roots;
 
-	public ABox() {
+	public TableauGraph() {
 		m_Roots = CollectionUtil.makeSet();
 	}
 	
-	public void addNodeWith(Concept c) {
-		
+	public Node makeRoot() {
+		Node n = Node.make();
+		m_Roots.add(n);
+		return n;
 	}
 	
 }

@@ -44,7 +44,7 @@ public class TableauServer {
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
 		makeTableaux();
 		TableauManager witTableau = m_Tableaux.get(witness);
-		witTableau.addNodeWith(c);
+		witTableau.addRootWith(c);
 		completeAll();
 		return !hasClash();
 	}
@@ -92,7 +92,7 @@ public class TableauServer {
 			hasChanged = false;
 			for (TableauManager tab : m_Tableaux.values()) {
 				if (!tab.isComplete()) {
-					tab.complete();
+					tab.expand();
 					hasChanged = true;
 				}
 			}

@@ -11,12 +11,12 @@ public class TableauManager {
 	private DLPackage m_Package;
 	private TBox m_TBox;
 	private TableauServer m_Server;
-	private ABox m_ABox;
+	private TableauGraph m_ABox;
 	
 	public TableauManager(KnowledgeBase kb) {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
-		m_ABox = new ABox();
+		m_ABox = new TableauGraph();
 	}
 	
 	public void setServer(TableauServer server) {
@@ -31,12 +31,20 @@ public class TableauManager {
 		return false;
 	}
 
-	public void addNodeWith(Concept c) {
-		m_ABox.addNodeWith(c);
+	public void addRootWith(Concept c) {
+		Node root = m_ABox.makeRoot();
+		root.addLabel(c);
+		applyUniversalRestriction(root);
 	}
 	
-	public void complete() {
+	public void expand() {
 		
 	}
-	
+
+	private void applyUniversalRestriction(Node n) {
+		for (Concept uc : m_TBox.getUC()) {
+			n.addLabel(uc);
+		}
+	}
+
 }
