@@ -2,22 +2,29 @@ package edu.iastate.pdlreasoner.tableau;
 
 import java.util.Set;
 
+import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauGraph {
 
+	private DLPackage m_Package;
 	private Set<Node> m_Roots;
-	private ClashDetector m_ClashDetector;
+	private GraphClashDetector m_ClashDetector;
 	private OpenNodesCollector m_OpenNodesCollector;
 
-	public TableauGraph() {
+	public TableauGraph(DLPackage dlPackage) {
+		m_Package = dlPackage;
 		m_Roots = CollectionUtil.makeSet();
-		m_ClashDetector = new ClashDetector();
+		m_ClashDetector = new GraphClashDetector();
 		m_OpenNodesCollector = new OpenNodesCollector();
 	}
 	
+	public DLPackage getPackage() {
+		return m_Package;
+	}
+	
 	public Node makeRoot() {
-		Node n = Node.make();
+		Node n = Node.make(this);
 		m_Roots.add(n);
 		return n;
 	}
@@ -39,7 +46,7 @@ public class TableauGraph {
 		return m_OpenNodesCollector.getNodes();
 	}
 	
-	private static class ClashDetector implements NodeVisitor {
+	private static class GraphClashDetector implements NodeVisitor {
 		
 		private boolean m_HasClash;
 		

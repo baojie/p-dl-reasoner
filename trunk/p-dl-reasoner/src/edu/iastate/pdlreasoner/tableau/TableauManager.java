@@ -16,7 +16,7 @@ public class TableauManager {
 	public TableauManager(KnowledgeBase kb) {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
-		m_Graph = new TableauGraph();
+		m_Graph = new TableauGraph(m_Package);
 	}
 	
 	public void setServer(TableauServer server) {

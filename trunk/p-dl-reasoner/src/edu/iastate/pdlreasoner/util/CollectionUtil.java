@@ -20,5 +20,9 @@ public class CollectionUtil {
 	public static <K,V> Map<K,V> makeMap() {
 		return new HashMap<K,V>();
 	}
+	
+	public static <T> Set<T> copy(Set<? extends T> a) {
+		return new HashSet<T>(a);
+	}
 
 }
