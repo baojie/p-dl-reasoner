@@ -1,6 +1,5 @@
 package edu.iastate.pdlreasoner.tableau;
 
-import java.util.List;
 import java.util.Set;
 
 import edu.iastate.pdlreasoner.model.Atom;
@@ -9,27 +8,64 @@ import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
+import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
+import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class Node {
 
 	private TableauGraph m_Graph;
 	private Node m_Parent;
-	private List<Node> m_Children;
+	private MultiValuedMap<Role, Node> m_Children;
 	private Set<Concept> m_OpenLabels;
 	private Set<Concept> m_ExpandedLabels;
 	private Set<Concept> m_Clashes;
 	private NodeClashDetector m_ClashDetector;
 	
+	public static Node make(TableauGraph g) {
+		return new Node(g);
+	}
+	
 	private Node(TableauGraph graph) {
 		m_Graph = graph;
-		m_Children = CollectionUtil.makeList();
+		m_Children = new MultiValuedMap<Role, Node>();
 		m_OpenLabels = CollectionUtil.makeSet();
 		m_ExpandedLabels = CollectionUtil.makeSet();
 		m_Clashes = CollectionUtil.makeSet();
 		m_ClashDetector = new NodeClashDetector();
 	}
+	
+	//Graph structural methods
+	
+	public void accept(NodeVisitor v) {
+		v.visit(this);
+		for (Set<Node> childrenForRole : m_Children.values()) {
+			for (Node child : childrenForRole) {
+				child.accept(v);
+			}
+		}
+	}
+	
+	public boolean containsChild(Role r, Concept c) {
+		Set<Node> rChildren = m_Children.get(r);
+		if (rChildren == null) return false;
+		for (Node n : rChildren) {
+			if (n.containsLabel(c)) return true;
+		}
+		return false;
+	}
+	
+	public Node addChildWith(Role r, Concept c) {
+		Node child = make(m_Graph);
+		child.m_Parent = this;
+		m_Children.add(r, child);
+		child.addLabel(c);
+		return child;
+	}
+	
+	
+	//Semantic methods
 	
 	public boolean addLabel(Concept c) {
 		if (m_ExpandedLabels.contains(c)) return false;
@@ -44,6 +80,13 @@ public class Node {
 		return m_ExpandedLabels.contains(c) || m_OpenLabels.contains(c); 
 	}
 	
+	public Set<Concept> flushOpenLabels() {
+		Set<Concept> openCopy = CollectionUtil.copy(m_OpenLabels);
+		m_ExpandedLabels.addAll(openCopy);
+		m_OpenLabels.clear();
+		return openCopy;
+	}
+	
 	public boolean isComplete() {
 		return m_OpenLabels.isEmpty();
 	}
@@ -52,20 +95,9 @@ public class Node {
 		return !m_Clashes.isEmpty();
 	}
 	
-	public void accept(NodeVisitor v) {
-		v.visit(this);
-		for (Node child : m_Children) {
-			child.accept(v);
-		}
-	}
-	
 	private boolean hasClashWith(Concept c) {
 		c.accept(m_ClashDetector.reset());
 		return m_ClashDetector.hasClash();
-	}
-	
-	public static Node make(TableauGraph g) {
-		return new Node(g);
 	}
 	
 	private class NodeClashDetector extends ConceptVisitorAdapter {
