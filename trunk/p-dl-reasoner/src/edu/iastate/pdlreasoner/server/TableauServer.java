@@ -1,6 +1,5 @@
 package edu.iastate.pdlreasoner.server;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +70,7 @@ public class TableauServer {
 	}
 	
 	private void makeTableaux() {
-		m_Tableaux = new HashMap<DLPackage, TableauManager>();
+		m_Tableaux = CollectionUtil.makeMap();
 		for (KnowledgeBase kb : m_KBs) {
 			TableauManager tableau = kb.getTableau();
 			tableau.setServer(this);

@@ -5,7 +5,8 @@ import org.junit.runners.Suite;
 
 import edu.iastate.pdlreasoner.kb.TBoxTest;
 import edu.iastate.pdlreasoner.model.visitor.NNFConverterTest;
-import edu.iastate.pdlreasoner.server.TableauServerTest;
+import edu.iastate.pdlreasoner.server.TableauServerMultiPackageTest;
+import edu.iastate.pdlreasoner.server.TableauServerSinglePackageTest;
 import edu.iastate.pdlreasoner.tableau.NodeTest;
 
 @RunWith(Suite.class)
@@ -13,6 +14,7 @@ import edu.iastate.pdlreasoner.tableau.NodeTest;
 	NodeTest.class,
 	NNFConverterTest.class,
 	TBoxTest.class,
-	TableauServerTest.class
+	TableauServerSinglePackageTest.class,
+	TableauServerMultiPackageTest.class
 })
 public class AllTests {}

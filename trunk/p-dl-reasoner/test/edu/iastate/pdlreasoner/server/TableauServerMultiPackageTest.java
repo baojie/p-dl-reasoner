@@ -24,7 +24,7 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
 
-public class TableauServerTest {
+public class TableauServerMultiPackageTest {
 
 	private DLPackage[] p;
 	private KnowledgeBase[] kb;
@@ -48,8 +48,10 @@ public class TableauServerTest {
 	@Test
 	public void empty() {
 		m_TableauServer.addKnowledgeBase(kb[0]);
+		m_TableauServer.addKnowledgeBase(kb[1]);
 		m_TableauServer.init();
 		assertTrue(m_TableauServer.isConsistent(p[0]));
+		assertTrue(m_TableauServer.isConsistent(p[1]));
 	}
 
 	@Test
