@@ -28,6 +28,7 @@ public class TableauServerTest {
 
 	private DLPackage[] p;
 	private KnowledgeBase[] kb;
+	private TableauServer m_TableauServer;
 	
 	@Before
 	public void setUp() {
@@ -40,10 +41,19 @@ public class TableauServerTest {
 		for (int i = 0; i < kb.length; i++) {
 			kb[i] = new KnowledgeBase(p[i]);
 		}
+		
+		m_TableauServer = new TableauServer();
 	}
-	
+
 	@Test
-	public void example1() {
+	public void empty() {
+		m_TableauServer.addKnowledgeBase(kb[0]);
+		m_TableauServer.init();
+		assertTrue(m_TableauServer.isConsistent(p[0]));
+	}
+
+	@Test
+	public void paperExample1() {
 		Top p0Top = makeTop(p[0]);
 		Role r = makeRole(URI.create("#r"));
 		Atom p0C = makeAtom(p[0], URI.create("#C"));
@@ -64,16 +74,16 @@ public class TableauServerTest {
 		
 		kb[1].addAxiom(p1D1, p1D2);
 		
-		TableauServer tableauServer = new TableauServer();
 		for (int i = 0; i <= 1; i++) {
-			tableauServer.addKnowledgeBase(kb[i]);
+			m_TableauServer.addKnowledgeBase(kb[i]);
 		}
 		
-		assertTrue(tableauServer.isConsistent(p[0]));
+		m_TableauServer.init();
+		assertTrue(m_TableauServer.isConsistent(p[0]));
 	}
 	
 	@Test
-	public void example2() {
+	public void paperExample2() {
 		Atom p0A = makeAtom(p[0], URI.create("#A"));
 		Atom p0B = makeAtom(p[0], URI.create("#B"));
 		Atom p1C = makeAtom(p[1], URI.create("#C"));
@@ -83,12 +93,12 @@ public class TableauServerTest {
 		kb[1].addAxiom(p0B, p1C);
 		kb[2].addAxiom(p1C, p2D);
 
-		TableauServer tableauServer = new TableauServer();
 		for (int i = 0; i <= 2; i++) {
-			tableauServer.addKnowledgeBase(kb[i]);
+			m_TableauServer.addKnowledgeBase(kb[i]);
 		}
-		
-		assertTrue(tableauServer.isSubclassOf(p0A, p2D, p[0]));
+
+		m_TableauServer.init();
+		assertTrue(m_TableauServer.isSubclassOf(p0A, p2D, p[0]));
 	}
 	
 }

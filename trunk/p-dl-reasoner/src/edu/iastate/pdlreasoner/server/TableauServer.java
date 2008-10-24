@@ -81,7 +81,7 @@ public class TableauServer {
 
 	private boolean hasClash() {
 		for (TableauManager t : m_Tableaux.values()) {
-			if (!t.hasClash()) return true;
+			if (t.hasClash()) return true;
 		}
 		return false;
 	}
