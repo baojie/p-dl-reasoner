@@ -1,6 +1,7 @@
 package edu.iastate.pdlreasoner.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,10 @@ public class CollectionUtil {
 	
 	public static <T> Set<T> copy(Set<? extends T> a) {
 		return new HashSet<T>(a);
+	}
+	
+	public static <T> Set<T> emptySetIfNull(Set<T> a) {
+		return (a == null) ? Collections.<T>emptySet() : a;
 	}
 
 }

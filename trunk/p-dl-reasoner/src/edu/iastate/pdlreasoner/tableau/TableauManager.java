@@ -1,20 +1,14 @@
 package edu.iastate.pdlreasoner.tableau;
 
-import java.util.Set;
-
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
-import edu.iastate.pdlreasoner.model.Atom;
-import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
-import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
-import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.server.TableauServer;
 
@@ -92,11 +86,21 @@ public class TableauManager {
 			if (!m_Node.containsChild(role, filler)) {
 				Node child = m_Node.addChildWith(role, filler);
 				applyUniversalRestriction(child);
+				
+				for (AllValues all : m_Node.getAllValuesWith(role)) {
+					Concept allValuesFiller = all.getFiller();
+					child.addLabel(allValuesFiller);
+				}
 			}
 		}
 
 		@Override
 		public void visit(AllValues allValues) {
+			Role role = allValues.getRole();
+			Concept filler = allValues.getFiller();
+			for (Node child : m_Node.getChildrenWith(role)) {
+				child.addLabel(filler);
+			}
 		}
 
 	}

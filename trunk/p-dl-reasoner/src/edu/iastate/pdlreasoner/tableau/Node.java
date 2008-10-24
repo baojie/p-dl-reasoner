@@ -2,6 +2,7 @@ package edu.iastate.pdlreasoner.tableau;
 
 import java.util.Set;
 
+import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
@@ -20,6 +21,7 @@ public class Node {
 	private MultiValuedMap<Role, Node> m_Children;
 	private Set<Concept> m_OpenLabels;
 	private Set<Concept> m_ExpandedLabels;
+	private MultiValuedMap<Role, AllValues> m_AllValuesCache;
 	private Set<Concept> m_Clashes;
 	private NodeClashDetector m_ClashDetector;
 	
@@ -32,6 +34,7 @@ public class Node {
 		m_Children = new MultiValuedMap<Role, Node>();
 		m_OpenLabels = CollectionUtil.makeSet();
 		m_ExpandedLabels = CollectionUtil.makeSet();
+		m_AllValuesCache = new MultiValuedMap<Role, AllValues>();
 		m_Clashes = CollectionUtil.makeSet();
 		m_ClashDetector = new NodeClashDetector();
 	}
@@ -54,6 +57,10 @@ public class Node {
 			if (n.containsLabel(c)) return true;
 		}
 		return false;
+	}
+	
+	public Set<Node> getChildrenWith(Role r) {
+		return CollectionUtil.emptySetIfNull(m_Children.get(r));
 	}
 	
 	public Node addChildWith(Role r, Concept c) {
@@ -80,7 +87,19 @@ public class Node {
 		return m_ExpandedLabels.contains(c) || m_OpenLabels.contains(c); 
 	}
 	
+	public Set<AllValues> getAllValuesWith(Role r) {
+		return CollectionUtil.emptySetIfNull(m_AllValuesCache.get(r));
+	}
+	
 	public Set<Concept> flushOpenLabels() {
+		//SMELLY
+		for (Concept c : m_OpenLabels) {
+			if (c instanceof AllValues) {
+				AllValues all = (AllValues) c;
+				m_AllValuesCache.add(all.getRole(), all);
+			}
+		}
+		
 		Set<Concept> openCopy = CollectionUtil.copy(m_OpenLabels);
 		m_ExpandedLabels.addAll(openCopy);
 		m_OpenLabels.clear();
