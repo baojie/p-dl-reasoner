@@ -87,7 +87,7 @@ public class TableauManager {
 				Node child = m_Node.addChildWith(role, filler);
 				applyUniversalRestriction(child);
 				
-				for (AllValues all : m_Node.getAllValuesWith(role)) {
+				for (AllValues all : m_Node.getExpandedAllValuesWith(role)) {
 					Concept allValuesFiller = all.getFiller();
 					child.addLabel(allValuesFiller);
 				}

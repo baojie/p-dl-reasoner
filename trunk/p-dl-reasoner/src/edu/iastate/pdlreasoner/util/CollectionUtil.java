@@ -22,6 +22,14 @@ public class CollectionUtil {
 		return new HashMap<K,V>();
 	}
 	
+	public static <T> Set<T> asSet(T... as) {
+		Set<T> set = new HashSet<T>(as.length);
+		for (T a : as) {
+			set.add(a);
+		}
+		return set;
+	}
+	
 	public static <T> Set<T> copy(Set<? extends T> a) {
 		return new HashSet<T>(a);
 	}
