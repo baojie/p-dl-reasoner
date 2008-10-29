@@ -1,5 +1,8 @@
 package edu.iastate.pdlreasoner.tableau;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.model.AllValues;
@@ -11,6 +14,11 @@ import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.server.TableauServer;
+import edu.iastate.pdlreasoner.tableau.messaging.CPush;
+import edu.iastate.pdlreasoner.tableau.messaging.CReport;
+import edu.iastate.pdlreasoner.tableau.messaging.Clash;
+import edu.iastate.pdlreasoner.tableau.messaging.Message;
+import edu.iastate.pdlreasoner.tableau.messaging.MessageProcessor;
 
 public class TableauManager {
 	
@@ -18,13 +26,22 @@ public class TableauManager {
 	private DLPackage m_Package;
 	private TBox m_TBox;
 	private TableauGraph m_Graph;
+	private Clock m_Clock;
+	private boolean m_HasToken;
+	private Queue<Message> m_MessageQueue;
+	
 	private ConceptExpander m_ConceptExpander;
+	private MessageProcessor m_MessageProcessor;
 	
 	public TableauManager(KnowledgeBase kb) {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
 		m_Graph = new TableauGraph(m_Package);
+		m_Clock = new Clock();
+		m_HasToken = false;
+		m_MessageQueue = new LinkedList<Message>();
 		m_ConceptExpander = new ConceptExpander();
+		m_MessageProcessor = new MessageProcessorImpl();
 	}
 	
 	public void setServer(TableauServer server) {
@@ -45,7 +62,30 @@ public class TableauManager {
 		applyUniversalRestriction(root);
 	}
 	
-	public void expand() {
+	public void synchronizeClockWith(Clock c) {
+		m_Clock.copy(c);
+	}
+	
+	public void setToken(boolean v) {
+		m_HasToken = v;
+	}
+	
+	public void receive(Message msg) {
+		m_MessageQueue.offer(msg);
+	}
+	
+	public void run() {
+		processMessages();
+		expandGraph();
+	}
+
+	private void processMessages() {
+		while (!m_MessageQueue.isEmpty()) {
+			m_MessageQueue.remove().execute(m_MessageProcessor);
+		}		
+	}
+
+	private void expandGraph() {
 		for (Node open : m_Graph.getOpenNodes()) {
 			m_ConceptExpander.reset(open);
 			for (Concept c : open.flushOpenLabels()) {
@@ -103,6 +143,23 @@ public class TableauManager {
 			}
 		}
 
+	}
+	
+	private class MessageProcessorImpl implements MessageProcessor {
+		
+		@Override
+		public void process(Clash msg) {
+			
+		}
+
+		@Override
+		public void process(CPush msg) {
+		}
+
+		@Override
+		public void process(CReport msg) {
+		}
+		
 	}
 	
 }

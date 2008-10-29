@@ -1,5 +1,6 @@
 package edu.iastate.pdlreasoner.tableau;
 
+import java.util.List;
 import java.util.Set;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
@@ -9,6 +10,7 @@ public class TableauGraph {
 
 	private DLPackage m_Package;
 	private Set<Node> m_Roots;
+	private List<Branch> m_Branches;
 	private GraphClashDetector m_ClashDetector;
 	private OpenNodesCollector m_OpenNodesCollector;
 

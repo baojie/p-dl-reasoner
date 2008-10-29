@@ -14,7 +14,9 @@ import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.struct.ImportGraph;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.tableau.Clock;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.tableau.messaging.Message;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
@@ -44,6 +46,8 @@ public class TableauServer {
 		makeTableaux();
 		TableauManager witTableau = m_Tableaux.get(witness);
 		witTableau.addRootWith(c);
+		witTableau.synchronizeClockWith(new Clock());
+		witTableau.setToken(true);
 		completeAll();
 		return !hasClash();
 	}
@@ -57,6 +61,12 @@ public class TableauServer {
 		Negation notSup = ModelFactory.makeNegation(witness, sup);
 		And sat = ModelFactory.makeAnd(sub, notSup);
 		return !isSatisfiable(sat, witness);
+	}
+	
+	public void broadcast(Message msg) {
+		for (TableauManager tab : m_Tableaux.values()) {
+			tab.receive(msg);
+		}
 	}
 	
 	private void buildImportGraph() {
@@ -91,7 +101,7 @@ public class TableauServer {
 			hasChanged = false;
 			for (TableauManager tab : m_Tableaux.values()) {
 				if (!tab.isComplete()) {
-					tab.expand();
+					tab.run();
 					hasChanged = true;
 				}
 			}
