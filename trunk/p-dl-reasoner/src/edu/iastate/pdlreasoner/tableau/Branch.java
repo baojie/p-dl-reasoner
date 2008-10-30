@@ -1,6 +1,5 @@
 package edu.iastate.pdlreasoner.tableau;
 
-
 public class Branch {
 
 	private Node m_Node;

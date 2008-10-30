@@ -1,6 +1,7 @@
 package edu.iastate.pdlreasoner.tableau;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
@@ -19,16 +20,18 @@ import edu.iastate.pdlreasoner.tableau.messaging.CReport;
 import edu.iastate.pdlreasoner.tableau.messaging.Clash;
 import edu.iastate.pdlreasoner.tableau.messaging.Message;
 import edu.iastate.pdlreasoner.tableau.messaging.MessageProcessor;
+import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauManager {
 	
 	private TableauServer m_Server;
 	private DLPackage m_Package;
 	private TBox m_TBox;
+	private List<TracedConcept> m_TracedUC;
 	private TableauGraph m_Graph;
 	private Clock m_Clock;
 	private boolean m_HasToken;
-	private Queue<Message> m_MessageQueue;
+	private Queue<Message> m_ReceivedMsgs;
 	
 	private ConceptExpander m_ConceptExpander;
 	private MessageProcessor m_MessageProcessor;
@@ -36,10 +39,14 @@ public class TableauManager {
 	public TableauManager(KnowledgeBase kb) {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
+		m_TracedUC = CollectionUtil.makeList();
+		for (Concept uc : m_TBox.getUC()) {
+			m_TracedUC.add(TracedConcept.makeOrigin(uc));
+		}
 		m_Graph = new TableauGraph(m_Package);
 		m_Clock = new Clock();
 		m_HasToken = false;
-		m_MessageQueue = new LinkedList<Message>();
+		m_ReceivedMsgs = new LinkedList<Message>();
 		m_ConceptExpander = new ConceptExpander();
 		m_MessageProcessor = new MessageProcessorImpl();
 	}
@@ -58,7 +65,7 @@ public class TableauManager {
 
 	public void addRootWith(Concept c) {
 		Node root = m_Graph.makeRoot();
-		root.addLabel(c);
+		root.addLabel(TracedConcept.makeOrigin(c));
 		applyUniversalRestriction(root);
 	}
 	
@@ -71,7 +78,7 @@ public class TableauManager {
 	}
 	
 	public void receive(Message msg) {
-		m_MessageQueue.offer(msg);
+		m_ReceivedMsgs.offer(msg);
 	}
 	
 	public void run() {
@@ -80,22 +87,35 @@ public class TableauManager {
 	}
 
 	private void processMessages() {
-		while (!m_MessageQueue.isEmpty()) {
-			m_MessageQueue.remove().execute(m_MessageProcessor);
+		while (!m_ReceivedMsgs.isEmpty()) {
+			m_ReceivedMsgs.remove().execute(m_MessageProcessor);
 		}		
 	}
 
 	private void expandGraph() {
 		for (Node open : m_Graph.getOpenNodes()) {
 			m_ConceptExpander.reset(open);
-			for (Concept c : open.flushOpenLabels()) {
-				c.accept(m_ConceptExpander);
+			
+			for (TracedConcept tc : open.getLabelsFor(And.class).flush()) {
+				m_ConceptExpander.expand(tc);
+			}
+			for (TracedConcept tc : open.getLabelsFor(SomeValues.class).flush()) {
+				m_ConceptExpander.expand(tc);
+			}
+			for (TracedConcept tc : open.getLabelsFor(AllValues.class).flush()) {
+				m_ConceptExpander.expand(tc);
+			}
+			
+			if (m_HasToken) {
+				for (TracedConcept tc : open.getLabelsFor(Or.class).flush()) {
+					m_ConceptExpander.expand(tc);
+				}
 			}
 		}
 	}
 
 	private void applyUniversalRestriction(Node n) {
-		for (Concept uc : m_TBox.getUC()) {
+		for (TracedConcept uc : m_TracedUC) {
 			n.addLabel(uc);
 		}
 	}
@@ -103,15 +123,21 @@ public class TableauManager {
 	private class ConceptExpander extends ConceptVisitorAdapter {
 		
 		private Node m_Node;
+		private TracedConcept m_Concept;
 		
 		public void reset(Node n) {
 			m_Node = n;
 		}
 		
+		public void expand(TracedConcept tc) {
+			m_Concept = tc;
+			tc.accept(this);
+		}
+		
 		@Override
 		public void visit(And and) {
 			for (Concept c : and.getOperands()) {
-				m_Node.addLabel(c);
+				m_Node.addLabel(m_Concept.derive(c));
 			}
 		}
 
@@ -124,12 +150,14 @@ public class TableauManager {
 			Role role = someValues.getRole();
 			Concept filler = someValues.getFiller();
 			if (!m_Node.containsChild(role, filler)) {
-				Node child = m_Node.addChildWith(role, filler);
+				Node child = m_Node.addChildWith(role, m_Concept.derive(filler));
 				applyUniversalRestriction(child);
 				
-				for (AllValues all : m_Node.getExpandedAllValuesWith(role)) {
-					Concept allValuesFiller = all.getFiller();
-					child.addLabel(allValuesFiller);
+				for (TracedConcept tc : m_Node.getLabelsFor(AllValues.class).getExpanded()) {
+					AllValues all = (AllValues) tc.getConcept();
+					if (role.equals(all.getRole())) {
+						child.addLabel(tc.derive(all.getFiller()));
+					}
 				}
 			}
 		}
@@ -139,7 +167,7 @@ public class TableauManager {
 			Role role = allValues.getRole();
 			Concept filler = allValues.getFiller();
 			for (Node child : m_Node.getChildrenWith(role)) {
-				child.addLabel(filler);
+				child.addLabel(m_Concept.derive(filler));
 			}
 		}
 

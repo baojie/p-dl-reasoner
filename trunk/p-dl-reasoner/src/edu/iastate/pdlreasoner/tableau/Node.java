@@ -1,8 +1,8 @@
 package edu.iastate.pdlreasoner.tableau;
 
+import java.util.Map;
 import java.util.Set;
 
-import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
@@ -19,11 +19,11 @@ public class Node {
 	private TableauGraph m_Graph;
 	private Node m_Parent;
 	private MultiValuedMap<Role, Node> m_Children;
-	private Set<Concept> m_OpenLabels;
-	private Set<Concept> m_ExpandedLabels;
-	private MultiValuedMap<Role, AllValues> m_ExpandedAllValuesCache;
+	
+	private Map<Class<? extends Concept>, TracedConceptSet> m_Labels;
 	private Set<Concept> m_Clashes;
 	private NodeClashDetector m_ClashDetector;
+
 	
 	public static Node make(TableauGraph g) {
 		return new Node(g);
@@ -32,9 +32,7 @@ public class Node {
 	private Node(TableauGraph graph) {
 		m_Graph = graph;
 		m_Children = new MultiValuedMap<Role, Node>();
-		m_OpenLabels = CollectionUtil.makeSet();
-		m_ExpandedLabels = CollectionUtil.makeSet();
-		m_ExpandedAllValuesCache = new MultiValuedMap<Role, AllValues>();
+		m_Labels = CollectionUtil.makeMap();
 		m_Clashes = CollectionUtil.makeSet();
 		m_ClashDetector = new NodeClashDetector();
 	}
@@ -63,51 +61,46 @@ public class Node {
 		return CollectionUtil.emptySetIfNull(m_Children.get(r));
 	}
 	
-	public Node addChildWith(Role r, Concept c) {
+	public Node addChildWith(Role r, TracedConcept tc) {
 		Node child = make(m_Graph);
 		child.m_Parent = this;
 		m_Children.add(r, child);
-		child.addLabel(c);
+		child.addLabel(tc);
 		return child;
 	}
 	
 	
 	//Semantic methods
 	
-	public boolean addLabel(Concept c) {
-		if (m_ExpandedLabels.contains(c)) return false;
-		boolean hasAdded = m_OpenLabels.add(c);
-		if (hasAdded && hasClashWith(c)) {
-			m_Clashes.add(c);
+	public <T extends Concept> boolean addLabel(TracedConcept tc) {
+		TracedConceptSet labelSet = m_Labels.get(tc.getConcept().getClass());
+		if (labelSet == null) {
+			labelSet = new TracedConceptSet();
+			m_Labels.put(tc.getConcept().getClass(), labelSet);
+		}
+		
+		boolean hasAdded = labelSet.add(tc);
+		if (hasAdded) {
+			//hasClashWith(tc));
 		}
 		return hasAdded;
 	}
 	
 	public boolean containsLabel(Concept c) {
-		return m_ExpandedLabels.contains(c) || m_OpenLabels.contains(c); 
+		TracedConceptSet labelSet = m_Labels.get(c.getClass());
+		if (labelSet == null) return false;
+		return labelSet.contains(c);
 	}
-	
-	public Set<AllValues> getExpandedAllValuesWith(Role r) {
-		return CollectionUtil.emptySetIfNull(m_ExpandedAllValuesCache.get(r));
-	}
-	
-	public Set<Concept> flushOpenLabels() {
-		//SMELLY
-		for (Concept c : m_OpenLabels) {
-			if (c instanceof AllValues) {
-				AllValues all = (AllValues) c;
-				m_ExpandedAllValuesCache.add(all.getRole(), all);
-			}
-		}
 		
-		Set<Concept> openCopy = CollectionUtil.copy(m_OpenLabels);
-		m_ExpandedLabels.addAll(openCopy);
-		m_OpenLabels.clear();
-		return openCopy;
+	public TracedConceptSet getLabelsFor(Class<? extends Concept> c) {
+		return m_Labels.get(c);
 	}
-	
+		
 	public boolean isComplete() {
-		return m_OpenLabels.isEmpty();
+		for (TracedConceptSet tcSet : m_Labels.values()) {
+			if (!tcSet.isComplete()) return false;
+		}
+		return true;
 	}
 	
 	public boolean hasClash() {
