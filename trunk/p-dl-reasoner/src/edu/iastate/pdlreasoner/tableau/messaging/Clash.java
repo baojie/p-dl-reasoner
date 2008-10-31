@@ -9,6 +9,10 @@ public class Clash implements Message {
 	public Clash(BranchPoint bp) {
 		m_RestoreTarget = bp;
 	}
+	
+	public BranchPoint getRestoreTarget() {
+		return m_RestoreTarget;
+	}
 
 	@Override
 	public void execute(MessageProcessor messageProcessor) {

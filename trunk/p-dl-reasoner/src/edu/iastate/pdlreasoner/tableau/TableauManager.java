@@ -126,7 +126,11 @@ public class TableauManager {
 	
 	private void processClash() {
 		BranchPoint clashCause = m_Graph.getEarliestClashCause();
-		if (clashCause == null) return;
+		if (clashCause == null) {
+			return;
+		} else if (clashCause == BranchPoint.ORIGIN) {
+			m_HasClashAtOrigin = true;
+		}
 		
 		m_Server.broadcast(new Clash(clashCause));
 	}
