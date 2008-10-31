@@ -1,6 +1,7 @@
 package edu.iastate.pdlreasoner.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +31,7 @@ public class CollectionUtil {
 		return set;
 	}
 	
-	public static <T> Set<T> copy(Set<? extends T> a) {
+	public static <T> Set<T> copy(Collection<? extends T> a) {
 		return new HashSet<T>(a);
 	}
 	
@@ -38,4 +39,14 @@ public class CollectionUtil {
 		return (a == null) ? Collections.<T>emptySet() : a;
 	}
 
+	public static <T extends Object & Comparable<? super T>> T max(T... as) {
+		if (as.length == 0) return null;
+		T currentMax = as[0];
+		for (int i = as.length - 1; i >= 0; i--) {
+			if (currentMax.compareTo(as[i]) < 0) {
+				currentMax = as[i];
+			}
+		}
+		return currentMax;
+	}
 }

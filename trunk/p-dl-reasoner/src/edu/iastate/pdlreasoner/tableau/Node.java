@@ -16,12 +16,13 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class Node {
 
+	//Graph structural fields
 	private TableauGraph m_Graph;
 	private Node m_Parent;
 	private MultiValuedMap<Role, Node> m_Children;
-	
+	//Semantic fields
 	private Map<Class<? extends Concept>, TracedConceptSet> m_Labels;
-	private Set<Concept> m_Clashes;
+	private Set<BranchPoint> m_ClashCauses;
 	private NodeClashDetector m_ClashDetector;
 
 	
@@ -33,7 +34,7 @@ public class Node {
 		m_Graph = graph;
 		m_Children = new MultiValuedMap<Role, Node>();
 		m_Labels = CollectionUtil.makeMap();
-		m_Clashes = CollectionUtil.makeSet();
+		m_ClashCauses = CollectionUtil.makeSet();
 		m_ClashDetector = new NodeClashDetector();
 	}
 	
@@ -81,15 +82,19 @@ public class Node {
 		
 		boolean hasAdded = labelSet.add(tc);
 		if (hasAdded) {
-			//hasClashWith(tc));
+			m_ClashDetector.detect(tc);
 		}
 		return hasAdded;
 	}
 	
 	public boolean containsLabel(Concept c) {
+		return getTracedConceptWith(c) != null;
+	}
+	
+	public TracedConcept getTracedConceptWith(Concept c) {
 		TracedConceptSet labelSet = m_Labels.get(c.getClass());
-		if (labelSet == null) return false;
-		return labelSet.contains(c);
+		if (labelSet == null) return null;
+		return labelSet.getTracedConceptWith(c);
 	}
 		
 	public TracedConceptSet getLabelsFor(Class<? extends Concept> c) {
@@ -104,44 +109,36 @@ public class Node {
 	}
 	
 	public boolean hasClash() {
-		return !m_Clashes.isEmpty();
-	}
-	
-	
-	private boolean hasClashWith(Concept c) {
-		c.accept(m_ClashDetector.reset());
-		return m_ClashDetector.hasClash();
+		return !m_ClashCauses.isEmpty();
 	}
 	
 	//Only NNF Concepts
 	private class NodeClashDetector extends ConceptVisitorAdapter {
 		
 		private final DLPackage m_HomePackage;
-		private boolean m_HasClash;
+		private TracedConcept m_Suspect;
 		
 		public NodeClashDetector() {
 			m_HomePackage = m_Graph.getPackage();
 		}
+		
+		public void detect(TracedConcept tc) {
+			m_Suspect = tc;
+			tc.accept(this);
+		}
 
-		public NodeClashDetector reset() {
-			m_HasClash = false;
-			return this;
-		}
-		
-		public boolean hasClash() {
-			return m_HasClash;
-		}
-		
 		@Override
 		public void visit(Bottom bottom) {
-			m_HasClash = true;
+			m_ClashCauses.add(m_Suspect.getDependency());
 		}
 		
 		@Override
 		public void visit(Atom atom) {
 			Negation negatedAtom = ModelFactory.makeNegation(m_HomePackage, atom);
-			if (containsLabel(negatedAtom)) {
-				m_HasClash = true;
+			TracedConcept tc = getTracedConceptWith(negatedAtom);
+			if (tc != null) {
+				TracedConcept maxTC = CollectionUtil.max(m_Suspect, tc);
+				m_ClashCauses.add(maxTC.getDependency());
 			}
 		}
 
@@ -149,8 +146,10 @@ public class Node {
 		public void visit(Negation negation) {
 			DLPackage context = negation.getContext();
 			Concept negatedConcept = negation.getNegatedConcept();
-			if (containsLabel(negatedConcept) && m_HomePackage.equals(context)) {
-				m_HasClash = true;
+			TracedConcept tc = getTracedConceptWith(negatedConcept);
+			if (tc != null && m_HomePackage.equals(context)) {
+				TracedConcept maxTC = CollectionUtil.max(m_Suspect, tc);
+				m_ClashCauses.add(maxTC.getDependency());
 			}
 		}
 	

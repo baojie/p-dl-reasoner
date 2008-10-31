@@ -3,7 +3,7 @@ package edu.iastate.pdlreasoner.tableau;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
-public class TracedConcept extends Concept {
+public class TracedConcept extends Concept implements Comparable<TracedConcept> {
 
 	private Concept m_Concept;
 	private BranchPoint m_Dependency;
@@ -24,6 +24,10 @@ public class TracedConcept extends Concept {
 	public Concept getConcept() {
 		return m_Concept;
 	}
+	
+	public BranchPoint getDependency() {
+		return m_Dependency;
+	}
 
 	@Override
 	public void accept(ConceptVisitor visitor) {
@@ -38,5 +42,10 @@ public class TracedConcept extends Concept {
 	@Override
 	public int hashCode() {
 		return m_Concept.hashCode();
+	}
+
+	@Override
+	public int compareTo(TracedConcept o) {
+		return m_Dependency.compareTo(o.m_Dependency);
 	}
 }
