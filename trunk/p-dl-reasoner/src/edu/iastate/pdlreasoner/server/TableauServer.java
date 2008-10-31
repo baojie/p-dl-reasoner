@@ -49,7 +49,7 @@ public class TableauServer {
 		witTableau.synchronizeClockWith(new Clock());
 		witTableau.setToken(true);
 		completeAll();
-		return !hasClash();
+		return !hasClashAtOrigin();
 	}
 	
 	public boolean isConsistent(DLPackage witness) {
@@ -88,9 +88,9 @@ public class TableauServer {
 		}
 	}
 
-	private boolean hasClash() {
+	private boolean hasClashAtOrigin() {
 		for (TableauManager t : m_Tableaux.values()) {
-			if (t.hasClash()) return true;
+			if (t.hasClashAtOrigin()) return true;
 		}
 		return false;
 	}

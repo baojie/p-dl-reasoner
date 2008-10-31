@@ -1,6 +1,7 @@
 package edu.iastate.pdlreasoner.tableau;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ public class TracedConceptSet {
 	}
 	
 	public Set<TracedConcept> flush() {
+		if (m_Open.isEmpty()) return Collections.emptySet();
 		Set<TracedConcept> openCopy = CollectionUtil.copy(m_Open.values());
 		m_Expanded.putAll(m_Open);
 		m_Open.clear();

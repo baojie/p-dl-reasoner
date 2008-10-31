@@ -97,8 +97,8 @@ public class Node {
 		return labelSet.getTracedConceptWith(c);
 	}
 		
-	public TracedConceptSet getLabelsFor(Class<? extends Concept> c) {
-		return m_Labels.get(c);
+	public TracedConceptSet getLabelsFor(Class<? extends Concept> type) {
+		return m_Labels.get(type);
 	}
 		
 	public boolean isComplete() {
@@ -108,8 +108,8 @@ public class Node {
 		return true;
 	}
 	
-	public boolean hasClash() {
-		return !m_ClashCauses.isEmpty();
+	public Set<BranchPoint> getClashCauses() {
+		return m_ClashCauses;
 	}
 	
 	//Only NNF Concepts

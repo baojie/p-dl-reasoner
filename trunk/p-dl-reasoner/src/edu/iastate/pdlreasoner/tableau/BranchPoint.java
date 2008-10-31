@@ -14,11 +14,17 @@ public class BranchPoint implements Comparable<BranchPoint> {
 	public boolean equals(Object obj) {
 		if (!(obj instanceof BranchPoint)) return false;
 		BranchPoint o = (BranchPoint) obj;
-		if (this == ORIGIN && o == ORIGIN) return true;
-		if (this == ORIGIN || o == ORIGIN) return false;
-		return m_Time == o.m_Time &&
-			m_Package.equals(o.m_Package) &&
-			m_BranchIndex == o.m_BranchIndex;
+		if (this == ORIGIN) {
+			return o == ORIGIN;
+		} else {
+			if (o == ORIGIN) {
+				return false;
+			} else {
+				return m_Time == o.m_Time &&
+					m_Package.equals(o.m_Package) &&
+					m_BranchIndex == o.m_BranchIndex;
+			}
+		}
 	}
 	
 	@Override
@@ -32,18 +38,17 @@ public class BranchPoint implements Comparable<BranchPoint> {
 	
 	@Override
 	public int compareTo(BranchPoint o) {
-		if (this == ORIGIN && o == ORIGIN) return 0;
 		if (this == ORIGIN) {
-			return -1;
-		} else if (o == ORIGIN) {
-			return 1;
+			return (o == ORIGIN) ? 0 : -1;
+		} else {
+			if (o == ORIGIN) return 1;
+			
+			int timeDiff = m_Time - o.m_Time;
+			if (timeDiff != 0) return timeDiff;
+			
+			//Both in the same package
+			return m_BranchIndex - o.m_BranchIndex;
 		}
-		
-		int timeDiff = m_Time - o.m_Time;
-		if (timeDiff != 0) return timeDiff;
-		
-		//Both in the same package
-		return m_BranchIndex - o.m_BranchIndex;
 	}
 
 }

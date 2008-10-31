@@ -1,5 +1,6 @@
 package edu.iastate.pdlreasoner.tableau;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -11,13 +12,14 @@ public class TableauGraph {
 	private DLPackage m_Package;
 	private Set<Node> m_Roots;
 	private List<Branch> m_Branches;
-	private GraphClashDetector m_ClashDetector;
+	
+	private ClashCauseCollector m_ClashDetector;
 	private OpenNodesCollector m_OpenNodesCollector;
 
 	public TableauGraph(DLPackage dlPackage) {
 		m_Package = dlPackage;
 		m_Roots = CollectionUtil.makeSet();
-		m_ClashDetector = new GraphClashDetector();
+		m_ClashDetector = new ClashCauseCollector();
 		m_OpenNodesCollector = new OpenNodesCollector();
 	}
 	
@@ -31,13 +33,13 @@ public class TableauGraph {
 		return n;
 	}
 
-	public boolean hasClash() {
+	public BranchPoint getEarliestClashCause() {
 		m_ClashDetector.reset();
 		for (Node root : m_Roots) {
 			root.accept(m_ClashDetector);
-			if (m_ClashDetector.hasClash()) return true;
 		}
-		return false;
+		Set<BranchPoint> clashCauses = m_ClashDetector.getClashCauses();
+		return clashCauses.isEmpty() ? null : Collections.min(clashCauses);
 	}
 	
 	public Set<Node> getOpenNodes() {
@@ -48,23 +50,25 @@ public class TableauGraph {
 		return m_OpenNodesCollector.getNodes();
 	}
 	
-	private static class GraphClashDetector implements NodeVisitor {
+	private static class ClashCauseCollector implements NodeVisitor {
 		
-		private boolean m_HasClash;
+		private Set<BranchPoint> m_ClashCauses;
 		
-		public void reset() {
-			m_HasClash = false;
+		public ClashCauseCollector() {
+			m_ClashCauses = CollectionUtil.makeSet();
 		}
 		
-		public boolean hasClash() {
-			return m_HasClash;
+		public void reset() {
+			m_ClashCauses.clear();
+		}
+		
+		public Set<BranchPoint> getClashCauses() {
+			return m_ClashCauses;
 		}
 
 		@Override
 		public void visit(Node n) {
-			if (n.hasClash()) {
-				m_HasClash = true;
-			}
+			m_ClashCauses.addAll(n.getClashCauses());
 		}
 		
 	}

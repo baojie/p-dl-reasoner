@@ -84,9 +84,9 @@ public class NodeTest {
 
 	@Test
 	public void testHasClash_Bottom() {
-		assertFalse(m_Node.hasClash());
+		assertFalse(m_Node.getClashCauses());
 		m_Node.addLabel(Bottom.INSTANCE);
-		assertTrue(m_Node.hasClash());
+		assertTrue(m_Node.getClashCauses());
 	}
 
 	@Test
@@ -96,10 +96,10 @@ public class NodeTest {
 		
 		m_Node.addLabel(atom);
 		m_Node.addLabel(foreignNotAtom);
-		assertFalse(m_Node.hasClash());
+		assertFalse(m_Node.getClashCauses());
 		
 		m_Node.addLabel(homeNotAtom);
-		assertTrue(m_Node.hasClash());
+		assertTrue(m_Node.getClashCauses());
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class NodeTest {
 		Negation homeNotAtom = makeNegation(m_HomePackage, atom);
 		m_Node.addLabel(homeNotAtom);
 		m_Node.addLabel(atom);
-		assertTrue(m_Node.hasClash());
+		assertTrue(m_Node.getClashCauses());
 	}
 
 	@Test
@@ -116,6 +116,6 @@ public class NodeTest {
 		m_Node.addLabel(homeNotAll);
 		m_Node.addLabel(all);
 		//Only NNF support
-		assertFalse(m_Node.hasClash());
+		assertFalse(m_Node.getClashCauses());
 	}
 }

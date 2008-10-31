@@ -8,11 +8,15 @@ import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
+import edu.iastate.pdlreasoner.model.Atom;
+import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
+import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.server.TableauServer;
 import edu.iastate.pdlreasoner.tableau.messaging.CPush;
@@ -32,6 +36,7 @@ public class TableauManager {
 	private Clock m_Clock;
 	private boolean m_HasToken;
 	private Queue<Message> m_ReceivedMsgs;
+	private boolean m_HasClashAtOrigin;
 	
 	private ConceptExpander m_ConceptExpander;
 	private MessageProcessor m_MessageProcessor;
@@ -47,6 +52,7 @@ public class TableauManager {
 		m_Clock = new Clock();
 		m_HasToken = false;
 		m_ReceivedMsgs = new LinkedList<Message>();
+		m_HasClashAtOrigin = false;
 		m_ConceptExpander = new ConceptExpander();
 		m_MessageProcessor = new MessageProcessorImpl();
 	}
@@ -56,11 +62,11 @@ public class TableauManager {
 	}
 
 	public boolean isComplete() {
-		return m_Graph.getOpenNodes().isEmpty();
+		return m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty();
 	}
 	
-	public boolean hasClash() {
-		return m_Graph.hasClash();
+	public boolean hasClashAtOrigin() {
+		return m_HasClashAtOrigin;
 	}
 
 	public void addRootWith(Concept c) {
@@ -84,6 +90,7 @@ public class TableauManager {
 	public void run() {
 		processMessages();
 		expandGraph();
+		processClash();
 	}
 
 	private void processMessages() {
@@ -96,22 +103,32 @@ public class TableauManager {
 		for (Node open : m_Graph.getOpenNodes()) {
 			m_ConceptExpander.reset(open);
 			
-			for (TracedConcept tc : open.getLabelsFor(And.class).flush()) {
-				m_ConceptExpander.expand(tc);
-			}
-			for (TracedConcept tc : open.getLabelsFor(SomeValues.class).flush()) {
-				m_ConceptExpander.expand(tc);
-			}
-			for (TracedConcept tc : open.getLabelsFor(AllValues.class).flush()) {
-				m_ConceptExpander.expand(tc);
-			}
-			
+			expand(open.getLabelsFor(Bottom.class));
+			expand(open.getLabelsFor(Top.class));
+			expand(open.getLabelsFor(Atom.class));
+			expand(open.getLabelsFor(Negation.class));
+			expand(open.getLabelsFor(And.class));
+			expand(open.getLabelsFor(SomeValues.class));
+			expand(open.getLabelsFor(AllValues.class));
 			if (m_HasToken) {
-				for (TracedConcept tc : open.getLabelsFor(Or.class).flush()) {
-					m_ConceptExpander.expand(tc);
-				}
+				expand(open.getLabelsFor(Or.class));
 			}
 		}
+	}
+	
+	private void expand(TracedConceptSet tcSet) {
+		if (tcSet != null) {
+			for (TracedConcept tc : tcSet.flush()) {
+				m_ConceptExpander.expand(tc);
+			}
+		}
+	}
+	
+	private void processClash() {
+		BranchPoint clashCause = m_Graph.getEarliestClashCause();
+		if (clashCause == null) return;
+		
+		m_Server.broadcast(new Clash(clashCause));
 	}
 
 	private void applyUniversalRestriction(Node n) {
