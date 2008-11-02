@@ -2,6 +2,7 @@ package edu.iastate.pdlreasoner.tableau;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,5 +45,32 @@ public class TracedConceptSet {
 	
 	public Collection<TracedConcept> getExpanded() {
 		return m_Expanded.values();
+	}
+
+	public boolean prune(BranchPoint restoreTarget) {
+		boolean hasChanged = prune(restoreTarget, m_Open);
+		hasChanged |= prune(restoreTarget, m_Expanded);
+		return hasChanged;
+	}
+	
+	public void reopen(TracedConcept tc) {
+		
+	}
+
+	public void reopenAll() {
+		m_Open.putAll(m_Expanded);
+		m_Expanded.clear();
+	}
+	
+	private boolean prune(BranchPoint restoreTarget, Map<Concept, TracedConcept> map) {
+		boolean hasChanged = false;
+		for (Iterator<TracedConcept> it = map.values().iterator(); it.hasNext(); ) {
+			TracedConcept tc = it.next();
+			if (restoreTarget.beforeOrEquals(tc.getDependency())) {
+				it.remove();
+				hasChanged = true;
+			}
+		}
+		return hasChanged;
 	}
 }

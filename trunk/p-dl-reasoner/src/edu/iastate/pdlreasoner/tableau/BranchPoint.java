@@ -29,6 +29,11 @@ public class BranchPoint implements Comparable<BranchPoint> {
 	public int getBranchIndex() {
 		return m_BranchIndex;
 	}
+	
+	public boolean beforeOrEquals(BranchPoint bp) {
+		return compareTo(bp) <= 0;
+	}
+	
 
 	@Override
 	public boolean equals(Object obj) {

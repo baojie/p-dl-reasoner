@@ -2,6 +2,9 @@ package edu.iastate.pdlreasoner.tableau;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
@@ -18,8 +21,8 @@ public class Node {
 
 	//Graph structural fields
 	private TableauGraph m_Graph;
-	private Node m_Parent;
-	private MultiValuedMap<Role, Node> m_Children;
+	private Edge m_ParentEdge;
+	private MultiValuedMap<Role, Edge> m_Children;
 	//Semantic fields
 	private BranchPoint m_Dependency;
 	private Map<Class<? extends Concept>, TracedConceptSet> m_Labels;
@@ -33,7 +36,7 @@ public class Node {
 	
 	private Node(TableauGraph graph, BranchPoint dependency) {
 		m_Graph = graph;
-		m_Children = new MultiValuedMap<Role, Node>();
+		m_Children = new MultiValuedMap<Role, Edge>();
 		m_Dependency = dependency;
 		m_Labels = CollectionUtil.makeMap();
 		m_ClashCauses = CollectionUtil.makeSet();
@@ -44,31 +47,39 @@ public class Node {
 	
 	public void accept(NodeVisitor v) {
 		v.visit(this);
-		for (Set<Node> childrenForRole : m_Children.values()) {
-			for (Node child : childrenForRole) {
-				child.accept(v);
+		for (Set<Edge> childrenForRole : m_Children.values()) {
+			for (Edge edge : childrenForRole) {
+				edge.getChild().accept(v);
 			}
 		}
 	}
 	
 	public boolean containsChild(Role r, Concept c) {
-		Set<Node> rChildren = m_Children.get(r);
+		Set<Edge> rChildren = m_Children.get(r);
 		if (rChildren == null) return false;
-		for (Node n : rChildren) {
-			if (n.containsLabel(c)) return true;
+		for (Edge edge : rChildren) {
+			if (edge.getChild().containsLabel(c)) return true;
 		}
 		return false;
 	}
 	
-	public Set<Node> getChildrenWith(Role r) {
+	public Set<Edge> getChildrenWith(Role r) {
 		return CollectionUtil.emptySetIfNull(m_Children.get(r));
 	}
 	
 	public Node addChildBy(Role r, BranchPoint dependency) {
 		Node child = make(m_Graph, dependency);
-		child.m_Parent = this;
-		m_Children.add(r, child);
+		Edge edge = Edge.make(this, r, child);
+		child.m_ParentEdge = edge;
+		m_Children.add(r, edge);
 		return child;
+	}
+	
+	public void removeFromParent() {
+		if (m_ParentEdge == null) return;
+		
+		m_ParentEdge.getParent().m_Children.remove(m_ParentEdge.getLabel(), m_ParentEdge);
+		m_ParentEdge = null;
 	}
 	
 	
@@ -117,6 +128,21 @@ public class Node {
 		return m_ClashCauses;
 	}
 	
+	public void pruneAndReopenLabels(BranchPoint restoreTarget) {
+		boolean hasChanged = false;
+		for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {
+			hasChanged |= entry.getValue().prune(restoreTarget);
+		}
+		
+		if (hasChanged) {
+			for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {
+				if (!Or.class.equals(entry.getKey())) {
+					entry.getValue().reopenAll();
+				}
+			}
+		}
+	}
+	
 	//Only NNF Concepts
 	private class NodeClashDetector extends ConceptVisitorAdapter {
 		
@@ -159,5 +185,5 @@ public class Node {
 		}
 	
 	}
-	
+
 }

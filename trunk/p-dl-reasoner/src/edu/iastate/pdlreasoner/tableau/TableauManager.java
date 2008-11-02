@@ -198,8 +198,8 @@ public class TableauManager {
 		public void visit(AllValues allValues) {
 			Role role = allValues.getRole();
 			Concept filler = allValues.getFiller();
-			for (Node child : m_Node.getChildrenWith(role)) {
-				child.addLabel(m_Concept.derive(filler));
+			for (Edge edge : m_Node.getChildrenWith(role)) {
+				edge.getChild().addLabel(m_Concept.derive(filler));
 			}
 		}
 
@@ -210,7 +210,7 @@ public class TableauManager {
 		@Override
 		public void process(Clash msg) {
 			BranchPoint restoreTarget = msg.getRestoreTarget();
-			m_Graph.prune(restoreTarget);
+			m_Graph.pruneTo(restoreTarget);
 			if (m_Package.equals(restoreTarget.getPackage())) {
 				m_Clock.setTime(restoreTarget.getTime());
 				tryNextChoiceOn(restoreTarget);

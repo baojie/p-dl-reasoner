@@ -15,6 +15,8 @@ public class TableauGraph {
 	
 	private ClashCauseCollector m_ClashDetector;
 	private OpenNodesCollector m_OpenNodesCollector;
+	private PruneNodesCollector m_PruneNodesCollector;
+	private ConceptPruner m_ConceptPruner;
 
 	public TableauGraph(DLPackage dlPackage) {
 		m_Package = dlPackage;
@@ -22,10 +24,18 @@ public class TableauGraph {
 		m_Branches = CollectionUtil.makeList();
 		m_ClashDetector = new ClashCauseCollector();
 		m_OpenNodesCollector = new OpenNodesCollector();
+		m_PruneNodesCollector = new PruneNodesCollector();
+		m_ConceptPruner = new ConceptPruner();
 	}
 	
 	public DLPackage getPackage() {
 		return m_Package;
+	}
+	
+	public void accept(NodeVisitor v) {
+		for (Node root : m_Roots) {
+			root.accept(v);
+		}
 	}
 	
 	public Node makeRoot(BranchPoint dependency) {
@@ -39,24 +49,47 @@ public class TableauGraph {
 		m_Branches.add(branch);
 	}
 	
-	public void prune(BranchPoint restoreTarget) {
+	public void pruneTo(BranchPoint restoreTarget) {
+		//Prune nodes
+		m_PruneNodesCollector.reset(restoreTarget);
+		accept(m_PruneNodesCollector);
+		for (Node n : m_PruneNodesCollector.getNodes()) {
+			if (!m_Roots.remove(n)) {
+				n.removeFromParent();
+			}
+		}
 		
+		//Prune and reopen concepts on remaining node
+		m_ConceptPruner.reset(restoreTarget);
+		accept(m_ConceptPruner);
+		
+		//Prune branches
+		int targetIndex = restoreTarget.getBranchIndex();
+		for (int i = m_Branches.size() - 1; i > targetIndex; i--) {
+			Branch iBranch = m_Branches.get(i);
+			if (restoreTarget.beforeOrEquals(iBranch.getDependency())) {
+				m_Branches.remove(i);
+			}
+		}
+		
+		//Reopen remaining branches - those that do not depend on the restoreTarget
+		//but still have to be pruned to make sure that restoreTarget is the latest branch.
+		for (int i = m_Branches.size() - 1; i > targetIndex; i--) {
+			Branch iBranch = m_Branches.remove(i);
+			iBranch.reopenConceptOnNode();
+		}
 	}
 
 	public BranchPoint getEarliestClashCause() {
 		m_ClashDetector.reset();
-		for (Node root : m_Roots) {
-			root.accept(m_ClashDetector);
-		}
+		accept(m_ClashDetector);
 		Set<BranchPoint> clashCauses = m_ClashDetector.getClashCauses();
 		return clashCauses.isEmpty() ? null : Collections.min(clashCauses);
 	}
 	
 	public Set<Node> getOpenNodes() {
 		m_OpenNodesCollector.reset();
-		for (Node root : m_Roots) {
-			root.accept(m_OpenNodesCollector);
-		}
+		accept(m_OpenNodesCollector);
 		return m_OpenNodesCollector.getNodes();
 	}
 	
@@ -104,6 +137,48 @@ public class TableauGraph {
 			if (!n.isComplete()) {
 				m_Nodes.add(n);
 			}
+		}
+		
+	}
+
+	private static class PruneNodesCollector implements NodeVisitor {
+		
+		private Set<Node> m_Nodes;
+		private BranchPoint m_RestoreTarget;
+		
+		public PruneNodesCollector() {
+			m_Nodes = CollectionUtil.makeSet();
+		}
+		
+		public void reset(BranchPoint restoreTarget) {
+			m_Nodes.clear();
+			m_RestoreTarget = restoreTarget;
+		}
+		
+		public Set<Node> getNodes() {
+			return m_Nodes;
+		}
+
+		@Override
+		public void visit(Node n) {
+			if (m_RestoreTarget.beforeOrEquals(n.getDependency())) {
+				m_Nodes.add(n);
+			}
+		}
+		
+	}
+
+	private static class ConceptPruner implements NodeVisitor {
+		
+		private BranchPoint m_RestoreTarget;
+		
+		public void reset(BranchPoint restoreTarget) {
+			m_RestoreTarget = restoreTarget;
+		}
+		
+		@Override
+		public void visit(Node n) {
+			n.pruneAndReopenLabels(m_RestoreTarget);
 		}
 		
 	}

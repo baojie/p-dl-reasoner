@@ -38,4 +38,9 @@ public class Branch {
 		return true;
 	}
 
+	public void reopenConceptOnNode() {
+		TracedConceptSet tcSet = m_Node.getLabelsFor(m_Concept.getConcept().getClass());
+		tcSet.reopen(m_Concept);
+	}
+	
 }
