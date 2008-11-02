@@ -168,6 +168,11 @@ public class TableauManager {
 		public void visit(Or or) {
 			Branch branch = new Branch(m_Node, m_Concept);
 			m_Graph.addBranch(branch, m_Clock.getTime());
+			
+			for (Concept disjunct : or.getOperands()) {
+				if (m_Node.containsLabel(disjunct)) return;
+			}
+			
 			branch.tryNext();
 		}
 
