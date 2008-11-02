@@ -9,7 +9,27 @@ public class BranchPoint implements Comparable<BranchPoint> {
 	private int m_Time;
 	private DLPackage m_Package;
 	private int m_BranchIndex;
+
+	private BranchPoint() {}
 	
+	public BranchPoint(int time, DLPackage dlPackage, int branchIndex) {
+		m_Time = time;
+		m_Package = dlPackage;
+		m_BranchIndex = branchIndex;
+	}
+
+	public int getTime() {
+		return m_Time;
+	}
+	
+	public DLPackage getPackage() {
+		return m_Package;
+	}
+	
+	public int getBranchIndex() {
+		return m_BranchIndex;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof BranchPoint)) return false;

@@ -98,6 +98,10 @@ public class TableauManager {
 			m_ReceivedMsgs.remove().execute(m_MessageProcessor);
 		}		
 	}
+	
+	private void tryNextChoiceOn(BranchPoint branchPoint) {
+		
+	}
 
 	private void expandGraph() {
 		for (Node open : m_Graph.getOpenNodes()) {
@@ -132,6 +136,10 @@ public class TableauManager {
 			m_HasClashAtOrigin = true;
 		}
 		
+		broadcastClash(clashCause);
+	}
+
+	private void broadcastClash(BranchPoint clashCause) {
 		m_Server.broadcast(new Clash(clashCause));
 	}
 
@@ -164,6 +172,9 @@ public class TableauManager {
 
 		@Override
 		public void visit(Or or) {
+			Branch branch = new Branch(m_Node, m_Concept);
+			m_Graph.addBranch(branch, m_Clock.getTime());
+			branch.tryNext();
 		}
 
 		@Override
@@ -198,7 +209,12 @@ public class TableauManager {
 		
 		@Override
 		public void process(Clash msg) {
-			
+			BranchPoint restoreTarget = msg.getRestoreTarget();
+			m_Graph.prune(restoreTarget);
+			if (m_Package.equals(restoreTarget.getPackage())) {
+				m_Clock.setTime(restoreTarget.getTime());
+				tryNextChoiceOn(restoreTarget);
+			}
 		}
 
 		@Override

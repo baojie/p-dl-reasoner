@@ -73,7 +73,7 @@ public class Node {
 	
 	//Semantic methods
 	
-	public <T extends Concept> boolean addLabel(TracedConcept tc) {
+	public boolean addLabel(TracedConcept tc) {
 		TracedConceptSet labelSet = m_Labels.get(tc.getConcept().getClass());
 		if (labelSet == null) {
 			labelSet = new TracedConceptSet();

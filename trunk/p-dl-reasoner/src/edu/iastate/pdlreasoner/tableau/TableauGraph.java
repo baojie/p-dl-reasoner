@@ -19,6 +19,7 @@ public class TableauGraph {
 	public TableauGraph(DLPackage dlPackage) {
 		m_Package = dlPackage;
 		m_Roots = CollectionUtil.makeSet();
+		m_Branches = CollectionUtil.makeList();
 		m_ClashDetector = new ClashCauseCollector();
 		m_OpenNodesCollector = new OpenNodesCollector();
 	}
@@ -31,6 +32,15 @@ public class TableauGraph {
 		Node n = Node.make(this);
 		m_Roots.add(n);
 		return n;
+	}
+
+	public void addBranch(Branch branch, int time) {
+		branch.setBranchPoint(new BranchPoint(time, m_Package, m_Branches.size()));
+		m_Branches.add(branch);
+	}
+	
+	public void prune(BranchPoint restoreTarget) {
+		
 	}
 
 	public BranchPoint getEarliestClashCause() {
