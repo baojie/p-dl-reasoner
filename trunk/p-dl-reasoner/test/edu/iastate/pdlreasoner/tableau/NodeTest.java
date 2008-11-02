@@ -49,7 +49,7 @@ public class NodeTest {
 	public void testAddChildWith() {
 		assertFalse(m_Node.containsChild(role, atom));
 		assertEquals(Collections.EMPTY_SET, m_Node.getChildrenWith(role));
-		Node child = m_Node.addChildWith(role, atom);
+		Node child = m_Node.addChildBy(role, atom);
 		assertTrue(m_Node.containsChild(role, atom));
 		assertFalse(m_Node.containsChild(role, all));
 		assertEquals(Collections.singleton(child), m_Node.getChildrenWith(role));

@@ -28,8 +28,8 @@ public class TableauGraph {
 		return m_Package;
 	}
 	
-	public Node makeRoot() {
-		Node n = Node.make(this);
+	public Node makeRoot(BranchPoint dependency) {
+		Node n = Node.make(this, dependency);
 		m_Roots.add(n);
 		return n;
 	}

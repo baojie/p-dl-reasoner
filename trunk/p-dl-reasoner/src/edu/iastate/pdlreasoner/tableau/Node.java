@@ -21,18 +21,20 @@ public class Node {
 	private Node m_Parent;
 	private MultiValuedMap<Role, Node> m_Children;
 	//Semantic fields
+	private BranchPoint m_Dependency;
 	private Map<Class<? extends Concept>, TracedConceptSet> m_Labels;
 	private Set<BranchPoint> m_ClashCauses;
 	private NodeClashDetector m_ClashDetector;
 
 	
-	public static Node make(TableauGraph g) {
-		return new Node(g);
+	public static Node make(TableauGraph g, BranchPoint dependency) {
+		return new Node(g, dependency);
 	}
 	
-	private Node(TableauGraph graph) {
+	private Node(TableauGraph graph, BranchPoint dependency) {
 		m_Graph = graph;
 		m_Children = new MultiValuedMap<Role, Node>();
+		m_Dependency = dependency;
 		m_Labels = CollectionUtil.makeMap();
 		m_ClashCauses = CollectionUtil.makeSet();
 		m_ClashDetector = new NodeClashDetector();
@@ -62,16 +64,19 @@ public class Node {
 		return CollectionUtil.emptySetIfNull(m_Children.get(r));
 	}
 	
-	public Node addChildWith(Role r, TracedConcept tc) {
-		Node child = make(m_Graph);
+	public Node addChildBy(Role r, BranchPoint dependency) {
+		Node child = make(m_Graph, dependency);
 		child.m_Parent = this;
 		m_Children.add(r, child);
-		child.addLabel(tc);
 		return child;
 	}
 	
 	
 	//Semantic methods
+	
+	public BranchPoint getDependency() {
+		return m_Dependency;
+	}
 	
 	public boolean addLabel(TracedConcept tc) {
 		TracedConceptSet labelSet = m_Labels.get(tc.getConcept().getClass());

@@ -1,7 +1,6 @@
 package edu.iastate.pdlreasoner.tableau;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
@@ -24,14 +23,12 @@ import edu.iastate.pdlreasoner.tableau.messaging.CReport;
 import edu.iastate.pdlreasoner.tableau.messaging.Clash;
 import edu.iastate.pdlreasoner.tableau.messaging.Message;
 import edu.iastate.pdlreasoner.tableau.messaging.MessageProcessor;
-import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauManager {
 	
 	private TableauServer m_Server;
 	private DLPackage m_Package;
 	private TBox m_TBox;
-	private List<TracedConcept> m_TracedUC;
 	private TableauGraph m_Graph;
 	private Clock m_Clock;
 	private boolean m_HasToken;
@@ -44,10 +41,6 @@ public class TableauManager {
 	public TableauManager(KnowledgeBase kb) {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
-		m_TracedUC = CollectionUtil.makeList();
-		for (Concept uc : m_TBox.getUC()) {
-			m_TracedUC.add(TracedConcept.makeOrigin(uc));
-		}
 		m_Graph = new TableauGraph(m_Package);
 		m_Clock = new Clock();
 		m_HasToken = false;
@@ -70,7 +63,7 @@ public class TableauManager {
 	}
 
 	public void addRootWith(Concept c) {
-		Node root = m_Graph.makeRoot();
+		Node root = m_Graph.makeRoot(BranchPoint.ORIGIN);
 		root.addLabel(TracedConcept.makeOrigin(c));
 		applyUniversalRestriction(root);
 	}
@@ -144,8 +137,9 @@ public class TableauManager {
 	}
 
 	private void applyUniversalRestriction(Node n) {
-		for (TracedConcept uc : m_TracedUC) {
-			n.addLabel(uc);
+		BranchPoint nodeDependency = n.getDependency();
+		for (Concept uc : m_TBox.getUC()) {
+			n.addLabel(new TracedConcept(uc, nodeDependency));
 		}
 	}
 
@@ -182,7 +176,8 @@ public class TableauManager {
 			Role role = someValues.getRole();
 			Concept filler = someValues.getFiller();
 			if (!m_Node.containsChild(role, filler)) {
-				Node child = m_Node.addChildWith(role, m_Concept.derive(filler));
+				Node child = m_Node.addChildBy(role, m_Concept.getDependency());
+				child.addLabel(m_Concept.derive(filler));
 				applyUniversalRestriction(child);
 				
 				for (TracedConcept tc : m_Node.getLabelsFor(AllValues.class).getExpanded()) {
