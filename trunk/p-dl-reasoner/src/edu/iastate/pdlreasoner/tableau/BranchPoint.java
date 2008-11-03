@@ -57,7 +57,7 @@ public class BranchPoint implements Comparable<BranchPoint> {
 		if (this == ORIGIN) {
 			return 0;
 		} else {
-			return m_Time << 1000 ^ m_Package.hashCode() ^ m_BranchIndex;
+			return (m_Time << 8) ^ m_Package.hashCode() ^ m_BranchIndex;
 		}
 	}
 	

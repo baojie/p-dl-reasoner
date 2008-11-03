@@ -35,13 +35,15 @@ public class TracedConcept extends Concept implements Comparable<TracedConcept> 
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		return m_Concept.equals(o);
+	public boolean equals(Object obj) {
+		if (!(obj instanceof TracedConcept)) return false;
+		TracedConcept o = (TracedConcept) obj;
+		return m_Concept.equals(o.m_Concept) && m_Dependency.equals(o.m_Dependency);
 	}
 	
 	@Override
 	public int hashCode() {
-		return m_Concept.hashCode();
+		return m_Concept.hashCode() ^ m_Dependency.hashCode();
 	}
 
 	@Override

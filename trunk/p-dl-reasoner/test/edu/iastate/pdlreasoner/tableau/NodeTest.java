@@ -8,6 +8,7 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
 import static edu.iastate.pdlreasoner.tableau.TracedConcept.makeOrigin;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
@@ -48,26 +49,37 @@ public class NodeTest {
 	}
 
 	@Test
-	public void testAddChildWith() {
+	public void testAddAndRemove() {
 		assertFalse(m_Node.containsChild(role, atom));
 		assertEquals(Collections.EMPTY_SET, m_Node.getChildrenWith(role));
+		
 		Node child = m_Node.addChildBy(role, BranchPoint.ORIGIN);
+		assertEquals(BranchPoint.ORIGIN, child.getDependency());
+		
 		child.addLabel(atomTC);
 		assertTrue(m_Node.containsChild(role, atom));
 		assertFalse(m_Node.containsChild(role, all));
 		assertEquals(Collections.singleton(Edge.make(m_Node, role, child)), m_Node.getChildrenWith(role));
+		
+		child.removeFromParent();
+		assertFalse(m_Node.containsChild(role, atom));
 	}
 
 	@Test
-	public void testAddLabel() {
+	public void testAddAndContainsLabel() {
 		assertFalse(m_Node.containsLabel(atom));
+		assertNull(m_Node.getTracedConceptWith(atom));
 		assertTrue(m_Node.addLabel(atomTC));
+		assertFalse(m_Node.addLabel(atomTC));
 		assertTrue(m_Node.containsLabel(atom));
+		assertEquals(atomTC, m_Node.getTracedConceptWith(atom));
 	}
 
 	@Test
 	public void testIsComplete() {
 		assertTrue(m_Node.isComplete());
+		m_Node.addLabel(atomTC);
+		assertFalse(m_Node.isComplete());
 	}
 
 	@Test
@@ -75,6 +87,9 @@ public class NodeTest {
 		assertTrue(m_Node.getClashCauses().isEmpty());
 		m_Node.addLabel(makeOrigin(Bottom.INSTANCE));
 		assertEquals(Collections.singleton(BranchPoint.ORIGIN), m_Node.getClashCauses());
+		
+		m_Node.clearClashCauses();
+		assertTrue(m_Node.getClashCauses().isEmpty());
 	}
 
 	@Test
