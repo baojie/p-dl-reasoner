@@ -146,8 +146,11 @@ public class TableauServerSinglePackageTest {
 	}
 
 	@Test
-	public void subclassOf() {
-		
+	public void subsetBlocking() {
+		SomeValues some = makeSomeValues(role, atoms[0]);
+		kb.addAxiom(top, some);
+		m_TableauServer.init();
+		assertTrue(m_TableauServer.isConsistent(p));
 	}
 
 }
