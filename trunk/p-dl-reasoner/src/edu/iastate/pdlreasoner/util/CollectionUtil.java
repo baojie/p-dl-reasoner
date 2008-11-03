@@ -42,7 +42,7 @@ public class CollectionUtil {
 	public static <T extends Object & Comparable<? super T>> T max(T... as) {
 		if (as.length == 0) return null;
 		T currentMax = as[0];
-		for (int i = as.length - 1; i >= 0; i--) {
+		for (int i = as.length - 1; i > 0; i--) {
 			if (currentMax.compareTo(as[i]) < 0) {
 				currentMax = as[i];
 			}
