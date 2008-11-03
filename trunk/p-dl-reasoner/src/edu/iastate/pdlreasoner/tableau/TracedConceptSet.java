@@ -74,4 +74,19 @@ public class TracedConceptSet {
 		}
 		return hasChanged;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Open:\n");
+		for (Concept key : m_Open.keySet()) {
+			builder.append(key).append("\n");
+		}
+		
+		builder.append("\nExpanded:\n");
+		for (Concept key : m_Expanded.keySet()) {
+			builder.append(key).append("\n");
+		}
+		return builder.toString();
+	}
 }

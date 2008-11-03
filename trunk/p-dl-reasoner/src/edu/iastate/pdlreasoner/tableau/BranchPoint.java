@@ -75,5 +75,18 @@ public class BranchPoint implements Comparable<BranchPoint> {
 			return m_BranchIndex - o.m_BranchIndex;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("(")
+			.append(m_Time)
+			.append(",")
+			.append(m_Package)
+			.append(",")
+			.append(m_BranchIndex)
+			.append(")");
+		return builder.toString();
+	}
 
 }
