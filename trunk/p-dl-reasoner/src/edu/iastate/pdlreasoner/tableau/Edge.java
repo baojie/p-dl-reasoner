@@ -30,4 +30,15 @@ public class Edge {
 		return m_Child;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Edge)) return false;
+		Edge o = (Edge) obj;
+		return m_Parent.equals(o.m_Parent) && m_Label.equals(o.m_Label) && m_Child.equals(o.m_Child);
+	}
+	
+	@Override
+	public int hashCode() {
+		return m_Parent.hashCode() ^ m_Label.hashCode() ^ m_Child.hashCode();
+	}
 }
