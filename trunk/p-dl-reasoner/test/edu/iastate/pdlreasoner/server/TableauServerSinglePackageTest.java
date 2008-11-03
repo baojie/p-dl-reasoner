@@ -71,7 +71,7 @@ public class TableauServerSinglePackageTest {
 	}
 	
 	@Test
-	public void bottom2() {
+	public void nestedClashesWithBottom() {
 		kb.addAxiom(top, atoms[0]);
 		kb.addAxiom(atoms[0], Bottom.INSTANCE);
 		m_TableauServer.init();
@@ -79,7 +79,7 @@ public class TableauServerSinglePackageTest {
 	}
 	
 	@Test
-	public void and() {
+	public void nestedClashesWithNegatedAtom() {
 		And bottom = makeAnd(atoms[1], negatedAtoms[1]);
 		kb.addAxiom(atoms[0], bottom);
 		m_TableauServer.init();
@@ -88,14 +88,23 @@ public class TableauServerSinglePackageTest {
 	}
 
 	@Test
-	public void andOr() {
+	public void and_Or1() {
 		Or negatedAtom0or1 = makeOr(negatedAtoms[0], negatedAtoms[1]);
 		kb.addAxiom(top, negatedAtom0or1);
 		m_TableauServer.init();
 		And atom0and1 = makeAnd(atoms[0], atoms[1]);
 		assertFalse(m_TableauServer.isSatisfiable(atom0and1, p));
 	}
-	
+
+	@Test
+	public void and_Or2() {
+		kb.addAxiom(top, atoms[0]);
+		m_TableauServer.init();
+		And bottom = makeAnd(atoms[0], negatedAtoms[0]);
+		Or or = makeOr(bottom, atoms[1]);
+		assertTrue(m_TableauServer.isSatisfiable(or, p));
+	}
+
 	@Test
 	public void nestedOr() {
 		Or atom01or2 = makeOr(makeAnd(atoms[0], atoms[1]), atoms[2]);
@@ -107,14 +116,35 @@ public class TableauServerSinglePackageTest {
 	}
 
 	@Test
-	public void some() {
+	public void some1() {
 		AllValues all = makeAllValues(role, negatedAtoms[0]);
 		kb.addAxiom(top, all);
 		m_TableauServer.init();
 		SomeValues some = makeSomeValues(role, atoms[0]);
 		assertFalse(m_TableauServer.isSatisfiable(some, p));
 	}
-	
+
+	@Test
+	public void some2() {
+		m_TableauServer.init();
+		AllValues all = makeAllValues(role, negatedAtoms[0]);
+		SomeValues some = makeSomeValues(role, atoms[0]);
+		And and = makeAnd(all, makeAnd(top, some));
+		assertFalse(m_TableauServer.isSatisfiable(and, p));
+	}
+
+	@Test
+	public void some_Or() {
+		AllValues all0 = makeAllValues(role, negatedAtoms[0]);
+		AllValues all1 = makeAllValues(role, negatedAtoms[1]);
+		kb.addAxiom(top, all0);
+		kb.addAxiom(top, all1);
+		m_TableauServer.init();
+		Or atom0or1 = makeOr(atoms[0], atoms[1]);
+		SomeValues some = makeSomeValues(role, atom0or1);
+		assertFalse(m_TableauServer.isSatisfiable(some, p));
+	}
+
 	@Test
 	public void subclassOf() {
 		
