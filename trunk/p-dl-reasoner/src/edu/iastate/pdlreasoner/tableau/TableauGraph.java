@@ -49,6 +49,10 @@ public class TableauGraph {
 		m_Branches.add(branch);
 	}
 	
+	public Branch getBranch(int index) {
+		return m_Branches.get(index);
+	}
+	
 	public void pruneTo(BranchPoint restoreTarget) {
 		//Prune nodes
 		m_PruneNodesCollector.reset(restoreTarget);
@@ -112,6 +116,7 @@ public class TableauGraph {
 		@Override
 		public void visit(Node n) {
 			m_ClashCauses.addAll(n.getClashCauses());
+			n.clearClashCauses();
 		}
 		
 	}

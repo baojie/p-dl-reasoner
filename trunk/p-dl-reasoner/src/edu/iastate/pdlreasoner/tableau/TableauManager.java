@@ -55,7 +55,8 @@ public class TableauManager {
 	}
 
 	public boolean isComplete() {
-		return m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty();
+		return m_ReceivedMsgs.isEmpty() && 
+			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
 	}
 	
 	public boolean hasClashAtOrigin() {
@@ -82,6 +83,8 @@ public class TableauManager {
 	
 	public void run() {
 		processMessages();
+		if (m_HasClashAtOrigin) return;
+		
 		expandGraph();
 		processClash();
 	}
@@ -93,7 +96,10 @@ public class TableauManager {
 	}
 	
 	private void tryNextChoiceOn(BranchPoint branchPoint) {
-		
+		Branch branch = m_Graph.getBranch(branchPoint.getBranchIndex());
+		if (!branch.tryNext()) {
+			broadcastClash(branch.getDependency());
+		}
 	}
 
 	private void expandGraph() {
@@ -123,11 +129,7 @@ public class TableauManager {
 	
 	private void processClash() {
 		BranchPoint clashCause = m_Graph.getEarliestClashCause();
-		if (clashCause == null) {
-			return;
-		} else if (clashCause == BranchPoint.ORIGIN) {
-			m_HasClashAtOrigin = true;
-		}
+		if (clashCause == null) return;
 		
 		broadcastClash(clashCause);
 	}
@@ -210,10 +212,14 @@ public class TableauManager {
 		@Override
 		public void process(Clash msg) {
 			BranchPoint restoreTarget = msg.getRestoreTarget();
-			m_Graph.pruneTo(restoreTarget);
-			if (m_Package.equals(restoreTarget.getPackage())) {
-				m_Clock.setTime(restoreTarget.getTime());
-				tryNextChoiceOn(restoreTarget);
+			if (restoreTarget == BranchPoint.ORIGIN) {
+				m_HasClashAtOrigin = true;
+			} else {
+				m_Graph.pruneTo(restoreTarget);
+				if (m_Package.equals(restoreTarget.getPackage())) {
+					m_Clock.setTime(restoreTarget.getTime());
+					tryNextChoiceOn(restoreTarget);
+				}
 			}
 		}
 

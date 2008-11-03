@@ -128,6 +128,10 @@ public class Node {
 		return m_ClashCauses;
 	}
 	
+	public void clearClashCauses() {
+		m_ClashCauses.clear();
+	}
+	
 	public void pruneAndReopenLabels(BranchPoint restoreTarget) {
 		boolean hasChanged = false;
 		for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {

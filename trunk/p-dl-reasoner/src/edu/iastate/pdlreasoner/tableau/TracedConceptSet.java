@@ -54,7 +54,8 @@ public class TracedConceptSet {
 	}
 	
 	public void reopen(TracedConcept tc) {
-		
+		m_Expanded.remove(tc.getConcept());
+		m_Open.put(tc.getConcept(), tc);
 	}
 
 	public void reopenAll() {
