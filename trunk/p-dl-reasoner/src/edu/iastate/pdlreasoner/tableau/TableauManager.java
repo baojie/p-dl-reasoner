@@ -73,8 +73,8 @@ public class TableauManager {
 		m_Clock.copy(c);
 	}
 	
-	public void setToken(boolean v) {
-		m_HasToken = v;
+	public void receiveToken() {
+		m_HasToken = true;
 	}
 	
 	public void receive(Message msg) {
@@ -87,6 +87,10 @@ public class TableauManager {
 		
 		expandGraph();
 		processClash();
+		
+		if (m_HasToken) {
+			releaseToken();
+		}
 	}
 
 	private void processMessages() {
@@ -136,6 +140,11 @@ public class TableauManager {
 
 	private void broadcastClash(BranchPoint clashCause) {
 		m_Server.broadcast(new Clash(clashCause));
+	}
+
+	private void releaseToken() {
+		m_HasToken = false;
+		m_Server.passToken(this, m_Clock);
 	}
 
 	private void applyUniversalRestriction(Node n) {

@@ -56,14 +56,14 @@ public class TableauServerSinglePackageTest {
 	}
 
 	@Test
-	public void inconsistency1() {
+	public void bottom1() {
 		kb.addAxiom(top, Bottom.INSTANCE);
 		m_TableauServer.init();
 		assertFalse(m_TableauServer.isConsistent(p));
 	}
 	
 	@Test
-	public void inconsistency2() {
+	public void bottom2() {
 		kb.addAxiom(top, atoms[0]);
 		kb.addAxiom(atoms[0], Bottom.INSTANCE);
 		m_TableauServer.init();
@@ -81,11 +81,21 @@ public class TableauServerSinglePackageTest {
 
 	@Test
 	public void andOr() {
-		Or negatedAtom01 = makeOr(negatedAtoms[0], negatedAtoms[1]);
-		kb.addAxiom(top, negatedAtom01);
+		Or negatedAtom0or1 = makeOr(negatedAtoms[0], negatedAtoms[1]);
+		kb.addAxiom(top, negatedAtom0or1);
 		m_TableauServer.init();
-		And atom01 = makeAnd(atoms[0], atoms[1]);
-		assertFalse(m_TableauServer.isSatisfiable(atom01, p));
+		And atom0and1 = makeAnd(atoms[0], atoms[1]);
+		assertFalse(m_TableauServer.isSatisfiable(atom0and1, p));
+	}
+	
+	@Test
+	public void nestedOr() {
+		Or atom01or2 = makeOr(makeAnd(atoms[0], atoms[1]), atoms[2]);
+		Or negatedAtom0or1 = makeOr(negatedAtoms[0], negatedAtoms[1]);
+		kb.addAxiom(top, atom01or2);
+		kb.addAxiom(top, negatedAtom0or1);
+		m_TableauServer.init();
+		assertTrue(m_TableauServer.isConsistent(p));
 	}
 
 	@Test
