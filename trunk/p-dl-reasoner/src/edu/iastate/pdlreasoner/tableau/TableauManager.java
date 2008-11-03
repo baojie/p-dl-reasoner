@@ -196,10 +196,13 @@ public class TableauManager {
 				child.addLabel(m_Concept.derive(filler));
 				applyUniversalRestriction(child);
 				
-				for (TracedConcept tc : m_Node.getLabelsFor(AllValues.class).getExpanded()) {
-					AllValues all = (AllValues) tc.getConcept();
-					if (role.equals(all.getRole())) {
-						child.addLabel(tc.derive(all.getFiller()));
+				TracedConceptSet allValuesSet = m_Node.getLabelsFor(AllValues.class);
+				if (allValuesSet != null) {
+					for (TracedConcept tc : allValuesSet.getExpanded()) {
+						AllValues all = (AllValues) tc.getConcept();
+						if (role.equals(all.getRole())) {
+							child.addLabel(tc.derive(all.getFiller()));
+						}
 					}
 				}
 			}

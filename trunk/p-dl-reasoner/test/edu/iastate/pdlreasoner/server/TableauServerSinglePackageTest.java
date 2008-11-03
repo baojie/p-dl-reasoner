@@ -1,10 +1,13 @@
 package edu.iastate.pdlreasoner.server;
 
+import static edu.iastate.pdlreasoner.model.ModelFactory.makeAllValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAnd;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeNegation;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,12 +18,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
+import edu.iastate.pdlreasoner.model.Role;
+import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
 
 public class TableauServerSinglePackageTest {
@@ -31,6 +37,7 @@ public class TableauServerSinglePackageTest {
 	private Top top;
 	private Atom[] atoms;
 	private Negation[] negatedAtoms;
+	private Role role;
 	
 	@Before
 	public void setUp() {
@@ -47,6 +54,7 @@ public class TableauServerSinglePackageTest {
 		for (int i = 0; i < negatedAtoms.length; i++) {
 			negatedAtoms[i] = makeNegation(p, atoms[i]);
 		}
+		role = makeRole(URI.create("#role"));
 	}
 
 	@Test
@@ -98,6 +106,15 @@ public class TableauServerSinglePackageTest {
 		assertTrue(m_TableauServer.isConsistent(p));
 	}
 
+	@Test
+	public void some() {
+		AllValues all = makeAllValues(role, negatedAtoms[0]);
+		kb.addAxiom(top, all);
+		m_TableauServer.init();
+		SomeValues some = makeSomeValues(role, atoms[0]);
+		assertFalse(m_TableauServer.isSatisfiable(some, p));
+	}
+	
 	@Test
 	public void subclassOf() {
 		
