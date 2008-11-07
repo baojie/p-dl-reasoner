@@ -31,6 +31,10 @@ public class CollectionUtil {
 		return set;
 	}
 	
+	public static <T> boolean isSubsetOf(Collection<T> a, Collection<T> b) {
+		return (a.size() <= b.size()) && (b.containsAll(a));
+	}
+	
 	public static <T> Set<T> copy(Collection<? extends T> a) {
 		return new HashSet<T>(a);
 	}

@@ -46,6 +46,17 @@ public class TracedConceptSet {
 	public Collection<TracedConcept> getExpanded() {
 		return m_Expanded.values();
 	}
+	
+	public boolean containsAllConcepts(TracedConceptSet o) {
+		return containsAllConcepts(o.m_Open.keySet()) && containsAllConcepts(o.m_Expanded.keySet());
+	}
+	
+	private boolean containsAllConcepts(Set<Concept> cs) {
+		for (Concept c : cs) {
+			if (getTracedConceptWith(c) == null) return false;
+		}
+		return true;
+	}
 
 	public boolean prune(BranchPoint restoreTarget) {
 		boolean hasChanged = prune(restoreTarget, m_Open);

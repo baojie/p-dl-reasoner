@@ -12,6 +12,7 @@ public class TableauGraph {
 	private DLPackage m_Package;
 	private Set<Node> m_Roots;
 	private List<Branch> m_Branches;
+	private Blocking m_Blocking;
 	
 	private ClashCauseCollector m_ClashDetector;
 	private OpenNodesCollector m_OpenNodesCollector;
@@ -22,6 +23,7 @@ public class TableauGraph {
 		m_Package = dlPackage;
 		m_Roots = CollectionUtil.makeSet();
 		m_Branches = CollectionUtil.makeList();
+		m_Blocking = new Blocking();
 		m_ClashDetector = new ClashCauseCollector();
 		m_OpenNodesCollector = new OpenNodesCollector();
 		m_PruneNodesCollector = new PruneNodesCollector();
@@ -51,6 +53,10 @@ public class TableauGraph {
 	
 	public Branch getBranch(int index) {
 		return m_Branches.get(index);
+	}
+	
+	public boolean isBlocked(Node n) {
+		return m_Blocking.isBlocked(n);
 	}
 	
 	public void pruneTo(BranchPoint restoreTarget) {
@@ -121,7 +127,7 @@ public class TableauGraph {
 		
 	}
 
-	private static class OpenNodesCollector implements NodeVisitor {
+	private class OpenNodesCollector implements NodeVisitor {
 		
 		private Set<Node> m_Nodes;
 		
@@ -139,7 +145,7 @@ public class TableauGraph {
 
 		@Override
 		public void visit(Node n) {
-			if (!n.isComplete()) {
+			if (!n.isComplete() && !m_Blocking.isBlocked(n)) {
 				m_Nodes.add(n);
 			}
 		}

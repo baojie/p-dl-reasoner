@@ -1,5 +1,6 @@
 package edu.iastate.pdlreasoner.tableau;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -66,6 +67,16 @@ public class Node {
 		return CollectionUtil.emptySetIfNull(m_Children.get(r));
 	}
 	
+	public List<Node> getAncestors() {
+		List<Node> ancestors = CollectionUtil.makeList();
+		for (Edge e = m_ParentEdge; e != null; ) { 
+			Node parent = e.getParent();
+			ancestors.add(parent);
+			e = parent.m_ParentEdge;
+		}
+		return ancestors;
+	}
+	
 	public Node addChildBy(Role r, BranchPoint dependency) {
 		Node child = make(m_Graph, dependency);
 		Edge edge = Edge.make(this, r, child);
@@ -114,6 +125,18 @@ public class Node {
 		
 	public TracedConceptSet getLabelsFor(Class<? extends Concept> type) {
 		return m_Labels.get(type);
+	}
+	
+	public boolean isSubsetOf(Node o) {
+		if (!CollectionUtil.isSubsetOf(m_Labels.keySet(), o.m_Labels.keySet())) return false;
+		
+		Map<Class<? extends Concept>, TracedConceptSet> oLabels = o.m_Labels;
+		for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {
+			TracedConceptSet set = entry.getValue();
+			TracedConceptSet oSet = oLabels.get(entry.getKey());
+			if (!oSet.containsAllConcepts(set)) return false;
+		}
+		return true;
 	}
 		
 	public boolean isComplete() {
