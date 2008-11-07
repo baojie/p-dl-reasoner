@@ -78,6 +78,10 @@ public class BranchPoint implements Comparable<BranchPoint> {
 	
 	@Override
 	public String toString() {
+		if (this == ORIGIN) {
+			return "ORIGIN";
+		}
+		
 		StringBuilder builder = new StringBuilder();
 		builder.append("(")
 			.append(m_Time)

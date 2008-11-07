@@ -50,4 +50,15 @@ public class TracedConcept extends Concept implements Comparable<TracedConcept> 
 	public int compareTo(TracedConcept o) {
 		return m_Dependency.compareTo(o.m_Dependency);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[")
+			.append(m_Concept)
+			.append(", ")
+			.append(m_Dependency)
+			.append("]");
+		return builder.toString();
+	}
 }
