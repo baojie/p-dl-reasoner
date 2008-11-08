@@ -2,6 +2,7 @@ package edu.iastate.pdlreasoner.tableau;
 
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 
 public class TracedConcept extends Concept implements Comparable<TracedConcept> {
 

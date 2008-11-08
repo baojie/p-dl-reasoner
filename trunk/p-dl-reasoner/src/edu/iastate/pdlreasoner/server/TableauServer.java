@@ -15,8 +15,8 @@ import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.struct.ImportGraph;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.struct.Ring;
-import edu.iastate.pdlreasoner.tableau.Clock;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.tableau.branch.Clock;
 import edu.iastate.pdlreasoner.tableau.messaging.Message;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 

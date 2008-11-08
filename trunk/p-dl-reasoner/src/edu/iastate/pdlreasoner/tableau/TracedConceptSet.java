@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.iastate.pdlreasoner.model.Concept;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TracedConceptSet {

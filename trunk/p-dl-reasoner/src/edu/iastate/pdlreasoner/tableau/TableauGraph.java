@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.tableau.branch.Branch;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauGraph {
@@ -14,7 +16,7 @@ public class TableauGraph {
 	private List<Branch> m_Branches;
 	private Blocking m_Blocking;
 	
-	private ClashCauseCollector m_ClashDetector;
+	private ClashCauseCollector m_ClashCollector;
 	private OpenNodesCollector m_OpenNodesCollector;
 	private PruneNodesCollector m_PruneNodesCollector;
 	private ConceptPruner m_ConceptPruner;
@@ -24,7 +26,7 @@ public class TableauGraph {
 		m_Roots = CollectionUtil.makeSet();
 		m_Branches = CollectionUtil.makeList();
 		m_Blocking = new Blocking();
-		m_ClashDetector = new ClashCauseCollector();
+		m_ClashCollector = new ClashCauseCollector();
 		m_OpenNodesCollector = new OpenNodesCollector();
 		m_PruneNodesCollector = new PruneNodesCollector();
 		m_ConceptPruner = new ConceptPruner();
@@ -91,9 +93,9 @@ public class TableauGraph {
 	}
 
 	public BranchPoint getEarliestClashCause() {
-		m_ClashDetector.reset();
-		accept(m_ClashDetector);
-		Set<BranchPoint> clashCauses = m_ClashDetector.getClashCauses();
+		m_ClashCollector.reset();
+		accept(m_ClashCollector);
+		Set<BranchPoint> clashCauses = m_ClashCollector.getClashCauses();
 		return clashCauses.isEmpty() ? null : Collections.min(clashCauses);
 	}
 	

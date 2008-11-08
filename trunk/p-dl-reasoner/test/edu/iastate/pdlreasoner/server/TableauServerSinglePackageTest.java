@@ -147,10 +147,18 @@ public class TableauServerSinglePackageTest {
 
 	@Test
 	public void subsetBlocking() {
-		SomeValues some = makeSomeValues(role, atoms[0]);
-		kb.addAxiom(top, some);
+		kb.addAxiom(top, makeSomeValues(role, atoms[0]));
 		m_TableauServer.init();
 		assertTrue(m_TableauServer.isConsistent(p));
+	}
+
+	@Test
+	public void contractictionAtChild() {
+		kb.addAxiom(top, makeSomeValues(role, atoms[0]));
+		kb.addAxiom(atoms[0], atoms[1]);
+		m_TableauServer.init();
+		AllValues all = makeAllValues(role, negatedAtoms[1]);
+		assertFalse(m_TableauServer.isSatisfiable(all, p));
 	}
 
 }

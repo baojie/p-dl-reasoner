@@ -23,6 +23,7 @@ import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Role;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 
 public class NodeTest {
 	

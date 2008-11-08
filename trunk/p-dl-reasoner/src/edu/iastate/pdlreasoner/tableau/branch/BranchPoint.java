@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.tableau;
+package edu.iastate.pdlreasoner.tableau.branch;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
 

@@ -1,7 +1,10 @@
-package edu.iastate.pdlreasoner.tableau;
+package edu.iastate.pdlreasoner.tableau.branch;
 
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.Or;
+import edu.iastate.pdlreasoner.tableau.Node;
+import edu.iastate.pdlreasoner.tableau.TracedConcept;
+import edu.iastate.pdlreasoner.tableau.TracedConceptSet;
 
 public class Branch {
 
@@ -30,6 +33,7 @@ public class Branch {
 	}
 	
 	public boolean tryNext() {
+		System.out.println("Trying next(" + m_NextChoice + "): " + m_Concept);
 		if (m_NextChoice >= m_Disjuncts.length) return false;
 		
 		TracedConcept tracedDisjunct = new TracedConcept(m_Disjuncts[m_NextChoice], m_ThisPoint);

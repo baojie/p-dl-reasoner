@@ -1,6 +1,6 @@
 package edu.iastate.pdlreasoner.tableau.messaging;
 
-import edu.iastate.pdlreasoner.tableau.BranchPoint;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 
 public class Clash implements Message {
 

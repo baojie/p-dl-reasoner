@@ -15,6 +15,7 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class Node {
@@ -154,6 +155,13 @@ public class Node {
 		m_ClashCauses.clear();
 	}
 	
+	private void addClashCause(BranchPoint bp) {
+		if (bp == BranchPoint.ORIGIN) {
+			new IllegalArgumentException().printStackTrace();
+		}
+		m_ClashCauses.add(bp);
+	}
+	
 	public void pruneAndReopenLabels(BranchPoint restoreTarget) {
 		boolean hasChanged = false;
 		for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {
@@ -180,13 +188,14 @@ public class Node {
 		}
 		
 		public void detect(TracedConcept tc) {
+			System.out.println(tc);
 			m_Suspect = tc;
 			tc.accept(this);
 		}
 
 		@Override
 		public void visit(Bottom bottom) {
-			m_ClashCauses.add(m_Suspect.getDependency());
+			addClashCause(m_Suspect.getDependency());
 		}
 		
 		@Override
@@ -195,7 +204,7 @@ public class Node {
 			TracedConcept tc = getTracedConceptWith(negatedAtom);
 			if (tc != null) {
 				TracedConcept maxTC = CollectionUtil.max(m_Suspect, tc);
-				m_ClashCauses.add(maxTC.getDependency());
+				addClashCause(maxTC.getDependency());
 			}
 		}
 
@@ -206,7 +215,7 @@ public class Node {
 			TracedConcept tc = getTracedConceptWith(negatedConcept);
 			if (tc != null && m_HomePackage.equals(context)) {
 				TracedConcept maxTC = CollectionUtil.max(m_Suspect, tc);
-				m_ClashCauses.add(maxTC.getDependency());
+				addClashCause(maxTC.getDependency());
 			}
 		}
 	
