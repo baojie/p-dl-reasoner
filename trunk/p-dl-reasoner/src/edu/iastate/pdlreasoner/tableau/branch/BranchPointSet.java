@@ -1,10 +1,13 @@
 package edu.iastate.pdlreasoner.tableau.branch;
 
+import java.util.BitSet;
 import java.util.Comparator;
 
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
 public class BranchPointSet {
+	
+	private BitSet m_BranchPoints;
 
 	public static final BranchPointSet EMPTY = new BranchPointSet();
 	public static final Comparator<BranchPointSet> ORDER_BY_LATEST_BRANCH_POINT = new Comparator<BranchPointSet>() {
@@ -41,16 +44,20 @@ public class BranchPointSet {
 	}
 	
 	public BranchPointSet() {
+		m_BranchPoints = new BitSet();
 	}
 	
 	public BranchPointSet(BranchPoint bp) {
+		this();
+		m_BranchPoints.set(bp.getIndex());
 	}
 
-	public void union(BranchPointSet dependency) {
+	public void union(BranchPointSet o) {
+		m_BranchPoints.or(o.m_BranchPoints);
 	}
 	
 	public void remove(BranchPoint bp) {
-		
+		m_BranchPoints.clear(bp.getIndex());
 	}
 
 	public boolean hasSameOrAfter(BranchPoint restoreTarget) {
@@ -58,11 +65,11 @@ public class BranchPointSet {
 	}
 
 	public BranchPoint getLatestBranchPoint() {
-		return null;
+		return new BranchPoint(m_BranchPoints.length() - 1);
 	}
 
 	public boolean isEmpty() {
-		return false;
+		return m_BranchPoints.isEmpty();
 	}
 
 }
