@@ -1,6 +1,6 @@
 package edu.iastate.pdlreasoner.tableau.branch;
 
-public class Clock {
+public class BranchToken {
 	
 	private int m_Time;
 	
@@ -12,7 +12,7 @@ public class Clock {
 		m_Time = t;
 	}
 	
-	public void copy(Clock c) {
+	public void copy(BranchToken c) {
 		m_Time = c.m_Time;
 	}
 	

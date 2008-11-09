@@ -1,33 +1,20 @@
 package edu.iastate.pdlreasoner.tableau.branch;
 
-import edu.iastate.pdlreasoner.model.DLPackage;
 
 public class BranchPoint implements Comparable<BranchPoint> {
 	
 	public static final BranchPoint ORIGIN = new BranchPoint();
 
-	private int m_Time;
-	private DLPackage m_Package;
-	private int m_BranchIndex;
+	private int m_Index;
 
 	private BranchPoint() {}
 	
-	public BranchPoint(int time, DLPackage dlPackage, int branchIndex) {
-		m_Time = time;
-		m_Package = dlPackage;
-		m_BranchIndex = branchIndex;
+	public BranchPoint(int index) {
+		m_Index = index;
 	}
 
-	public int getTime() {
-		return m_Time;
-	}
-	
-	public DLPackage getPackage() {
-		return m_Package;
-	}
-	
-	public int getBranchIndex() {
-		return m_BranchIndex;
+	public int getIndex() {
+		return m_Index;
 	}
 	
 	public boolean beforeOrEquals(BranchPoint bp) {
@@ -45,9 +32,7 @@ public class BranchPoint implements Comparable<BranchPoint> {
 			if (o == ORIGIN) {
 				return false;
 			} else {
-				return m_Time == o.m_Time &&
-					m_Package.equals(o.m_Package) &&
-					m_BranchIndex == o.m_BranchIndex;
+				return m_Index == o.m_Index;
 			}
 		}
 	}
@@ -55,9 +40,9 @@ public class BranchPoint implements Comparable<BranchPoint> {
 	@Override
 	public int hashCode() {
 		if (this == ORIGIN) {
-			return 0;
+			return -1;
 		} else {
-			return (m_Time << 8) ^ m_Package.hashCode() ^ m_BranchIndex;
+			return m_Index;
 		}
 	}
 	
@@ -68,11 +53,7 @@ public class BranchPoint implements Comparable<BranchPoint> {
 		} else {
 			if (o == ORIGIN) return 1;
 			
-			int timeDiff = m_Time - o.m_Time;
-			if (timeDiff != 0) return timeDiff;
-			
-			//Both in the same package
-			return m_BranchIndex - o.m_BranchIndex;
+			return m_Index - o.m_Index;
 		}
 	}
 	
@@ -80,17 +61,9 @@ public class BranchPoint implements Comparable<BranchPoint> {
 	public String toString() {
 		if (this == ORIGIN) {
 			return "ORIGIN";
+		} else {
+			return String.valueOf(m_Index); 
 		}
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append("(")
-			.append(m_Time)
-			.append(",")
-			.append(m_Package)
-			.append(",")
-			.append(m_BranchIndex)
-			.append(")");
-		return builder.toString();
 	}
 
 }

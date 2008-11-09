@@ -20,7 +20,7 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.server.TableauServer;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
-import edu.iastate.pdlreasoner.tableau.branch.Clock;
+import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.messaging.CPush;
 import edu.iastate.pdlreasoner.tableau.messaging.CReport;
 import edu.iastate.pdlreasoner.tableau.messaging.Clash;
@@ -33,7 +33,7 @@ public class TableauManager {
 	private DLPackage m_Package;
 	private TBox m_TBox;
 	private TableauGraph m_Graph;
-	private Clock m_Clock;
+	private BranchToken m_Clock;
 	private boolean m_HasToken;
 	private Queue<Message> m_ReceivedMsgs;
 	private boolean m_HasClashAtOrigin;
@@ -45,7 +45,7 @@ public class TableauManager {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
 		m_Graph = new TableauGraph(m_Package);
-		m_Clock = new Clock();
+		m_Clock = new BranchToken();
 		m_HasToken = false;
 		m_ReceivedMsgs = new LinkedList<Message>();
 		m_HasClashAtOrigin = false;
@@ -72,7 +72,7 @@ public class TableauManager {
 		applyUniversalRestriction(root);
 	}
 	
-	public void synchronizeClockWith(Clock c) {
+	public void synchronizeClockWith(BranchToken c) {
 		m_Clock.copy(c);
 	}
 	
@@ -103,7 +103,7 @@ public class TableauManager {
 	}
 	
 	private void tryNextChoiceOn(BranchPoint branchPoint) {
-		Branch branch = m_Graph.getBranch(branchPoint.getBranchIndex());
+		Branch branch = m_Graph.getBranch(branchPoint.getIndex());
 		if (!branch.tryNext()) {
 			broadcastClash(branch.getDependency());
 		}
@@ -231,10 +231,10 @@ public class TableauManager {
 				m_HasClashAtOrigin = true;
 			} else {
 				m_Graph.pruneTo(restoreTarget);
-				if (m_Package.equals(restoreTarget.getPackage())) {
-					m_Clock.setTime(restoreTarget.getTime());
+				//if (m_Package.equals(restoreTarget.getPackage())) {
+					m_Clock.setTime(restoreTarget.getIndex());
 					tryNextChoiceOn(restoreTarget);
-				}
+				//}
 			}
 		}
 

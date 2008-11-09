@@ -49,7 +49,7 @@ public class TableauGraph {
 	}
 
 	public void addBranch(Branch branch, int time) {
-		branch.setBranchPoint(new BranchPoint(time, m_Package, m_Branches.size()));
+		branch.setBranchPoint(new BranchPoint(time));
 		m_Branches.add(branch);
 	}
 	
@@ -76,7 +76,7 @@ public class TableauGraph {
 		accept(m_ConceptPruner);
 		
 		//Prune branches
-		int targetIndex = restoreTarget.getBranchIndex();
+		int targetIndex = restoreTarget.getIndex();
 		for (int i = m_Branches.size() - 1; i > targetIndex; i--) {
 			Branch iBranch = m_Branches.get(i);
 			if (restoreTarget.beforeOrEquals(iBranch.getDependency())) {

@@ -16,7 +16,7 @@ import edu.iastate.pdlreasoner.struct.ImportGraph;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
-import edu.iastate.pdlreasoner.tableau.branch.Clock;
+import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.messaging.Message;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
@@ -26,7 +26,7 @@ public class TableauServer {
 	private ImportGraph m_Import;
 	private Map<DLPackage, TableauManager> m_Tableaux;
 	private Ring<TableauManager> m_TableauxRing;
-	private Clock m_GlobalClock;
+	private BranchToken m_GlobalClock;
 	
 	public TableauServer() {
 		m_KBs = CollectionUtil.makeList();
@@ -72,7 +72,7 @@ public class TableauServer {
 		}
 	}
 
-	public void passToken(TableauManager tab, Clock clock) {
+	public void passToken(TableauManager tab, BranchToken clock) {
 		m_GlobalClock.copy(clock);
 		m_GlobalClock.tick();
 		TableauManager next = m_TableauxRing.getNext(tab);
@@ -99,7 +99,7 @@ public class TableauServer {
 		}
 
 		m_TableauxRing = new Ring<TableauManager>(m_Tableaux.values());
-		m_GlobalClock = new Clock();
+		m_GlobalClock = new BranchToken();
 	}
 
 	private boolean hasClashAtOrigin() {
