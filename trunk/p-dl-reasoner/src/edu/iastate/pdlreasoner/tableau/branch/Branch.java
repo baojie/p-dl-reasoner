@@ -10,41 +10,55 @@ public class Branch {
 
 	private Node m_Node;
 	private TracedConcept m_Concept;
-	private int m_NextChoice;
 	private BranchPoint m_ThisPoint;
+	private int m_NextChoice;
 	
+	private BranchPointSet m_ThisPointSet;
 	private Concept[] m_Disjuncts;
+	private BranchPointSet[] m_DisjunctClashCause;
 	
-	public Branch(Node node, TracedConcept tc) {
+	public Branch(Node node, TracedConcept tc, BranchPoint bp) {
 		m_Node = node;
 		m_Concept = tc;
+		m_ThisPoint = bp;
 		m_NextChoice = 0;
 		
+		m_ThisPointSet = new BranchPointSet(bp);
 		Or or = (Or) tc.getConcept();
 		m_Disjuncts = or.getOperands();
-	}
-
-	public void setBranchPoint(BranchPoint branchPoint) {
-		m_ThisPoint = branchPoint;
+		m_DisjunctClashCause = new BranchPointSet[m_Disjuncts.length];
 	}
 	
-	public BranchPoint getDependency() {
+	public BranchPoint getBranchPoint() {
+		return m_ThisPoint;
+	}
+
+	public BranchPointSet getDependency() {
 		return m_Concept.getDependency();
 	}
 	
-	public boolean tryNext() {
-		System.out.println("Trying next(" + m_NextChoice + "): " + m_Concept);
-		if (m_NextChoice >= m_Disjuncts.length) return false;
+	public void tryNext() {
+		BranchPointSet dependency = null;
+		if (m_NextChoice == m_Disjuncts.length - 1) {
+			m_DisjunctClashCause[m_NextChoice] = m_Concept.getDependency();
+			dependency = BranchPointSet.union(m_DisjunctClashCause);
+			dependency.remove(m_ThisPoint);
+		} else {
+			dependency = m_ThisPointSet;
+		}
 		
-		TracedConcept tracedDisjunct = new TracedConcept(m_Disjuncts[m_NextChoice], m_ThisPoint);
+		TracedConcept tracedDisjunct = new TracedConcept(m_Disjuncts[m_NextChoice], dependency);
 		m_Node.addLabel(tracedDisjunct);
 		m_NextChoice++;
-		return true;
 	}
 
+	public void setLastClashCause(BranchPointSet clashCause) {
+		m_DisjunctClashCause[m_NextChoice - 1] = clashCause;
+	}
+	
 	public void reopenConceptOnNode() {
 		TracedConceptSet tcSet = m_Node.getLabelsFor(m_Concept.getConcept().getClass());
 		tcSet.reopen(m_Concept);
 	}
-	
+
 }

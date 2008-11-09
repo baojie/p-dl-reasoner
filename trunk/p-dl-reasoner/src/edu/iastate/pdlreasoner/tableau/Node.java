@@ -16,6 +16,7 @@ import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class Node {
@@ -25,17 +26,17 @@ public class Node {
 	private Edge m_ParentEdge;
 	private MultiValuedMap<Role, Edge> m_Children;
 	//Semantic fields
-	private BranchPoint m_Dependency;
+	private BranchPointSet m_Dependency;
 	private Map<Class<? extends Concept>, TracedConceptSet> m_Labels;
-	private Set<BranchPoint> m_ClashCauses;
+	private Set<BranchPointSet> m_ClashCauses;
 	private NodeClashDetector m_ClashDetector;
 
 	
-	public static Node make(TableauGraph g, BranchPoint dependency) {
+	public static Node make(TableauGraph g, BranchPointSet dependency) {
 		return new Node(g, dependency);
 	}
 	
-	private Node(TableauGraph graph, BranchPoint dependency) {
+	private Node(TableauGraph graph, BranchPointSet dependency) {
 		m_Graph = graph;
 		m_Children = new MultiValuedMap<Role, Edge>();
 		m_Dependency = dependency;
@@ -78,7 +79,7 @@ public class Node {
 		return ancestors;
 	}
 	
-	public Node addChildBy(Role r, BranchPoint dependency) {
+	public Node addChildBy(Role r, BranchPointSet dependency) {
 		Node child = make(m_Graph, dependency);
 		Edge edge = Edge.make(this, r, child);
 		child.m_ParentEdge = edge;
@@ -96,7 +97,7 @@ public class Node {
 	
 	//Semantic methods
 	
-	public BranchPoint getDependency() {
+	public BranchPointSet getDependency() {
 		return m_Dependency;
 	}
 	
@@ -147,7 +148,7 @@ public class Node {
 		return true;
 	}
 	
-	public Set<BranchPoint> getClashCauses() {
+	public Set<BranchPointSet> getClashCauses() {
 		return m_ClashCauses;
 	}
 	
@@ -155,11 +156,8 @@ public class Node {
 		m_ClashCauses.clear();
 	}
 	
-	private void addClashCause(BranchPoint bp) {
-		if (bp == BranchPoint.ORIGIN) {
-			new IllegalArgumentException().printStackTrace();
-		}
-		m_ClashCauses.add(bp);
+	private void addClashCause(TracedConcept... clashes) {
+		m_ClashCauses.add(BranchPointSet.unionDependencies(clashes));
 	}
 	
 	public void pruneAndReopenLabels(BranchPoint restoreTarget) {
@@ -188,14 +186,13 @@ public class Node {
 		}
 		
 		public void detect(TracedConcept tc) {
-			System.out.println(tc);
 			m_Suspect = tc;
 			tc.accept(this);
 		}
 
 		@Override
 		public void visit(Bottom bottom) {
-			addClashCause(m_Suspect.getDependency());
+			addClashCause(m_Suspect);
 		}
 		
 		@Override
@@ -203,8 +200,7 @@ public class Node {
 			Negation negatedAtom = ModelFactory.makeNegation(m_HomePackage, atom);
 			TracedConcept tc = getTracedConceptWith(negatedAtom);
 			if (tc != null) {
-				TracedConcept maxTC = CollectionUtil.max(m_Suspect, tc);
-				addClashCause(maxTC.getDependency());
+				addClashCause(m_Suspect, tc);
 			}
 		}
 
@@ -214,8 +210,7 @@ public class Node {
 			Concept negatedConcept = negation.getNegatedConcept();
 			TracedConcept tc = getTracedConceptWith(negatedConcept);
 			if (tc != null && m_HomePackage.equals(context)) {
-				TracedConcept maxTC = CollectionUtil.max(m_Suspect, tc);
-				addClashCause(maxTC.getDependency());
+				addClashCause(m_Suspect, tc);
 			}
 		}
 	

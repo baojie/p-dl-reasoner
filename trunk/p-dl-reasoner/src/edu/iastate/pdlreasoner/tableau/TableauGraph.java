@@ -7,6 +7,7 @@ import java.util.Set;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauGraph {
@@ -42,19 +43,30 @@ public class TableauGraph {
 		}
 	}
 	
-	public Node makeRoot(BranchPoint dependency) {
+	public Node makeRoot(BranchPointSet dependency) {
 		Node n = Node.make(this, dependency);
 		m_Roots.add(n);
 		return n;
 	}
 
-	public void addBranch(Branch branch, int time) {
-		branch.setBranchPoint(new BranchPoint(time));
+	public void addBranch(Branch branch) {
 		m_Branches.add(branch);
 	}
 	
-	public Branch getBranch(int index) {
-		return m_Branches.get(index);
+	public boolean hasBranch(BranchPoint bp) {
+		for (int i = m_Branches.size() - 1; i >= 0; i--) {
+			int compare = bp.compareTo(m_Branches.get(i).getBranchPoint());
+			if (compare == 0) {
+				return true;
+			} else if (compare > 0) {
+				return false;
+			}			
+		}
+		return false;
+	}
+
+	public Branch getLastBranch() {
+		return m_Branches.get(m_Branches.size() - 1);
 	}
 	
 	public boolean isBlocked(Node n) {
@@ -76,27 +88,31 @@ public class TableauGraph {
 		accept(m_ConceptPruner);
 		
 		//Prune branches
-		int targetIndex = restoreTarget.getIndex();
-		for (int i = m_Branches.size() - 1; i > targetIndex; i--) {
+		for (int i = m_Branches.size() - 1; i >= 0; i--) {
 			Branch iBranch = m_Branches.get(i);
-			if (restoreTarget.beforeOrEquals(iBranch.getDependency())) {
+			if (iBranch.getDependency().hasSameOrAfter(restoreTarget)) {
 				m_Branches.remove(i);
+			} else {
+				break;
 			}
 		}
 		
 		//Reopen remaining branches - those that do not depend on the restoreTarget
 		//but still have to be pruned to make sure that restoreTarget is the latest branch.
-		for (int i = m_Branches.size() - 1; i > targetIndex; i--) {
-			Branch iBranch = m_Branches.remove(i);
+		for (int i = m_Branches.size() - 1; i >= 0; i--) {
+			Branch iBranch = m_Branches.get(i);
+			if (restoreTarget.equals(iBranch)) break;
+			
+			m_Branches.remove(i);
 			iBranch.reopenConceptOnNode();
 		}
 	}
 
-	public BranchPoint getEarliestClashCause() {
+	public BranchPointSet getEarliestClashCause() {
 		m_ClashCollector.reset();
 		accept(m_ClashCollector);
-		Set<BranchPoint> clashCauses = m_ClashCollector.getClashCauses();
-		return clashCauses.isEmpty() ? null : Collections.min(clashCauses);
+		Set<BranchPointSet> clashCauses = m_ClashCollector.getClashCauses();
+		return clashCauses.isEmpty() ? null : Collections.min(clashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
 	}
 	
 	public Set<Node> getOpenNodes() {
@@ -107,7 +123,7 @@ public class TableauGraph {
 	
 	private static class ClashCauseCollector implements NodeVisitor {
 		
-		private Set<BranchPoint> m_ClashCauses;
+		private Set<BranchPointSet> m_ClashCauses;
 		
 		public ClashCauseCollector() {
 			m_ClashCauses = CollectionUtil.makeSet();
@@ -117,7 +133,7 @@ public class TableauGraph {
 			m_ClashCauses.clear();
 		}
 		
-		public Set<BranchPoint> getClashCauses() {
+		public Set<BranchPointSet> getClashCauses() {
 			return m_ClashCauses;
 		}
 
@@ -174,7 +190,7 @@ public class TableauGraph {
 
 		@Override
 		public void visit(Node n) {
-			if (m_RestoreTarget.beforeOrEquals(n.getDependency())) {
+			if (n.getDependency().hasSameOrAfter(m_RestoreTarget)) {
 				m_Nodes.add(n);
 			}
 		}

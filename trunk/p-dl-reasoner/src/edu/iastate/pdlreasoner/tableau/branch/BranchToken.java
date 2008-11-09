@@ -2,22 +2,24 @@ package edu.iastate.pdlreasoner.tableau.branch;
 
 public class BranchToken {
 	
-	private int m_Time;
-	
-	public int getTime() {
-		return m_Time;
+	private int m_NextIndex;
+
+	private BranchToken(int index) {
+		m_NextIndex = index;
 	}
 	
-	public void setTime(int t) {
-		m_Time = t;
+	public static BranchToken make() {
+		return new BranchToken(0);
 	}
-	
-	public void copy(BranchToken c) {
-		m_Time = c.m_Time;
+
+	public static BranchToken make(BranchPoint restoreTarget) {
+		return new BranchToken(restoreTarget.getIndex() + 1);
 	}
-	
-	public void tick() {
-		m_Time++;
+
+	public BranchPoint makeNextBranchPoint() {
+		BranchPoint bp = new BranchPoint(m_NextIndex);
+		m_NextIndex++;
+		return bp;
 	}
-	
+
 }

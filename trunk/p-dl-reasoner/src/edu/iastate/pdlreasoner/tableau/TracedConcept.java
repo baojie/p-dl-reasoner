@@ -2,20 +2,21 @@ package edu.iastate.pdlreasoner.tableau;
 
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
-import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 
-public class TracedConcept extends Concept implements Comparable<TracedConcept> {
+
+public class TracedConcept {
 
 	private Concept m_Concept;
-	private BranchPoint m_Dependency;
+	private BranchPointSet m_Dependency;
 	
-	public TracedConcept(Concept c, BranchPoint depends) {
+	public TracedConcept(Concept c, BranchPointSet depends) {
 		m_Concept = c;
 		m_Dependency = depends;
 	}
 	
 	public static TracedConcept makeOrigin(Concept c) {
-		return new TracedConcept(c, BranchPoint.ORIGIN);
+		return new TracedConcept(c, BranchPointSet.EMPTY);
 	}
 	
 	public TracedConcept derive(Concept c) {
@@ -26,11 +27,10 @@ public class TracedConcept extends Concept implements Comparable<TracedConcept> 
 		return m_Concept;
 	}
 	
-	public BranchPoint getDependency() {
+	public BranchPointSet getDependency() {
 		return m_Dependency;
 	}
 
-	@Override
 	public void accept(ConceptVisitor visitor) {
 		m_Concept.accept(visitor);
 	}
@@ -47,11 +47,6 @@ public class TracedConcept extends Concept implements Comparable<TracedConcept> 
 		return m_Concept.hashCode() ^ m_Dependency.hashCode();
 	}
 
-	@Override
-	public int compareTo(TracedConcept o) {
-		return m_Dependency.compareTo(o.m_Dependency);
-	}
-	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

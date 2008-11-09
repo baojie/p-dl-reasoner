@@ -1,17 +1,17 @@
 package edu.iastate.pdlreasoner.tableau.messaging;
 
-import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 
 public class Clash implements Message {
 
-	private BranchPoint m_RestoreTarget;
+	private BranchPointSet m_Cause;
 
-	public Clash(BranchPoint bp) {
-		m_RestoreTarget = bp;
+	public Clash(BranchPointSet cause) {
+		m_Cause = cause;
 	}
 	
-	public BranchPoint getRestoreTarget() {
-		return m_RestoreTarget;
+	public BranchPointSet getCause() {
+		return m_Cause;
 	}
 
 	@Override

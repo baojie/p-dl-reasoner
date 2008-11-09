@@ -20,6 +20,7 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.server.TableauServer;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.messaging.CPush;
 import edu.iastate.pdlreasoner.tableau.messaging.CReport;
@@ -33,8 +34,7 @@ public class TableauManager {
 	private DLPackage m_Package;
 	private TBox m_TBox;
 	private TableauGraph m_Graph;
-	private BranchToken m_Clock;
-	private boolean m_HasToken;
+	private BranchToken m_Token;
 	private Queue<Message> m_ReceivedMsgs;
 	private boolean m_HasClashAtOrigin;
 	
@@ -45,8 +45,7 @@ public class TableauManager {
 		m_Package = kb.getPackage();
 		m_TBox = kb.getTBox();
 		m_Graph = new TableauGraph(m_Package);
-		m_Clock = new BranchToken();
-		m_HasToken = false;
+		m_Token = null;
 		m_ReceivedMsgs = new LinkedList<Message>();
 		m_HasClashAtOrigin = false;
 		m_ConceptExpander = new ConceptExpander();
@@ -62,36 +61,50 @@ public class TableauManager {
 			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
 	}
 	
+	public boolean hasPendingMessages() {
+		return !m_ReceivedMsgs.isEmpty();
+	}
+	
 	public boolean hasClashAtOrigin() {
 		return m_HasClashAtOrigin;
 	}
 
 	public void addRootWith(Concept c) {
-		Node root = m_Graph.makeRoot(BranchPoint.ORIGIN);
+		Node root = m_Graph.makeRoot(BranchPointSet.EMPTY);
 		root.addLabel(TracedConcept.makeOrigin(c));
 		applyUniversalRestriction(root);
 	}
 	
-	public void synchronizeClockWith(BranchToken c) {
-		m_Clock.copy(c);
-	}
-	
-	public void receiveToken() {
-		m_HasToken = true;
+	public void receiveToken(BranchToken tok) {
+		m_Token = tok;
 	}
 	
 	public void receive(Message msg) {
 		m_ReceivedMsgs.offer(msg);
 	}
 	
+	public boolean isOwnerOf(BranchPointSet clashCause) {
+		return m_Graph.hasBranch(clashCause.getLatestBranchPoint());
+	}
+	
+	public void tryNextChoiceOnClashedBranchWith(BranchPointSet clashCause) {
+		Branch branch = m_Graph.getLastBranch();
+		branch.setLastClashCause(clashCause);
+		branch.tryNext();
+	}
+
 	public void run() {
 		processMessages();
 		if (m_HasClashAtOrigin) return;
+		if (m_Server.isSynchronizingForClash()) {
+			processClash();
+			return;
+		}
 		
 		expandGraph();
 		processClash();
 		
-		if (m_HasToken) {
+		if (m_Token != null) {
 			releaseToken();
 		}
 	}
@@ -102,13 +115,6 @@ public class TableauManager {
 		}		
 	}
 	
-	private void tryNextChoiceOn(BranchPoint branchPoint) {
-		Branch branch = m_Graph.getBranch(branchPoint.getIndex());
-		if (!branch.tryNext()) {
-			broadcastClash(branch.getDependency());
-		}
-	}
-
 	private void expandGraph() {
 		for (Node open : m_Graph.getOpenNodes()) {
 			m_ConceptExpander.reset(open);
@@ -120,7 +126,7 @@ public class TableauManager {
 			expand(open.getLabelsFor(And.class));
 			expand(open.getLabelsFor(SomeValues.class));
 			expand(open.getLabelsFor(AllValues.class));
-			if (m_HasToken) {
+			if (m_Token != null) {
 				expand(open.getLabelsFor(Or.class));
 			}
 		}
@@ -135,23 +141,20 @@ public class TableauManager {
 	}
 	
 	private void processClash() {
-		BranchPoint clashCause = m_Graph.getEarliestClashCause();
+		BranchPointSet clashCause = m_Graph.getEarliestClashCause();
 		if (clashCause == null) return;
 		
-		broadcastClash(clashCause);
-	}
-
-	private void broadcastClash(BranchPoint clashCause) {
-		m_Server.broadcast(new Clash(clashCause));
+		m_Server.processClash(clashCause);
 	}
 
 	private void releaseToken() {
-		m_HasToken = false;
-		m_Server.passToken(this, m_Clock);
+		BranchToken temp = m_Token;
+		m_Token = null;
+		m_Server.returnTokenFrom(this, temp);
 	}
 
 	private void applyUniversalRestriction(Node n) {
-		BranchPoint nodeDependency = n.getDependency();
+		BranchPointSet nodeDependency = n.getDependency();
 		for (Concept uc : m_TBox.getUC()) {
 			n.addLabel(new TracedConcept(uc, nodeDependency));
 		}
@@ -180,8 +183,8 @@ public class TableauManager {
 
 		@Override
 		public void visit(Or or) {
-			Branch branch = new Branch(m_Node, m_Concept);
-			m_Graph.addBranch(branch, m_Clock.getTime());
+			Branch branch = new Branch(m_Node, m_Concept, m_Token.makeNextBranchPoint());
+			m_Graph.addBranch(branch);
 			
 			for (Concept disjunct : or.getOperands()) {
 				if (m_Node.containsLabel(disjunct)) return;
@@ -204,7 +207,8 @@ public class TableauManager {
 					for (TracedConcept tc : allValuesSet.getExpanded()) {
 						AllValues all = (AllValues) tc.getConcept();
 						if (role.equals(all.getRole())) {
-							child.addLabel(tc.derive(all.getFiller()));
+							BranchPointSet unionDepends = BranchPointSet.union(m_Node.getDependency(), tc.getDependency());
+							child.addLabel(new TracedConcept(all.getFiller(), unionDepends));
 						}
 					}
 				}
@@ -216,7 +220,9 @@ public class TableauManager {
 			Role role = allValues.getRole();
 			Concept filler = allValues.getFiller();
 			for (Edge edge : m_Node.getChildrenWith(role)) {
-				edge.getChild().addLabel(m_Concept.derive(filler));
+				Node child = edge.getChild();
+				BranchPointSet unionDepends = BranchPointSet.union(child.getDependency(), m_Concept.getDependency());
+				child.addLabel(new TracedConcept(filler, unionDepends));
 			}
 		}
 
@@ -226,15 +232,12 @@ public class TableauManager {
 		
 		@Override
 		public void process(Clash msg) {
-			BranchPoint restoreTarget = msg.getRestoreTarget();
-			if (restoreTarget == BranchPoint.ORIGIN) {
+			BranchPointSet clashCause = msg.getCause();
+			if (clashCause.isEmpty()) {
 				m_HasClashAtOrigin = true;
 			} else {
+				BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
 				m_Graph.pruneTo(restoreTarget);
-				//if (m_Package.equals(restoreTarget.getPackage())) {
-					m_Clock.setTime(restoreTarget.getIndex());
-					tryNextChoiceOn(restoreTarget);
-				//}
 			}
 		}
 

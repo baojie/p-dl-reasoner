@@ -79,7 +79,7 @@ public class TracedConceptSet {
 		boolean hasChanged = false;
 		for (Iterator<TracedConcept> it = map.values().iterator(); it.hasNext(); ) {
 			TracedConcept tc = it.next();
-			if (restoreTarget.beforeOrEquals(tc.getDependency())) {
+			if (tc.getDependency().hasSameOrAfter(restoreTarget)) {
 				it.remove();
 				hasChanged = true;
 			}

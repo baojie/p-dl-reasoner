@@ -1,5 +1,6 @@
 package edu.iastate.pdlreasoner.server;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,8 +17,9 @@ import edu.iastate.pdlreasoner.struct.ImportGraph;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
-import edu.iastate.pdlreasoner.tableau.messaging.Message;
+import edu.iastate.pdlreasoner.tableau.messaging.Clash;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
@@ -26,7 +28,7 @@ public class TableauServer {
 	private ImportGraph m_Import;
 	private Map<DLPackage, TableauManager> m_Tableaux;
 	private Ring<TableauManager> m_TableauxRing;
-	private BranchToken m_GlobalClock;
+	private Set<BranchPointSet> m_ClashCauses;
 	
 	public TableauServer() {
 		m_KBs = CollectionUtil.makeList();
@@ -49,8 +51,7 @@ public class TableauServer {
 		makeTableaux();
 		TableauManager witTableau = m_Tableaux.get(witness);
 		witTableau.addRootWith(c);
-		witTableau.synchronizeClockWith(m_GlobalClock);
-		witTableau.receiveToken();
+		witTableau.receiveToken(BranchToken.make());
 		completeAll();
 		return !hasClashAtOrigin();
 	}
@@ -66,18 +67,24 @@ public class TableauServer {
 		return !isSatisfiable(sat, witness);
 	}
 	
-	public void broadcast(Message msg) {
-		for (TableauManager tab : m_Tableaux.values()) {
-			tab.receive(msg);
+	public void processClash(BranchPointSet clashCause) {
+		if (m_ClashCauses.add(clashCause)) {
+			Clash clash = new Clash(clashCause);
+			for (TableauManager tab : m_Tableaux.values()) {
+				tab.receive(clash);
+			}
 		}
 	}
 
-	public void passToken(TableauManager tab, BranchToken clock) {
-		m_GlobalClock.copy(clock);
-		m_GlobalClock.tick();
+	public boolean isSynchronizingForClash() {
+		return !m_ClashCauses.isEmpty();
+	}
+	
+	public void returnTokenFrom(TableauManager tab, BranchToken token) {
+		if (isSynchronizingForClash()) return;
+		
 		TableauManager next = m_TableauxRing.getNext(tab);
-		next.synchronizeClockWith(m_GlobalClock);
-		next.receiveToken();
+		next.receiveToken(token);
 	}
 
 	private void buildImportGraph() {
@@ -99,7 +106,7 @@ public class TableauServer {
 		}
 
 		m_TableauxRing = new Ring<TableauManager>(m_Tableaux.values());
-		m_GlobalClock = new BranchToken();
+		m_ClashCauses = CollectionUtil.makeSet();
 	}
 
 	private boolean hasClashAtOrigin() {
@@ -108,10 +115,37 @@ public class TableauServer {
 		}
 		return false;
 	}
+	
+	private boolean hasPendingMessages() {
+		for (TableauManager t : m_Tableaux.values()) {
+			if (t.hasPendingMessages()) return true;
+		}
+		return false;
+	}
+	
+	private TableauManager findOwnerOf(BranchPointSet clashCause) {
+		for (TableauManager t : m_Tableaux.values()) {
+			if (t.isOwnerOf(clashCause)) return t;
+		}
+		return null;
+	}
+
+	private void resumeCompletion() {
+		BranchPointSet clashCause = Collections.min(m_ClashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
+		m_ClashCauses.clear();
+		TableauManager resumeTab = findOwnerOf(clashCause);
+		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
+		resumeTab.receiveToken(token);
+		resumeTab.tryNextChoiceOnClashedBranchWith(clashCause);
+	}
 
 	private void completeAll() {
 		boolean hasChanged = true;
 		while (hasChanged) {
+			if (isSynchronizingForClash() && !hasPendingMessages()) {
+				resumeCompletion();
+			}			
+			
 			hasChanged = false;
 			for (TableauManager tab : m_Tableaux.values()) {
 				if (!tab.isComplete()) {
