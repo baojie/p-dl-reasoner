@@ -23,7 +23,7 @@ import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Role;
-import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 
 public class NodeTest {
 	
@@ -41,7 +41,7 @@ public class NodeTest {
 		m_HomePackage = makePackage(URI.create("#package"));
 		m_ForeignPackage = makePackage(URI.create("#package2"));
 		TableauGraph g = new TableauGraph(m_HomePackage);
-		m_Node = g.makeRoot(BranchPoint.ORIGIN);
+		m_Node = g.makeRoot(BranchPointSet.EMPTY);
 		role = makeRole(URI.create("#role"));
 		atom = makeAtom(m_HomePackage, URI.create("#atom"));
 		atomTC = makeOrigin(atom);
@@ -54,8 +54,8 @@ public class NodeTest {
 		assertFalse(m_Node.containsChild(role, atom));
 		assertEquals(Collections.EMPTY_SET, m_Node.getChildrenWith(role));
 		
-		Node child = m_Node.addChildBy(role, BranchPoint.ORIGIN);
-		assertEquals(BranchPoint.ORIGIN, child.getDependency());
+		Node child = m_Node.addChildBy(role, BranchPointSet.EMPTY);
+		assertEquals(BranchPointSet.EMPTY, child.getDependency());
 		
 		child.addLabel(atomTC);
 		assertTrue(m_Node.containsChild(role, atom));
@@ -87,7 +87,7 @@ public class NodeTest {
 	public void testHasClash_Bottom() {
 		assertTrue(m_Node.getClashCauses().isEmpty());
 		m_Node.addLabel(makeOrigin(Bottom.INSTANCE));
-		assertEquals(Collections.singleton(BranchPoint.ORIGIN), m_Node.getClashCauses());
+		assertEquals(Collections.singleton(BranchPointSet.EMPTY), m_Node.getClashCauses());
 		
 		m_Node.clearClashCauses();
 		assertTrue(m_Node.getClashCauses().isEmpty());
@@ -103,7 +103,7 @@ public class NodeTest {
 		assertTrue(m_Node.getClashCauses().isEmpty());
 		
 		m_Node.addLabel(makeOrigin(homeNotAtom));
-		assertEquals(Collections.singleton(BranchPoint.ORIGIN), m_Node.getClashCauses());
+		assertEquals(Collections.singleton(BranchPointSet.EMPTY), m_Node.getClashCauses());
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class NodeTest {
 		Negation homeNotAtom = makeNegation(m_HomePackage, atom);
 		m_Node.addLabel(makeOrigin(homeNotAtom));
 		m_Node.addLabel(atomTC);
-		assertEquals(Collections.singleton(BranchPoint.ORIGIN), m_Node.getClashCauses());
+		assertEquals(Collections.singleton(BranchPointSet.EMPTY), m_Node.getClashCauses());
 	}
 
 	@Test
