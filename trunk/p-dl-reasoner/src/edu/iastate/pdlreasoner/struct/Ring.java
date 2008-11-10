@@ -11,9 +11,8 @@ public class Ring<E> {
 	private Map<E, E> m_Ring;
 
 	public Ring(Collection<E> col) {
-		if (col.isEmpty()) return;
-		
 		m_Ring = new HashMap<E, E>();
+		if (col.isEmpty()) return;
 		
 		List<E> list = new ArrayList<E>(col);
 		for (int i = 0; i < list.size() - 1; i++) {
