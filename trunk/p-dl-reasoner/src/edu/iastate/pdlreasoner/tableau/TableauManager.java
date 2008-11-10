@@ -83,8 +83,8 @@ public class TableauManager {
 		m_ReceivedMsgs.offer(msg);
 	}
 	
-	public boolean isOwnerOf(BranchPointSet clashCause) {
-		return m_Graph.hasBranch(clashCause.getLatestBranchPoint());
+	public boolean isOwnerOf(BranchPoint restoreTarget) {
+		return m_Graph.hasBranch(restoreTarget);
 	}
 	
 	public void tryNextChoiceOnClashedBranchWith(BranchPointSet clashCause) {

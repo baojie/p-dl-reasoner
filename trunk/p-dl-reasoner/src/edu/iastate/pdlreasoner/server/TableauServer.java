@@ -17,6 +17,7 @@ import edu.iastate.pdlreasoner.struct.ImportGraph;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.messaging.Clash;
@@ -124,8 +125,9 @@ public class TableauServer {
 	}
 	
 	private TableauManager findOwnerOf(BranchPointSet clashCause) {
+		BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
 		for (TableauManager t : m_Tableaux.values()) {
-			if (t.isOwnerOf(clashCause)) return t;
+			if (t.isOwnerOf(restoreTarget)) return t;
 		}
 		return null;
 	}

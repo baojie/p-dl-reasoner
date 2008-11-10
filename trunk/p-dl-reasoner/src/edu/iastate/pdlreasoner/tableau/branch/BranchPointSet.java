@@ -13,7 +13,7 @@ public class BranchPointSet {
 	public static final Comparator<BranchPointSet> ORDER_BY_LATEST_BRANCH_POINT = new Comparator<BranchPointSet>() {
 			@Override
 			public int compare(BranchPointSet o1, BranchPointSet o2) {
-				return 0;
+				return o1.m_BranchPoints.length() - o2.m_BranchPoints.length();
 			}
 		};
 
@@ -61,7 +61,7 @@ public class BranchPointSet {
 	}
 
 	public boolean hasSameOrAfter(BranchPoint restoreTarget) {
-		return false;
+		return m_BranchPoints.length() >= restoreTarget.getIndex();
 	}
 
 	public BranchPoint getLatestBranchPoint() {
