@@ -135,6 +135,8 @@ public class TableauServer {
 	private void resumeCompletion() {
 		BranchPointSet clashCause = Collections.min(m_ClashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
 		m_ClashCauses.clear();
+		if (clashCause.isEmpty()) return;
+		
 		TableauManager resumeTab = findOwnerOf(clashCause);
 		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
 		resumeTab.receiveToken(token);

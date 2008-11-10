@@ -101,7 +101,7 @@ public class TableauGraph {
 		//but still have to be pruned to make sure that restoreTarget is the latest branch.
 		for (int i = m_Branches.size() - 1; i >= 0; i--) {
 			Branch iBranch = m_Branches.get(i);
-			if (restoreTarget.equals(iBranch)) break;
+			if (restoreTarget.equals(iBranch.getBranchPoint())) break;
 			
 			m_Branches.remove(i);
 			iBranch.reopenConceptOnNode();

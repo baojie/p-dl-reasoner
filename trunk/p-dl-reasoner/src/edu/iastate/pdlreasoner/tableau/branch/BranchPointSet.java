@@ -28,7 +28,7 @@ public class BranchPointSet {
 			}
 		}
 		return union;
-	}			
+	}
 		
 	public static BranchPointSet unionDependencies(TracedConcept... tcs) {
 		BranchPointSet allDepends = null;
@@ -61,7 +61,7 @@ public class BranchPointSet {
 	}
 
 	public boolean hasSameOrAfter(BranchPoint restoreTarget) {
-		return m_BranchPoints.length() >= restoreTarget.getIndex();
+		return m_BranchPoints.length() > restoreTarget.getIndex();
 	}
 
 	public BranchPoint getLatestBranchPoint() {
@@ -71,5 +71,21 @@ public class BranchPointSet {
 	public boolean isEmpty() {
 		return m_BranchPoints.isEmpty();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof BranchPointSet)) return false;
+		BranchPointSet o = (BranchPointSet) obj;
+		return m_BranchPoints.equals(o.m_BranchPoints);
+	}
+	
+	@Override
+	public int hashCode() {
+		return m_BranchPoints.hashCode();
+	}
 
+	@Override
+	public String toString() {
+		return m_BranchPoints.toString();
+	}
 }
