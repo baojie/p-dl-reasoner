@@ -65,7 +65,7 @@ public class BranchPointSet {
 	}
 
 	public BranchPoint getLatestBranchPoint() {
-		return new BranchPoint(m_BranchPoints.length() - 1);
+		return isEmpty() ? null : new BranchPoint(m_BranchPoints.length() - 1);
 	}
 
 	public boolean isEmpty() {

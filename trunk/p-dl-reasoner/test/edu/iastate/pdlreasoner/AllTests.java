@@ -9,6 +9,7 @@ import edu.iastate.pdlreasoner.server.TableauServerMultiPackageTest;
 import edu.iastate.pdlreasoner.server.TableauServerSinglePackageTest;
 import edu.iastate.pdlreasoner.struct.RingTest;
 import edu.iastate.pdlreasoner.tableau.NodeTest;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPointSetTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -17,6 +18,7 @@ import edu.iastate.pdlreasoner.tableau.NodeTest;
 	TableauServerSinglePackageTest.class,
 	TableauServerMultiPackageTest.class,
 	RingTest.class,
+	BranchPointSetTest.class,
 	NodeTest.class	
 })
 public class AllTests {}
