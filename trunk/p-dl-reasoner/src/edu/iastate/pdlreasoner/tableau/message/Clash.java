@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.tableau.messaging;
+package edu.iastate.pdlreasoner.tableau.message;
 
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 

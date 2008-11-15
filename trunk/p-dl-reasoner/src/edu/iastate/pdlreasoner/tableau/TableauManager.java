@@ -22,11 +22,14 @@ import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
-import edu.iastate.pdlreasoner.tableau.messaging.CPush;
-import edu.iastate.pdlreasoner.tableau.messaging.CReport;
-import edu.iastate.pdlreasoner.tableau.messaging.Clash;
-import edu.iastate.pdlreasoner.tableau.messaging.Message;
-import edu.iastate.pdlreasoner.tableau.messaging.MessageProcessor;
+import edu.iastate.pdlreasoner.tableau.graph.Edge;
+import edu.iastate.pdlreasoner.tableau.graph.Node;
+import edu.iastate.pdlreasoner.tableau.graph.TableauGraph;
+import edu.iastate.pdlreasoner.tableau.message.CPush;
+import edu.iastate.pdlreasoner.tableau.message.CReport;
+import edu.iastate.pdlreasoner.tableau.message.Clash;
+import edu.iastate.pdlreasoner.tableau.message.Message;
+import edu.iastate.pdlreasoner.tableau.message.MessageProcessor;
 
 public class TableauManager {
 	

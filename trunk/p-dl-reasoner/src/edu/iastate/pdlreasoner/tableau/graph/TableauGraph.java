@@ -1,10 +1,11 @@
-package edu.iastate.pdlreasoner.tableau;
+package edu.iastate.pdlreasoner.tableau.graph;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.tableau.Blocking;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -14,6 +15,7 @@ public class TableauGraph {
 
 	private DLPackage m_Package;
 	private Set<Node> m_Roots;
+	private NodeFactory m_NodeFactory;
 	private List<Branch> m_Branches;
 	private Blocking m_Blocking;
 	
@@ -25,6 +27,7 @@ public class TableauGraph {
 	public TableauGraph(DLPackage dlPackage) {
 		m_Package = dlPackage;
 		m_Roots = CollectionUtil.makeSet();
+		m_NodeFactory = new NodeFactory(this);
 		m_Branches = CollectionUtil.makeList();
 		m_Blocking = new Blocking();
 		m_ClashCollector = new ClashCauseCollector();
@@ -43,8 +46,12 @@ public class TableauGraph {
 		}
 	}
 	
+	public Node makeNode(BranchPointSet dependency) {
+		return m_NodeFactory.make(dependency);
+	}
+	
 	public Node makeRoot(BranchPointSet dependency) {
-		Node n = Node.make(this, dependency);
+		Node n = makeNode(dependency);
 		m_Roots.add(n);
 		return n;
 	}

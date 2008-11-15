@@ -24,6 +24,9 @@ import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
+import edu.iastate.pdlreasoner.tableau.graph.Edge;
+import edu.iastate.pdlreasoner.tableau.graph.Node;
+import edu.iastate.pdlreasoner.tableau.graph.TableauGraph;
 
 public class NodeTest {
 	

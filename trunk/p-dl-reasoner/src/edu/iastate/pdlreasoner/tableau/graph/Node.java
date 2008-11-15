@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.tableau;
+package edu.iastate.pdlreasoner.tableau.graph;
 
 import java.util.List;
 import java.util.Map;
@@ -15,12 +15,15 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.tableau.TracedConcept;
+import edu.iastate.pdlreasoner.tableau.TracedConceptSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class Node {
 
+	private int m_ID;
 	//Graph structural fields
 	private TableauGraph m_Graph;
 	private Edge m_ParentEdge;
@@ -32,11 +35,8 @@ public class Node {
 	private NodeClashDetector m_ClashDetector;
 
 	
-	public static Node make(TableauGraph g, BranchPointSet dependency) {
-		return new Node(g, dependency);
-	}
-	
-	private Node(TableauGraph graph, BranchPointSet dependency) {
+	protected Node(int id, TableauGraph graph, BranchPointSet dependency) {
+		m_ID = id;
 		m_Graph = graph;
 		m_Children = new MultiValuedMap<Role, Edge>();
 		m_Dependency = dependency;
@@ -80,7 +80,7 @@ public class Node {
 	}
 	
 	public Node addChildBy(Role r, BranchPointSet dependency) {
-		Node child = make(m_Graph, dependency);
+		Node child = m_Graph.makeNode(dependency);
 		Edge edge = Edge.make(this, r, child);
 		child.m_ParentEdge = edge;
 		m_Children.add(r, edge);

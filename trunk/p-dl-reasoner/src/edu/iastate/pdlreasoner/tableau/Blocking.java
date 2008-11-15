@@ -2,6 +2,8 @@ package edu.iastate.pdlreasoner.tableau;
 
 import java.util.List;
 
+import edu.iastate.pdlreasoner.tableau.graph.Node;
+
 public class Blocking {
 
 	public boolean isBlocked(Node n) {

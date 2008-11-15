@@ -2,9 +2,9 @@ package edu.iastate.pdlreasoner.tableau.branch;
 
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.Or;
-import edu.iastate.pdlreasoner.tableau.Node;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.TracedConceptSet;
+import edu.iastate.pdlreasoner.tableau.graph.Node;
 
 public class Branch {
 

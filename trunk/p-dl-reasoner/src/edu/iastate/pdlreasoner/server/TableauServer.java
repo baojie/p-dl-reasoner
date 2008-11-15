@@ -20,7 +20,7 @@ import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
-import edu.iastate.pdlreasoner.tableau.messaging.Clash;
+import edu.iastate.pdlreasoner.tableau.message.Clash;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
