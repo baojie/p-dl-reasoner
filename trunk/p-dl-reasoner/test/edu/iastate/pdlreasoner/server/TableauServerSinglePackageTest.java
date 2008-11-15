@@ -22,7 +22,6 @@ import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
-import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
@@ -187,5 +186,13 @@ public class TableauServerSinglePackageTest {
 		assertFalse(m_TableauServer.isSatisfiable(all, p));
 	}
 
+	@Test
+	public void someValuesClash() {
+		kb.addAxiom(atoms[0], makeSomeValues(role, atoms[1]));
+		kb.addAxiom(makeSomeValues(role, top), negatedAtoms[0]);
+		m_TableauServer.init();
+		assertFalse(m_TableauServer.isSatisfiable(atoms[0], p));
+	}
+	
 }
 
