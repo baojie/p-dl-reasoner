@@ -45,6 +45,10 @@ public class Node {
 		m_ClashDetector = new NodeClashDetector();
 	}
 	
+	public int getID() {
+		return m_ID;
+	}
+	
 	//Graph structural methods
 	
 	public void accept(NodeVisitor v) {

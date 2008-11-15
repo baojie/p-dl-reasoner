@@ -25,9 +25,9 @@ import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.graph.Edge;
 import edu.iastate.pdlreasoner.tableau.graph.Node;
 import edu.iastate.pdlreasoner.tableau.graph.TableauGraph;
-import edu.iastate.pdlreasoner.tableau.message.CPush;
-import edu.iastate.pdlreasoner.tableau.message.CReport;
+import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.Clash;
+import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.Message;
 import edu.iastate.pdlreasoner.tableau.message.MessageProcessor;
 
@@ -176,7 +176,17 @@ public class TableauManager {
 			m_Concept = tc;
 			tc.accept(this);
 		}
-		
+
+		@Override
+		public void visit(Top top) {
+			
+		}
+
+		@Override
+		public void visit(Atom atom) {
+			
+		}
+
 		@Override
 		public void visit(And and) {
 			for (Concept c : and.getOperands()) {
@@ -245,11 +255,11 @@ public class TableauManager {
 		}
 
 		@Override
-		public void process(CPush msg) {
+		public void process(ForwardConceptReport msg) {
 		}
 
 		@Override
-		public void process(CReport msg) {
+		public void process(BackwardConceptReport msg) {
 		}
 		
 	}
