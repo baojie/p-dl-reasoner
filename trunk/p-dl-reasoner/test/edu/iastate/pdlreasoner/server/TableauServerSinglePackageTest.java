@@ -22,6 +22,7 @@ import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
+import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
@@ -46,7 +47,7 @@ public class TableauServerSinglePackageTest {
 		kb = new KnowledgeBase(p);
 		m_TableauServer.addKnowledgeBase(kb);
 		top = makeTop(p);
-		atoms = new Atom[5];
+		atoms = new Atom[10];
 		for (int i = 0; i < atoms.length; i++) {
 			atoms[i] = makeAtom(p, URI.create("#atom" + i));
 		}
@@ -146,10 +147,35 @@ public class TableauServerSinglePackageTest {
 	}
 
 	@Test
-	public void subsetBlocking() {
+	public void directSubsetBlocking1() {
 		kb.addAxiom(top, makeSomeValues(role, atoms[0]));
 		m_TableauServer.init();
 		assertTrue(m_TableauServer.isConsistent(p));
+	}
+
+	@Test
+	public void directSubsetBlocking2() {
+		And and = makeAnd(makeSomeValues(role, atoms[0]), makeSomeValues(role, atoms[1]));
+		kb.addAxiom(top, and);
+		m_TableauServer.init();
+		assertTrue(m_TableauServer.isConsistent(p));
+	}
+	
+	@Test
+	public void directSubsetBlockingWithBacktracking() {
+		kb.addAxiom(atoms[0], makeSomeValues(role, atoms[1]));
+		kb.addAxiom(atoms[1], makeSomeValues(role, atoms[0]));
+		m_TableauServer.init();
+		And and = makeAnd(atoms[0], atoms[1]);
+		assertTrue(m_TableauServer.isSatisfiable(and, p));
+	}
+
+	@Test
+	public void indirectSubsetBlocking() {
+		m_TableauServer.init();
+		SomeValues some = makeSomeValues(role, makeSomeValues(role, atoms[0]));
+		And and = makeAnd(makeSomeValues(role, atoms[0]), atoms[1]);
+		assertTrue(m_TableauServer.isSatisfiable(makeAnd(some, and), p));
 	}
 
 	@Test
