@@ -10,6 +10,7 @@ import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
+import edu.iastate.pdlreasoner.model.ContextualizedConcept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
@@ -177,14 +178,22 @@ public class TableauManager {
 			tc.accept(this);
 		}
 
+		private void visitAtomOrTop(ContextualizedConcept c) {
+			DLPackage context = c.getContext();
+			if (!m_Package.equals(context)) {
+				BackwardConceptReport backward = new BackwardConceptReport(m_Package, context, m_Node.getID(), m_Concept);
+				m_Server.processConceptReport(backward);
+			}
+		}
+
 		@Override
 		public void visit(Top top) {
-			
+			visitAtomOrTop(top);
 		}
 
 		@Override
 		public void visit(Atom atom) {
-			
+			visitAtomOrTop(atom);
 		}
 
 		@Override
@@ -256,10 +265,12 @@ public class TableauManager {
 
 		@Override
 		public void process(ForwardConceptReport msg) {
+			
 		}
 
 		@Override
 		public void process(BackwardConceptReport msg) {
+			
 		}
 		
 	}

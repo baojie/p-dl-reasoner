@@ -20,7 +20,9 @@ import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
+import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.Clash;
+import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
@@ -35,6 +37,9 @@ public class TableauServer {
 		m_KBs = CollectionUtil.makeList();
 		m_Import = new ImportGraph();
 	}
+	
+	
+	//Upper Interfaces
 	
 	public void addKnowledgeBase(KnowledgeBase kb) {
 		m_KBs.add(kb);
@@ -68,6 +73,17 @@ public class TableauServer {
 		return !isSatisfiable(sat, witness);
 	}
 	
+	
+	//Lower Interfaces
+	
+	public void processConceptReport(BackwardConceptReport backward) {
+		m_Tableaux.get(backward.getDestination()).receive(backward);
+	}
+
+	public void processConceptReport(ForwardConceptReport forward) {
+		m_Tableaux.get(forward.getDestination()).receive(forward);
+	}
+
 	public void processClash(BranchPointSet clashCause) {
 		if (m_ClashCauses.add(clashCause)) {
 			Clash clash = new Clash(clashCause);
@@ -87,6 +103,9 @@ public class TableauServer {
 		TableauManager next = m_TableauxRing.getNext(tab);
 		next.receiveToken(token);
 	}
+	
+	
+	//Private
 
 	private void buildImportGraph() {
 		for (KnowledgeBase kb : m_KBs) {

@@ -5,8 +5,8 @@ import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
 public class BackwardConceptReport extends ConceptReport {
 
-	public BackwardConceptReport(DLPackage source, int nodeID, TracedConcept concept) {
-		super(source, nodeID, concept);
+	public BackwardConceptReport(DLPackage source, DLPackage destination, int nodeID, TracedConcept concept) {
+		super(source, destination, nodeID, concept);
 	}
 	
 	@Override
