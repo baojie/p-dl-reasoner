@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
@@ -174,6 +175,13 @@ public class Node {
 			for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {
 				if (!Or.class.equals(entry.getKey())) {
 					entry.getValue().reopenAll();
+				}
+			}
+			
+			if (m_ParentEdge != null) {
+				TracedConceptSet parentAllValues = m_ParentEdge.getParent().getLabelsFor(AllValues.class);
+				if (parentAllValues != null) {
+					parentAllValues.reopenAll();
 				}
 			}
 		}

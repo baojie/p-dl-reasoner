@@ -194,5 +194,16 @@ public class TableauServerSinglePackageTest {
 		assertFalse(m_TableauServer.isSatisfiable(atoms[0], p));
 	}
 	
+	@Test
+	public void reopenParentAllValuesOnRestore() {
+		m_TableauServer.init();
+		And bottom = makeAnd(atoms[0], negatedAtoms[0]);
+		SomeValues some = makeSomeValues(role, makeOr(bottom, atoms[0]));
+		AllValues all = makeAllValues(role, bottom);
+		And wrapAll = makeAnd(atoms[2], makeAnd(atoms[1], all));
+		And and = makeAnd(some, wrapAll);
+		assertFalse(m_TableauServer.isSatisfiable(and, p));
+	}
+	
 }
 

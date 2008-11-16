@@ -71,6 +71,8 @@ public class TracedConceptSet {
 	}
 
 	public void reopenAll() {
+		if (m_Expanded.isEmpty()) return;
+		
 		m_Open.putAll(m_Expanded);
 		m_Expanded.clear();
 	}
