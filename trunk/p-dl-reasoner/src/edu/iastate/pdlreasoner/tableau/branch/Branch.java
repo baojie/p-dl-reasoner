@@ -8,11 +8,15 @@ import edu.iastate.pdlreasoner.tableau.graph.Node;
 
 public class Branch {
 
+	//Constants
 	private Node m_Node;
 	private TracedConcept m_Concept;
 	private BranchPoint m_ThisPoint;
+	
+	//Variables
 	private int m_NextChoice;
 	
+	//Caches
 	private BranchPointSet m_ThisPointSet;
 	private Concept[] m_Disjuncts;
 	private BranchPointSet[] m_DisjunctClashCause;

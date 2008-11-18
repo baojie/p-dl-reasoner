@@ -13,12 +13,16 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauGraph {
 
+	//Constants
 	private DLPackage m_Package;
+	
+	//Variables
 	private Set<Node> m_Roots;
 	private NodeFactory m_NodeFactory;
 	private List<Branch> m_Branches;
 	private Blocking m_Blocking;
 	
+	//Processors
 	private ClashCauseCollector m_ClashCollector;
 	private OpenNodesCollector m_OpenNodesCollector;
 	private PruneNodesCollector m_PruneNodesCollector;

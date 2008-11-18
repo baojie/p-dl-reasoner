@@ -25,10 +25,12 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 public class Node {
 
 	private int m_ID;
+	
 	//Graph structural fields
 	private TableauGraph m_Graph;
 	private Edge m_ParentEdge;
 	private MultiValuedMap<Role, Edge> m_Children;
+	
 	//Semantic fields
 	private BranchPointSet m_Dependency;
 	private Map<Class<? extends Concept>, TracedConceptSet> m_Labels;

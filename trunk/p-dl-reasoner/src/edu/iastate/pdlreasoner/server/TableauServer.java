@@ -22,10 +22,13 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
 	
+	//Constants wrt KBs
 	private List<KnowledgeBase> m_KBs;
 	private ImportGraph m_ImportGraph;
 	
+	//Variables (new per query)
 	private TableauTopology m_Tableaux;
+	private InterTableauManager m_InterTableau;
 	private Set<BranchPointSet> m_ClashCauses;
 	
 	public TableauServer() {
@@ -106,6 +109,9 @@ public class TableauServer {
 		for (TableauManager t : m_Tableaux) {
 			t.setServer(this);
 		}
+		
+		m_InterTableau = new InterTableauManager(m_ImportGraph);
+		
 		m_ClashCauses = CollectionUtil.makeSet();
 	}
 

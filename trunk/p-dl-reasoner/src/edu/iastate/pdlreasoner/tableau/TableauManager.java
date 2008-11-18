@@ -34,14 +34,18 @@ import edu.iastate.pdlreasoner.tableau.message.MessageProcessor;
 
 public class TableauManager {
 	
+	//Constants
 	private TableauServer m_Server;
 	private DLPackage m_Package;
 	private TBox m_TBox;
+	
+	//Variables
 	private TableauGraph m_Graph;
 	private BranchToken m_Token;
 	private Queue<Message> m_ReceivedMsgs;
 	private boolean m_HasClashAtOrigin;
 	
+	//Processors
 	private ConceptExpander m_ConceptExpander;
 	private MessageProcessor m_MessageProcessor;
 	

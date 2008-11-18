@@ -17,9 +17,13 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TBox {
 
+	//Constants
 	private KnowledgeBase m_HomeKB;
+	
+	//Variables
 	private List<Subclass> m_Axioms;
 	
+	//Caches
 	private List<Concept> m_UC;
 	
 	public TBox(KnowledgeBase homeKB) {
