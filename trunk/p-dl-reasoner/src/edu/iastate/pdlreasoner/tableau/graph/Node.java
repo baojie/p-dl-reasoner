@@ -14,6 +14,7 @@ import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
+import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
@@ -109,10 +110,14 @@ public class Node {
 	}
 	
 	public boolean addLabel(TracedConcept tc) {
-		TracedConceptSet labelSet = m_Labels.get(tc.getConcept().getClass());
+		Concept concept = tc.getConcept();
+		if (isLocalTop(concept)) return false;
+		
+		Class<? extends Concept> conceptClass = concept.getClass();
+		TracedConceptSet labelSet = m_Labels.get(conceptClass);
 		if (labelSet == null) {
 			labelSet = new TracedConceptSet();
-			m_Labels.put(tc.getConcept().getClass(), labelSet);
+			m_Labels.put(conceptClass, labelSet);
 		}
 		
 		boolean hasAdded = labelSet.add(tc);
@@ -120,6 +125,14 @@ public class Node {
 			m_ClashDetector.detect(tc);
 		}
 		return hasAdded;
+	}
+
+	private boolean isLocalTop(Concept c) {
+		if (c instanceof Top) {
+			Top top = (Top) c;
+			return m_Graph.getPackage().equals(top.getContext());
+		}
+		return false;
 	}
 	
 	public boolean containsLabel(Concept c) {
