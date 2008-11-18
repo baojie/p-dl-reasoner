@@ -15,9 +15,7 @@ import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
-import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.Clash;
-import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
@@ -28,7 +26,7 @@ public class TableauServer {
 	
 	//Variables (new per query)
 	private TableauTopology m_Tableaux;
-	private InterTableauManager m_InterTableau;
+	private InterTableauManager m_InterTableauMan;
 	private Set<BranchPointSet> m_ClashCauses;
 	
 	public TableauServer() {
@@ -73,14 +71,6 @@ public class TableauServer {
 	
 	//Lower Interfaces
 	
-	public void processConceptReport(BackwardConceptReport backward) {
-		m_Tableaux.get(backward.getDestination()).receive(backward);
-	}
-
-	public void processConceptReport(ForwardConceptReport forward) {
-		m_Tableaux.get(forward.getDestination()).receive(forward);
-	}
-
 	public void processClash(BranchPointSet clashCause) {
 		if (m_ClashCauses.add(clashCause)) {
 			Clash clash = new Clash(clashCause);
@@ -106,11 +96,11 @@ public class TableauServer {
 
 	private void makeTableaux() {
 		m_Tableaux = new TableauTopology(m_KBs);
+		m_InterTableauMan = new InterTableauManager(m_ImportGraph, m_Tableaux);
 		for (TableauManager t : m_Tableaux) {
 			t.setServer(this);
+			t.setInterTableauManager(m_InterTableauMan);
 		}
-		
-		m_InterTableau = new InterTableauManager(m_ImportGraph);
 		
 		m_ClashCauses = CollectionUtil.makeSet();
 	}

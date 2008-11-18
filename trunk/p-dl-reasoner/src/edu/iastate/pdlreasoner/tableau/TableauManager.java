@@ -18,6 +18,7 @@ import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
+import edu.iastate.pdlreasoner.server.InterTableauManager;
 import edu.iastate.pdlreasoner.server.TableauServer;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
@@ -36,6 +37,7 @@ public class TableauManager {
 	
 	//Constants
 	private TableauServer m_Server;
+	private InterTableauManager m_InterTableauMan;
 	private DLPackage m_Package;
 	private TBox m_TBox;
 	
@@ -64,6 +66,10 @@ public class TableauManager {
 		m_Server = server;
 	}
 
+	public void setInterTableauManager(InterTableauManager interTableauMan) {
+		m_InterTableauMan = interTableauMan;
+	}
+	
 	public boolean isComplete() {
 		return m_ReceivedMsgs.isEmpty() && 
 			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
@@ -186,7 +192,7 @@ public class TableauManager {
 			DLPackage context = c.getContext();
 			if (!m_Package.equals(context)) {
 				BackwardConceptReport backward = new BackwardConceptReport(m_Package, context, m_Node.getID(), m_Concept);
-				m_Server.processConceptReport(backward);
+				m_InterTableauMan.processConceptReport(backward);
 			}
 		}
 
@@ -278,5 +284,5 @@ public class TableauManager {
 		}
 		
 	}
-	
+
 }
