@@ -1,7 +1,8 @@
-package edu.iastate.pdlreasoner.struct;
+package edu.iastate.pdlreasoner.server;
 
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.struct.MultiLabeledDirectedGraph;
 
 public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 

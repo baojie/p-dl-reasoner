@@ -2,7 +2,6 @@ package edu.iastate.pdlreasoner.server;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -13,9 +12,7 @@ import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
-import edu.iastate.pdlreasoner.struct.ImportGraph;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
-import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -29,8 +26,8 @@ public class TableauServer {
 	
 	private List<KnowledgeBase> m_KBs;
 	private ImportGraph m_Import;
-	private Map<DLPackage, TableauManager> m_Tableaux;
-	private Ring<TableauManager> m_TableauxRing;
+	
+	private TableauTopology m_Tableaux;
 	private Set<BranchPointSet> m_ClashCauses;
 	
 	public TableauServer() {
@@ -87,7 +84,7 @@ public class TableauServer {
 	public void processClash(BranchPointSet clashCause) {
 		if (m_ClashCauses.add(clashCause)) {
 			Clash clash = new Clash(clashCause);
-			for (TableauManager tab : m_Tableaux.values()) {
+			for (TableauManager tab : m_Tableaux) {
 				tab.receive(clash);
 			}
 		}
@@ -100,7 +97,7 @@ public class TableauServer {
 	public void returnTokenFrom(TableauManager tab, BranchToken token) {
 		if (isSynchronizingForClash()) return;
 		
-		TableauManager next = m_TableauxRing.getNext(tab);
+		TableauManager next = m_Tableaux.getNext(tab);
 		next.receiveToken(token);
 	}
 	
@@ -118,26 +115,22 @@ public class TableauServer {
 	}
 	
 	private void makeTableaux() {
-		m_Tableaux = CollectionUtil.makeMap();
-		for (KnowledgeBase kb : m_KBs) {
-			TableauManager tableau = kb.getTableau();
-			tableau.setServer(this);
-			m_Tableaux.put(kb.getPackage(), tableau);
+		m_Tableaux = new TableauTopology(m_KBs);
+		for (TableauManager t : m_Tableaux) {
+			t.setServer(this);
 		}
-
-		m_TableauxRing = new Ring<TableauManager>(m_Tableaux.values());
 		m_ClashCauses = CollectionUtil.makeSet();
 	}
 
 	private boolean hasClashAtOrigin() {
-		for (TableauManager t : m_Tableaux.values()) {
+		for (TableauManager t : m_Tableaux) {
 			if (t.hasClashAtOrigin()) return true;
 		}
 		return false;
 	}
 	
 	private boolean hasPendingMessages() {
-		for (TableauManager t : m_Tableaux.values()) {
+		for (TableauManager t : m_Tableaux) {
 			if (t.hasPendingMessages()) return true;
 		}
 		return false;
@@ -145,7 +138,7 @@ public class TableauServer {
 	
 	private TableauManager findOwnerOf(BranchPointSet clashCause) {
 		BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
-		for (TableauManager t : m_Tableaux.values()) {
+		for (TableauManager t : m_Tableaux) {
 			if (t.isOwnerOf(restoreTarget)) return t;
 		}
 		return null;
@@ -170,7 +163,7 @@ public class TableauServer {
 			}			
 			
 			hasChanged = false;
-			for (TableauManager tab : m_Tableaux.values()) {
+			for (TableauManager tab : m_Tableaux) {
 				if (!tab.isComplete()) {
 					tab.run();
 					hasChanged = true;
