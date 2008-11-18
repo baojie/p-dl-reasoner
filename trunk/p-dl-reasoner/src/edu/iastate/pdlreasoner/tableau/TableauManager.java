@@ -191,7 +191,7 @@ public class TableauManager {
 		private void visitAtomOrTop(ContextualizedConcept c) {
 			DLPackage context = c.getContext();
 			if (!m_Package.equals(context)) {
-				BackwardConceptReport backward = new BackwardConceptReport(m_Package, context, m_Node.getID(), m_Concept);
+				BackwardConceptReport backward = new BackwardConceptReport(context, m_Package, m_Node.getID(), m_Concept);
 				m_InterTableauMan.processConceptReport(backward);
 			}
 		}

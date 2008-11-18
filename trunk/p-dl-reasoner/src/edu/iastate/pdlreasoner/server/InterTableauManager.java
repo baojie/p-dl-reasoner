@@ -14,11 +14,11 @@ public class InterTableauManager {
 	}
 
 	public void processConceptReport(BackwardConceptReport backward) {
-		m_Tableaux.get(backward.getDestination()).receive(backward);
+		m_Tableaux.get(backward.getImporter()).receive(backward);
 	}
 
 	public void processConceptReport(ForwardConceptReport forward) {
-		m_Tableaux.get(forward.getDestination()).receive(forward);
+		m_Tableaux.get(forward.getImporter()).receive(forward);
 	}
 
 

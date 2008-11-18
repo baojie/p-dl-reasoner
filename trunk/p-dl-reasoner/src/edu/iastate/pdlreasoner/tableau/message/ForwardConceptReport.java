@@ -5,8 +5,9 @@ import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
 public class ForwardConceptReport extends ConceptReport {
 
-	public ForwardConceptReport(DLPackage source, DLPackage destination, int nodeID, TracedConcept concept) {
-		super(source, destination, nodeID, concept);
+	public ForwardConceptReport(DLPackage owner, int ownerNodeID, DLPackage importer, TracedConcept concept) {
+		super(owner, importer, concept);
+		setOwnerNodeID(ownerNodeID);
 	}
 
 	@Override
