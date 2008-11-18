@@ -3,7 +3,6 @@ package edu.iastate.pdlreasoner.server;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.model.And;
@@ -12,7 +11,6 @@ import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
-import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -25,14 +23,13 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 public class TableauServer {
 	
 	private List<KnowledgeBase> m_KBs;
-	private ImportGraph m_Import;
+	private ImportGraph m_ImportGraph;
 	
 	private TableauTopology m_Tableaux;
 	private Set<BranchPointSet> m_ClashCauses;
 	
 	public TableauServer() {
 		m_KBs = CollectionUtil.makeList();
-		m_Import = new ImportGraph();
 	}
 	
 	
@@ -47,7 +44,7 @@ public class TableauServer {
 			kb.init();
 		}
 		
-		buildImportGraph();
+		m_ImportGraph = new ImportGraph(m_KBs);
 	}
 	
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
@@ -104,16 +101,6 @@ public class TableauServer {
 	
 	//Private
 
-	private void buildImportGraph() {
-		for (KnowledgeBase kb : m_KBs) {
-			DLPackage homePackage = kb.getPackage();
-			MultiValuedMap<DLPackage, Concept> externalConcepts = kb.getExternalConcepts();
-			for (Entry<DLPackage, Set<Concept>> entry : externalConcepts.entrySet()) {
-				m_Import.addLabels(entry.getKey(), homePackage, entry.getValue());
-			}
-		}
-	}
-	
 	private void makeTableaux() {
 		m_Tableaux = new TableauTopology(m_KBs);
 		for (TableauManager t : m_Tableaux) {
