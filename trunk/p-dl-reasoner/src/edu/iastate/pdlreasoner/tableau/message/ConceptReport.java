@@ -1,50 +1,30 @@
 package edu.iastate.pdlreasoner.tableau.message;
 
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
 public abstract class ConceptReport implements Message {
 	
-	protected DLPackage m_Owner;
-	protected DLPackage m_Importer;
+	protected GlobalNodeID m_ImportSource;
+	protected GlobalNodeID m_ImportTarget;
 	protected TracedConcept m_Concept;
-	protected int m_OwnerNodeID;
-	protected int m_ImporterNodeID;
 	
-	protected ConceptReport(DLPackage owner, DLPackage importer, TracedConcept concept) {
-		m_Owner = owner;
-		m_Importer = importer;
+	protected ConceptReport(GlobalNodeID importSource, GlobalNodeID importTarget, TracedConcept concept) {
+		m_ImportSource = importSource;
+		m_ImportTarget = importTarget;
 		m_Concept = concept;
-		m_OwnerNodeID = -1;
-		m_ImporterNodeID = -1;
 	}
 	
-	public DLPackage getOwner() {
-		return m_Owner;
+	public GlobalNodeID getImportSource() {
+		return m_ImportSource;
 	}
-	
-	public DLPackage getImporter() {
-		return m_Importer;
+
+	public GlobalNodeID getImportTarget() {
+		return m_ImportTarget;
 	}
 
 	public TracedConcept getConcept() {
 		return m_Concept;
-	}
-
-	public void setOwnerNodeID(int id) {
-		m_OwnerNodeID = id;
-	}
-	
-	public int getOwnerNodeID() {
-		return m_OwnerNodeID;
-	}
-
-	public void setImporterNodeID(int id) {
-		m_ImporterNodeID = id;
-	}
-	
-	public int getImporterNodeID() {
-		return m_ImporterNodeID;
 	}
 
 }

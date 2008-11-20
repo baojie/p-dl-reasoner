@@ -16,6 +16,7 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
+import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.TracedConceptSet;
@@ -49,8 +50,10 @@ public class Node {
 		m_ClashDetector = new NodeClashDetector();
 	}
 	
-	public int getID() {
-		return m_ID;
+	public GlobalNodeID makeAndCacheGlobalNodeID() {
+		GlobalNodeID globalID = GlobalNodeID.make(m_Graph.getPackage(), m_ID);
+		m_Graph.put(globalID, this);
+		return globalID;
 	}
 	
 	//Graph structural methods

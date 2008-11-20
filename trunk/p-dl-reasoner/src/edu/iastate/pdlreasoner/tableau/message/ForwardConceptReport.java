@@ -1,13 +1,12 @@
 package edu.iastate.pdlreasoner.tableau.message;
 
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
 public class ForwardConceptReport extends ConceptReport {
 
-	public ForwardConceptReport(DLPackage owner, int ownerNodeID, DLPackage importer, TracedConcept concept) {
-		super(owner, importer, concept);
-		setOwnerNodeID(ownerNodeID);
+	public ForwardConceptReport(GlobalNodeID importSource, GlobalNodeID importTarget, TracedConcept concept) {
+		super(importSource, importTarget, concept);
 	}
 
 	@Override

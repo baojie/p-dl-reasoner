@@ -2,9 +2,11 @@ package edu.iastate.pdlreasoner.tableau.graph;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.Blocking;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
@@ -18,6 +20,7 @@ public class TableauGraph {
 	
 	//Variables
 	private Set<Node> m_Roots;
+	private Map<GlobalNodeID,Node> m_GlobalMap;
 	private NodeFactory m_NodeFactory;
 	private List<Branch> m_Branches;
 	private Blocking m_Blocking;
@@ -31,6 +34,7 @@ public class TableauGraph {
 	public TableauGraph(DLPackage dlPackage) {
 		m_Package = dlPackage;
 		m_Roots = CollectionUtil.makeSet();
+		m_GlobalMap = CollectionUtil.makeMap();
 		m_NodeFactory = new NodeFactory(this);
 		m_Branches = CollectionUtil.makeList();
 		m_Blocking = new Blocking();
@@ -58,6 +62,14 @@ public class TableauGraph {
 		Node n = makeNode(dependency);
 		m_Roots.add(n);
 		return n;
+	}
+
+	public void put(GlobalNodeID globalID, Node node) {
+		m_GlobalMap.put(globalID, node);
+	}
+	
+	public Node get(GlobalNodeID globalID) {
+		return m_GlobalMap.get(globalID);
 	}
 
 	public void addBranch(Branch branch) {

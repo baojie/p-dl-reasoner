@@ -51,7 +51,7 @@ public class TableauServer {
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
 		makeTableaux();
 		TableauManager witTableau = m_Tableaux.get(witness);
-		witTableau.addRootWith(c);
+		witTableau.addGlobalRootWith(c);
 		witTableau.receiveToken(BranchToken.make());
 		completeAll();
 		return !hasClashAtOrigin();

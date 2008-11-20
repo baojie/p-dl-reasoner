@@ -20,6 +20,7 @@ import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
 import edu.iastate.pdlreasoner.server.InterTableauManager;
 import edu.iastate.pdlreasoner.server.TableauServer;
+import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -70,6 +71,18 @@ public class TableauManager {
 		m_InterTableauMan = interTableauMan;
 	}
 	
+	public void addGlobalRootWith(Concept c) {
+		Node root = m_Graph.makeRoot(BranchPointSet.EMPTY);
+		root.addLabel(TracedConcept.makeOrigin(c));
+		applyUniversalRestriction(root);
+	}
+	
+	public GlobalNodeID addRoot(BranchPointSet dependency) {
+		Node root = m_Graph.makeRoot(dependency);
+		applyUniversalRestriction(root);
+		return root.makeAndCacheGlobalNodeID();
+	}
+	
 	public boolean isComplete() {
 		return m_ReceivedMsgs.isEmpty() && 
 			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
@@ -83,12 +96,6 @@ public class TableauManager {
 		return m_HasClashAtOrigin;
 	}
 
-	public void addRootWith(Concept c) {
-		Node root = m_Graph.makeRoot(BranchPointSet.EMPTY);
-		root.addLabel(TracedConcept.makeOrigin(c));
-		applyUniversalRestriction(root);
-	}
-	
 	public void receiveToken(BranchToken tok) {
 		m_Token = tok;
 	}
@@ -191,7 +198,9 @@ public class TableauManager {
 		private void visitAtomOrTop(ContextualizedConcept c) {
 			DLPackage context = c.getContext();
 			if (!m_Package.equals(context)) {
-				BackwardConceptReport backward = new BackwardConceptReport(context, m_Package, m_Node.getID(), m_Concept);
+				GlobalNodeID importSource = GlobalNodeID.makeWithUnknownID(context);
+				GlobalNodeID importTarget = m_Node.makeAndCacheGlobalNodeID();
+				BackwardConceptReport backward = new BackwardConceptReport(importSource, importTarget, m_Concept);
 				m_InterTableauMan.processConceptReport(backward);
 			}
 		}
@@ -280,7 +289,10 @@ public class TableauManager {
 
 		@Override
 		public void process(BackwardConceptReport msg) {
-			
+			Node node = m_Graph.get(msg.getImportSource());
+			TracedConcept concept = msg.getConcept();
+			BranchPointSet unionDepends = BranchPointSet.union(node.getDependency(), concept.getDependency());
+			node.addLabel(new TracedConcept(concept.getConcept(), unionDepends));
 		}
 		
 	}
