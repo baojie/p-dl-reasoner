@@ -20,7 +20,7 @@ public class TableauGraph {
 	
 	//Variables
 	private Set<Node> m_Roots;
-	private Map<GlobalNodeID,Node> m_GlobalMap;
+	private Map<GlobalNodeID,Node> m_GlobalMap; /////////////PRUNE ME WHEN BACKTRACKING
 	private NodeFactory m_NodeFactory;
 	private List<Branch> m_Branches;
 	private Blocking m_Blocking;

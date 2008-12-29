@@ -31,8 +31,5 @@ public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 	public Set<DLPackage> getAllVerticesConnecting(DLPackage source, DLPackage target) {
 		return null;
 	}
-
-	public List<DLPackage> topologicalSort(Set<DLPackage> vs) {
-		return null;
-	}
+	
 }
