@@ -1,7 +1,6 @@
 package edu.iastate.pdlreasoner.server;
 
 import java.util.List;
-import java.util.Set;
 
 import org.jgrapht.graph.DefaultEdge;
 
@@ -78,7 +77,7 @@ public class InterTableauManager {
 	}
 
 	private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) {
-		Set<DLPackage> midPackages = m_ImportGraph.getAllVerticesConnecting(importSource.getPackage(), importTarget.getPackage());
+		List<DLPackage> midPackages = m_ImportGraph.getAllVerticesConnecting(importSource.getPackage(), importTarget.getPackage());
 		for (DLPackage midPackage : midPackages) {
 			GlobalNodeID midNode = m_InterTableau.getSourceVertexOf(importTarget, midPackage);
 			if (midNode == null) {

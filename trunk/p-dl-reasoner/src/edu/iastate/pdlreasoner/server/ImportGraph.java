@@ -1,9 +1,11 @@
 package edu.iastate.pdlreasoner.server;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.jgrapht.Graphs;
 import org.jgrapht.alg.TransitiveClosure;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
@@ -28,8 +30,20 @@ public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 		TransitiveClosure.INSTANCE.closeSimpleDirectedGraph(this);
 	}
 
-	public Set<DLPackage> getAllVerticesConnecting(DLPackage source, DLPackage target) {
-		return null;
+	public List<DLPackage> getAllVerticesConnecting(DLPackage source, DLPackage target) {
+		if (getEdge(source, target) == null) {
+			throw new IllegalArgumentException("Missing an edge from the source vertex to the target vertex.");
+		}
+		
+		List<DLPackage> midVertices = Graphs.successorListOf(this, source);
+		for (Iterator<DLPackage> it = midVertices.iterator(); it.hasNext(); ) {
+			DLPackage midVertex = it.next();
+			if (getEdge(midVertex, target) == null) {
+				it.remove();
+			}
+		}
+		
+		return midVertices;
 	}
 	
 }
