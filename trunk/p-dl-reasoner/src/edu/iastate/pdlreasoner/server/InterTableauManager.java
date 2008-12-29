@@ -48,9 +48,9 @@ public class InterTableauManager {
 		}
 		
 		//Add source to graph
+		TableauManager importSourceTab = m_Tableaux.get(importSourcePackage);
 		GlobalNodeID importSource = m_InterTableau.getSourceVertexOf(importTarget, importSourcePackage);
 		if (importSource == null) {
-			TableauManager importSourceTab = m_Tableaux.get(importSourcePackage);
 			importSource = importSourceTab.addRoot(sourceDependency);
 			m_InterTableau.addVertex(importSource, sourceDependency);
 			addEdge(importSource, importTarget);
@@ -58,7 +58,7 @@ public class InterTableauManager {
 		
 		//Continue with reporting
 		requestedImportSource.copyIDFrom(importSource);
-		m_Tableaux.get(importSourcePackage).receive(backward);
+		importSourceTab.receive(backward);
 	}
 
 	public void processConceptReport(ForwardConceptReport forward) {
