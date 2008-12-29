@@ -6,7 +6,6 @@ import java.util.Set;
 import org.jgrapht.graph.DefaultEdge;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
-import edu.iastate.pdlreasoner.server.graph.EdgeListener;
 import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.server.graph.InterTableauTransitiveGraph;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
@@ -28,7 +27,6 @@ public class InterTableauManager {
 		m_ImportGraph = importGraph;
 		m_Tableaux = tableaux;
 		m_InterTableau = new InterTableauTransitiveGraph();
-		m_InterTableau.addEdgeListener(new EdgeListenerImp());
 	}
 
 	public void processConceptReport(BackwardConceptReport backward) {
@@ -45,7 +43,6 @@ public class InterTableauManager {
 		BranchPointSet targetDependency = m_InterTableau.getDependency(importTarget);
 		if (targetDependency == null) {
 			m_InterTableau.addVertex(importTarget, conceptDependency);
-			targetDependency = conceptDependency;
 			sourceDependency = conceptDependency;
 		} else {
 			sourceDependency = BranchPointSet.union(targetDependency, conceptDependency);
@@ -57,7 +54,7 @@ public class InterTableauManager {
 			TableauManager importSourceTab = m_Tableaux.get(importSourcePackage);
 			importSource = importSourceTab.addRoot(sourceDependency);
 			m_InterTableau.addVertex(importSource, sourceDependency);
-			m_InterTableau.addEdgeAndCloseTransitivity(importSource, importTarget);
+			addEdge(importSource, importTarget);
 		}
 		
 		//Continue with reporting
@@ -69,27 +66,30 @@ public class InterTableauManager {
 		DLPackage msgTarget = forward.getImportTarget().getPackage();
 		m_Tableaux.get(msgTarget).receive(forward);
 	}
-
 	
-	class EdgeListenerImp implements EdgeListener<DefaultEdge> {
-
-		@Override
-		public void edgesAdded(List<DefaultEdge> newEdges) {
-			for (DefaultEdge e : newEdges) {
-				GlobalNodeID importSource = m_InterTableau.getEdgeSource(e);
-				GlobalNodeID importTarget = m_InterTableau.getEdgeTarget(e);
-				BranchPointSet targetDependency = m_InterTableau.getDependency(importTarget);
-				doRRule(importSource, importTarget, targetDependency);
-			}
+	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) {
+		List<DefaultEdge> newEdges = m_InterTableau.addEdgeAndCloseTransitivity(importSource, importTarget);
+		for (DefaultEdge e : newEdges) {
+			GlobalNodeID eSource = m_InterTableau.getEdgeSource(e);
+			GlobalNodeID eTarget = m_InterTableau.getEdgeTarget(e);
+			BranchPointSet eSourceDependency = m_InterTableau.getDependency(eSource);
+			doRRule(eSource, eTarget, eSourceDependency);
 		}
-		
-		private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) {
-			Set<DLPackage> midPackages = m_ImportGraph.getAllVerticesConnecting(importSource.getPackage(), importTarget.getPackage());
-			
-			
-			
-		}
-		
 	}
-	
+
+	private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) {
+		Set<DLPackage> midPackages = m_ImportGraph.getAllVerticesConnecting(importSource.getPackage(), importTarget.getPackage());
+		for (DLPackage midPackage : midPackages) {
+			GlobalNodeID midNode = m_InterTableau.getSourceVertexOf(importTarget, midPackage);
+			if (midNode == null) {
+				TableauManager midTab = m_Tableaux.get(midPackage);
+				midNode = midTab.addRoot(dependency);
+				m_InterTableau.addVertex(midNode, dependency);
+				addEdge(midNode, importTarget);
+			}
+			
+			addEdge(importSource, midNode);
+		}
+	}
+
 }

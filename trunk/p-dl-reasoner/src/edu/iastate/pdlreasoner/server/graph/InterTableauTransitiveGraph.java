@@ -14,12 +14,10 @@ public class InterTableauTransitiveGraph {
 
 	private SimpleDirectedGraph<GlobalNodeID,DefaultEdge> m_Graph;
 	private Map<GlobalNodeID,BranchPointSet> m_NodeDependency;
-	private List<EdgeListener<DefaultEdge>> m_Listeners;
 
 	public InterTableauTransitiveGraph() {
 		m_Graph = new SimpleDirectedGraph<GlobalNodeID, DefaultEdge>(DefaultEdge.class);
 		m_NodeDependency = CollectionUtil.makeMap();
-		m_Listeners = CollectionUtil.makeList();
 	}
 
 	public boolean addVertex(GlobalNodeID v, BranchPointSet dependency) {
@@ -42,26 +40,12 @@ public class InterTableauTransitiveGraph {
 		return m_Graph.getEdgeTarget(e);
 	}
 
-	public void addEdgeAndCloseTransitivity(GlobalNodeID source, GlobalNodeID target) {
+	public List<DefaultEdge> addEdgeAndCloseTransitivity(GlobalNodeID source, GlobalNodeID target) {
 		List<DefaultEdge> newEdges = CollectionUtil.makeList();
 		
 		
 		
-		fireEdgesAdded(newEdges);
-	}
-
-	public void addEdgeListener(EdgeListener<DefaultEdge> l) {
-		m_Listeners.add(l);
-	}
-	
-	public void removeEdgeListener(EdgeListener<DefaultEdge> l) {
-		m_Listeners.remove(l);
-	}
-
-	private void fireEdgesAdded(List<DefaultEdge> newEdges) {
-		for (EdgeListener<DefaultEdge> l : m_Listeners) {
-			l.edgesAdded(newEdges);
-		}
+		return newEdges;
 	}
 
 }
