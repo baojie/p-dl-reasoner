@@ -1,8 +1,10 @@
 package edu.iastate.pdlreasoner.server.graph;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -21,10 +23,18 @@ public class InterTableauTransitiveGraph {
 	}
 
 	public boolean addVertex(GlobalNodeID v, BranchPointSet dependency) {
-		return false;
+		boolean result = m_Graph.addVertex(v);
+		if (result) {
+			m_NodeDependency.put(v, dependency);
+		}
+		
+		return result;
 	}
 
 	public GlobalNodeID getSourceVertexOf(GlobalNodeID v, DLPackage dlPackage) {
+		for (GlobalNodeID source : Graphs.predecessorListOf(m_Graph, v)) {
+			if (source.getPackage().equals(dlPackage)) return source;
+		}
 		return null;
 	}
 	
@@ -41,9 +51,22 @@ public class InterTableauTransitiveGraph {
 	}
 
 	public List<DefaultEdge> addEdgeAndCloseTransitivity(GlobalNodeID source, GlobalNodeID target) {
+		if (m_Graph.getEdge(source, target) != null) return Collections.emptyList();
+		
 		List<DefaultEdge> newEdges = CollectionUtil.makeList();
 		
-		
+		List<GlobalNodeID> sourceAncestors = Graphs.predecessorListOf(m_Graph, source);
+		sourceAncestors.add(source);
+		List<GlobalNodeID> targetDescendents = Graphs.successorListOf(m_Graph, target);
+		targetDescendents.add(target);
+		for (GlobalNodeID sourceAncestor : sourceAncestors) {
+			for (GlobalNodeID targetDescendent : targetDescendents) {
+				DefaultEdge newEdge = m_Graph.addEdge(sourceAncestor, targetDescendent);
+				if (newEdge != null) {
+					newEdges.add(newEdge);
+				}
+			}
+		}
 		
 		return newEdges;
 	}
