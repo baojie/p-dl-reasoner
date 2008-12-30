@@ -211,7 +211,7 @@ public class TableauManager {
 				m_InterTableauMan.processConceptReport(backward);
 			} else {
 				List<DLPackage> importers = m_ImportGraph.getImportersOf(m_Package, c);
-				if (!importers.isEmpty()) {
+				if (importers != null) {
 					GlobalNodeID importSource = m_Node.getGlobalNodeID();
 					for (DLPackage importer : importers) {
 						GlobalNodeID importTarget = GlobalNodeID.makeWithUnknownID(importer);

@@ -32,6 +32,8 @@ public class InterTableauTransitiveGraph {
 	}
 
 	public GlobalNodeID getSourceVertexOf(GlobalNodeID v, DLPackage dlPackage) {
+		if (!m_Graph.containsVertex(v)) return null;
+		
 		for (GlobalNodeID source : Graphs.predecessorListOf(m_Graph, v)) {
 			if (source.getPackage().equals(dlPackage)) return source;
 		}
@@ -39,6 +41,8 @@ public class InterTableauTransitiveGraph {
 	}
 	
 	public GlobalNodeID getTargetVertexOf(GlobalNodeID v, DLPackage dlPackage) {
+		if (!m_Graph.containsVertex(v)) return null;
+		
 		for (GlobalNodeID target : Graphs.successorListOf(m_Graph, v)) {
 			if (target.getPackage().equals(dlPackage)) return target;
 		}

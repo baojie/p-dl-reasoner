@@ -12,7 +12,9 @@ import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.struct.MultiLabeledDirectedGraph;
+import edu.iastate.pdlreasoner.struct.MultiLabeledEdge;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 
@@ -47,7 +49,21 @@ public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 	}
 
 	public List<DLPackage> getImportersOf(DLPackage source, Concept c) {
-		return null;
+		if (!containsVertex(source)) return null;
+		
+		List<DLPackage> importers = null;
+		for (MultiLabeledEdge<Concept> outgoingEdge : outgoingEdgesOf(source)) {
+        	if (outgoingEdge.getLabels().contains(c)) {
+        		if (importers == null) {
+        			//Lazy construction for optimization
+        			importers = CollectionUtil.makeList();
+        		}
+        		
+        		importers.add(getEdgeTarget(outgoingEdge));
+        	}
+        }
+
+        return importers;
 	}
 
 }
