@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Concept;
@@ -19,6 +21,8 @@ import edu.iastate.pdlreasoner.tableau.message.Clash;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauServer {
+	
+	private static final Logger LOGGER = Logger.getLogger(TableauServer.class);
 	
 	//Constants wrt KBs
 	private List<KnowledgeBase> m_KBs;
@@ -46,6 +50,11 @@ public class TableauServer {
 		}
 		
 		m_ImportGraph = new ImportGraph(m_KBs);
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Import Graph:");
+			LOGGER.debug(m_ImportGraph);
+		}
 	}
 	
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
