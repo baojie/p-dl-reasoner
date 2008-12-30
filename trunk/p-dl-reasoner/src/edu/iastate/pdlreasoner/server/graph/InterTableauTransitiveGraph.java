@@ -38,6 +38,13 @@ public class InterTableauTransitiveGraph {
 		return null;
 	}
 	
+	public GlobalNodeID getTargetVertexOf(GlobalNodeID v, DLPackage dlPackage) {
+		for (GlobalNodeID target : Graphs.successorListOf(m_Graph, v)) {
+			if (target.getPackage().equals(dlPackage)) return target;
+		}
+		return null;
+	}
+	
 	public BranchPointSet getDependency(GlobalNodeID v) {
 		return m_NodeDependency.get(v);
 	}

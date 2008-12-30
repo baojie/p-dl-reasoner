@@ -27,6 +27,7 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 public class Node {
 
 	private int m_ID;
+	private GlobalNodeID m_GlobalID;
 	
 	//Graph structural fields
 	private TableauGraph m_Graph;
@@ -50,10 +51,12 @@ public class Node {
 		m_ClashDetector = new NodeClashDetector();
 	}
 	
-	public GlobalNodeID makeAndCacheGlobalNodeID() {
-		GlobalNodeID globalID = GlobalNodeID.make(m_Graph.getPackage(), m_ID);
-		m_Graph.put(globalID, this);
-		return globalID;
+	public GlobalNodeID getGlobalNodeID() {
+		if (m_GlobalID == null) {
+			m_GlobalID = GlobalNodeID.make(m_Graph.getPackage(), m_ID);
+			m_Graph.put(m_GlobalID, this);
+		}
+		return m_GlobalID;
 	}
 	
 	//Graph structural methods

@@ -1,6 +1,7 @@
 package edu.iastate.pdlreasoner.tableau;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
@@ -18,6 +19,7 @@ import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
+import edu.iastate.pdlreasoner.server.ImportGraph;
 import edu.iastate.pdlreasoner.server.InterTableauManager;
 import edu.iastate.pdlreasoner.server.TableauServer;
 import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
@@ -38,6 +40,7 @@ public class TableauManager {
 	
 	//Constants
 	private TableauServer m_Server;
+	private ImportGraph m_ImportGraph;
 	private InterTableauManager m_InterTableauMan;
 	private DLPackage m_Package;
 	private TBox m_TBox;
@@ -67,6 +70,10 @@ public class TableauManager {
 		m_Server = server;
 	}
 
+	public void setImportGraph(ImportGraph importGraph) {
+		m_ImportGraph = importGraph;
+	}
+
 	public void setInterTableauManager(InterTableauManager interTableauMan) {
 		m_InterTableauMan = interTableauMan;
 	}
@@ -80,7 +87,7 @@ public class TableauManager {
 	public GlobalNodeID addRoot(BranchPointSet dependency) {
 		Node root = m_Graph.makeRoot(dependency);
 		applyUniversalRestriction(root);
-		return root.makeAndCacheGlobalNodeID();
+		return root.getGlobalNodeID();
 	}
 	
 	public boolean isComplete() {
@@ -199,9 +206,19 @@ public class TableauManager {
 			DLPackage context = c.getContext();
 			if (!m_Package.equals(context)) {
 				GlobalNodeID importSource = GlobalNodeID.makeWithUnknownID(context);
-				GlobalNodeID importTarget = m_Node.makeAndCacheGlobalNodeID();
+				GlobalNodeID importTarget = m_Node.getGlobalNodeID();
 				BackwardConceptReport backward = new BackwardConceptReport(importSource, importTarget, m_Concept);
 				m_InterTableauMan.processConceptReport(backward);
+			} else {
+				List<DLPackage> importers = m_ImportGraph.getImportersOf(m_Package, c);
+				if (!importers.isEmpty()) {
+					GlobalNodeID importSource = m_Node.getGlobalNodeID();
+					for (DLPackage importer : importers) {
+						GlobalNodeID importTarget = GlobalNodeID.makeWithUnknownID(importer);
+						ForwardConceptReport forward = new ForwardConceptReport(importSource, importTarget, m_Concept);
+						m_InterTableauMan.processConceptReport(forward);
+					}
+				}
 			}
 		}
 
@@ -284,7 +301,8 @@ public class TableauManager {
 
 		@Override
 		public void process(ForwardConceptReport msg) {
-			
+			Node node = m_Graph.get(msg.getImportTarget());
+			node.addLabel(msg.getConcept());
 		}
 
 		@Override

@@ -45,5 +45,9 @@ public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 		
 		return midVertices;
 	}
-	
+
+	public List<DLPackage> getImportersOf(DLPackage source, Concept c) {
+		return null;
+	}
+
 }

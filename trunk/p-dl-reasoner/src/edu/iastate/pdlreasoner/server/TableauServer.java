@@ -99,6 +99,7 @@ public class TableauServer {
 		m_InterTableauMan = new InterTableauManager(m_ImportGraph, m_Tableaux);
 		for (TableauManager t : m_Tableaux) {
 			t.setServer(this);
+			t.setImportGraph(m_ImportGraph);
 			t.setInterTableauManager(m_InterTableauMan);
 		}
 		

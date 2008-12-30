@@ -62,8 +62,16 @@ public class InterTableauManager {
 	}
 
 	public void processConceptReport(ForwardConceptReport forward) {
-		DLPackage msgTarget = forward.getImportTarget().getPackage();
-		m_Tableaux.get(msgTarget).receive(forward);
+		GlobalNodeID requestedImportTarget = forward.getImportTarget();
+		DLPackage importTargetPackage = requestedImportTarget.getPackage();
+		GlobalNodeID importSource = forward.getImportSource();
+		
+		GlobalNodeID importTarget = m_InterTableau.getTargetVertexOf(importSource, importTargetPackage);
+		if (importTarget == null) return;
+		
+		requestedImportTarget.copyIDFrom(importTarget);
+		TableauManager importTargetTab = m_Tableaux.get(importTargetPackage);
+		importTargetTab.receive(forward);
 	}
 	
 	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) {
