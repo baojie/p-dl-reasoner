@@ -112,6 +112,7 @@ public class TableauGraph {
 	public void pruneTo(BranchPoint restoreTarget) {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(m_Package.toDebugString() + "pruning starts with target = " + restoreTarget);
+			LOGGER.debug(m_Package.toDebugString() + "branches before pruning = " + m_Branches);
 		}
 		
 		//Prune nodes
@@ -141,18 +142,19 @@ public class TableauGraph {
 			}
 		}
 		
-		//Reopen remaining branches - those that do not depend on the restoreTarget
-		//but still have to be pruned to make sure that restoreTarget is the latest branch.
+		//Reopen remaining branches added after restoreTarget - those that do not depend
+		//on the restoreTarget but still have to be pruned to make sure that restoreTarget
+		//is the latest branch.
 		for (int i = m_Branches.size() - 1; i >= 0; i--) {
 			Branch iBranch = m_Branches.get(i);
-			if (restoreTarget.equals(iBranch.getBranchPoint())) break;
+			if (iBranch.getBranchPoint().compareTo(restoreTarget) <= 0) break;
 			
 			m_Branches.remove(i);
 			iBranch.reopenConceptOnNode();
 		}
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_Package.toDebugString() + "branches = " + m_Branches);
+			LOGGER.debug(m_Package.toDebugString() + "branches after pruning = " + m_Branches);
 		}
 	}
 
