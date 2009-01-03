@@ -100,7 +100,7 @@ public class TableauServerMultiPackageTest {
 		}
 
 		m_TableauServer.init();
-		assertTrue(m_TableauServer.isSubclassOf(p0A, p2D, p[0]));
+		assertTrue(m_TableauServer.isSubclassOf(p0A, p2D, p[3]));
 	}
 	
 }
