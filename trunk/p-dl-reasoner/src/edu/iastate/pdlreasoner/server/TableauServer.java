@@ -59,7 +59,7 @@ public class TableauServer {
 	
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Query = satisfiability of " + c + " with witness " + witness.toDebugString());
+			LOGGER.debug("Query = satisfiability of " + c + " as witnessed by " + witness);
 		}
 		
 		makeTableaux();
@@ -71,10 +71,10 @@ public class TableauServer {
 		if (LOGGER.isDebugEnabled()) {
 			if (hasClashAtOrigin) {
 				LOGGER.debug("All branches clashed");
-				LOGGER.debug("Concept " + c + " is not satisfiable");
+				LOGGER.debug("Concept " + c + " is not satisfiable as witnessed by " + witness);
 			} else {
 				LOGGER.debug("Found clash-free completed tableaux");
-				LOGGER.debug("Concept " + c + " is satisfiable");
+				LOGGER.debug("Concept " + c + " is satisfiable as witnessed by " + witness);
 			}
 			LOGGER.debug("");
 		}

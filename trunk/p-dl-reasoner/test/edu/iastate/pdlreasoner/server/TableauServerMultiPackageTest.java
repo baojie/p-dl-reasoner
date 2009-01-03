@@ -9,6 +9,7 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
@@ -102,6 +103,44 @@ public class TableauServerMultiPackageTest {
 		m_TableauServer.init();
 		assertTrue(m_TableauServer.isSubclassOf(p0A, p2D, p[2]));
 	}
-	
-}
 
+
+	@Test
+	public void paperExample3() {
+		Atom p0B = makeAtom(p[0], URI.create("#B"));
+		Atom p0F = makeAtom(p[0], URI.create("#F"));
+		Atom p1P = makeAtom(p[1], URI.create("#P"));
+		
+		kb[0].addAxiom(p0B, p0F);
+		kb[1].addAxiom(p1P, p0B);
+		kb[1].addAxiom(p1P, makeNegation(p[1], p0F));
+		
+		for (int i = 0; i <= 1; i++) {
+			m_TableauServer.addKnowledgeBase(kb[i]);
+		}
+		
+		m_TableauServer.init();
+		assertFalse(m_TableauServer.isSatisfiable(p1P, p[1]));
+	}
+
+	@Test
+	public void paperExample4() {
+		Atom p0A = makeAtom(p[0], URI.create("#A"));
+		Atom p0C = makeAtom(p[0], URI.create("#C"));
+		Role p1r = makeRole(URI.create("#r"));
+		Atom p1B = makeAtom(p[1], URI.create("#B"));
+		
+		kb[0].addAxiom(p0A, p0C);
+		kb[1].addAxiom(p0A, makeSomeValues(p1r, p1B));
+		kb[1].addAxiom(p1B, makeAnd(p0A, makeNegation(p[1], p0C)));
+		
+		for (int i = 0; i <= 1; i++) {
+			m_TableauServer.addKnowledgeBase(kb[i]);
+		}
+		
+		m_TableauServer.init();
+		assertTrue(m_TableauServer.isSatisfiable(p0A, p[0]));
+		assertFalse(m_TableauServer.isSatisfiable(p0A, p[1]));
+	}
+
+}
