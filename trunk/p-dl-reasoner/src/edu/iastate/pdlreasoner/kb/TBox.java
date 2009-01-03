@@ -3,6 +3,8 @@ package edu.iastate.pdlreasoner.kb;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.ContextualizedConcept;
@@ -17,6 +19,8 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TBox {
 
+	private static final Logger LOGGER = Logger.getLogger(TBox.class);
+	
 	//Constants
 	private KnowledgeBase m_HomeKB;
 	
@@ -46,6 +50,10 @@ public class TBox {
 			Concept nnfNotSub = converter.convert(notSub);
 			Concept uc = ModelFactory.makeOr(nnfNotSub, subclass.getSup());
 			m_UC.add(uc);
+		}
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_HomeKB.getPackage().toDebugString() + "UC = " + m_UC);
 		}
 	}
 	

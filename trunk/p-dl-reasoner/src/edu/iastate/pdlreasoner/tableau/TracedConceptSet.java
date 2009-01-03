@@ -92,15 +92,17 @@ public class TracedConceptSet {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Open:\n");
+		builder.append("Open={ ");
 		for (Concept key : m_Open.keySet()) {
-			builder.append(key).append("\n");
+			builder.append(key).append(" ");
 		}
 		
-		builder.append("\nExpanded:\n");
+		builder.append("} Expanded={ ");
 		for (Concept key : m_Expanded.keySet()) {
-			builder.append(key).append("\n");
+			builder.append(key).append(" ");
 		}
+		builder.append("}");
+		
 		return builder.toString();
 	}
 }

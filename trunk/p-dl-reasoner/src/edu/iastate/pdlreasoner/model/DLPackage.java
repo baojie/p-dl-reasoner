@@ -14,6 +14,10 @@ public class DLPackage {
 		return m_URI;
 	}
 	
+	public String toDebugString() {
+		return new StringBuilder("<").append(m_URI).append("> ").toString();
+	}
+	
 	@Override
 	public String toString() {
 		return m_URI.toString();

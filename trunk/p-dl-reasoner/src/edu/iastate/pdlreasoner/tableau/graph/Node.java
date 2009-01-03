@@ -207,7 +207,7 @@ public class Node {
 			}
 		}
 	}
-	
+
 	//Only NNF Concepts
 	private class NodeClashDetector extends ConceptVisitorAdapter {
 		
@@ -247,6 +247,15 @@ public class Node {
 			}
 		}
 	
+	}
+
+	@Override
+	public String toString() {
+		return "#" + m_ID;
+	}
+	
+	public String getLabels() {
+		return m_Labels.values().toString();
 	}
 
 }

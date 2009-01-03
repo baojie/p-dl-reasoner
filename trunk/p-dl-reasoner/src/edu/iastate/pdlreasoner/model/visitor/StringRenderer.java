@@ -54,7 +54,7 @@ public class StringRenderer implements ConceptVisitor {
 		m_Builder.append(NOT)
 			.append("(")
 			.append(negation.getContext())
-			.append(", ");
+			.append(",");
 		
 		negation.getNegatedConcept().accept(this);
 		
@@ -67,7 +67,7 @@ public class StringRenderer implements ConceptVisitor {
 		Concept[] operands = set.getOperands();
 		operands[0].accept(this);
 		for (int i = 1; i < operands.length; i++) {
-			m_Builder.append(", ");
+			m_Builder.append(",");
 			operands[i].accept(this);
 		}
 					
@@ -89,7 +89,7 @@ public class StringRenderer implements ConceptVisitor {
 	private void visitRestriction(Restriction r) {
 		m_Builder.append("(")
 			.append(r.getRole())
-			.append(", ");
+			.append(",");
 	
 		r.getFiller().accept(this);
 		

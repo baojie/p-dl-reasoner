@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
+
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.model.AllValues;
@@ -37,6 +39,8 @@ import edu.iastate.pdlreasoner.tableau.message.Message;
 import edu.iastate.pdlreasoner.tableau.message.MessageProcessor;
 
 public class TableauManager {
+	
+	private static final Logger LOGGER = Logger.getLogger(TableauManager.class);
 	
 	//Constants
 	private TableauServer m_Server;
@@ -81,6 +85,11 @@ public class TableauManager {
 	public void addGlobalRootWith(Concept c) {
 		Node root = m_Graph.makeRoot(BranchPointSet.EMPTY);
 		root.addLabel(TracedConcept.makeOrigin(c));
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "starting with global root " + root + ": " + root.getLabels());
+		}
+		
 		applyUniversalRestriction(root);
 	}
 	
@@ -185,6 +194,10 @@ public class TableauManager {
 		BranchPointSet nodeDependency = n.getDependency();
 		for (Concept uc : m_TBox.getUC()) {
 			n.addLabel(new TracedConcept(uc, nodeDependency));
+		}
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "applied UR on node " + n + ": " + n.getLabels());
 		}
 	}
 

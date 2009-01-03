@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.Blocking;
@@ -15,6 +17,8 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauGraph {
 
+	private static final Logger LOGGER = Logger.getLogger(TableauGraph.class);
+	
 	//Constants
 	private DLPackage m_Package;
 	
@@ -61,6 +65,11 @@ public class TableauGraph {
 	public Node makeRoot(BranchPointSet dependency) {
 		Node n = makeNode(dependency);
 		m_Roots.add(n);
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "added root " + n + ", all roots = " + m_Roots);
+		}
+		
 		return n;
 	}
 

@@ -19,4 +19,9 @@ public class MultiLabeledEdge<T> {
 		return m_Labels;
 	}
 	
+	@Override
+	public String toString() {
+		return m_Labels.toString();
+	}
+	
 }

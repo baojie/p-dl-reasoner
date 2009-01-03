@@ -52,8 +52,7 @@ public class TableauServer {
 		m_ImportGraph = new ImportGraph(m_KBs);
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Import Graph:");
-			LOGGER.debug(m_ImportGraph);
+			LOGGER.debug("Import graph = " + m_ImportGraph);
 		}
 	}
 	
