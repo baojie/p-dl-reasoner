@@ -1,5 +1,7 @@
 package edu.iastate.pdlreasoner.tableau.branch;
 
+import org.apache.log4j.Logger;
+
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
@@ -8,6 +10,8 @@ import edu.iastate.pdlreasoner.tableau.graph.Node;
 
 public class Branch {
 
+	private static final Logger LOGGER = Logger.getLogger(Branch.class);
+	
 	//Constants
 	private Node m_Node;
 	private TracedConcept m_Concept;
@@ -52,6 +56,10 @@ public class Branch {
 		}
 		
 		TracedConcept tracedDisjunct = new TracedConcept(m_Disjuncts[m_NextChoice], dependency);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Trying next choice " + tracedDisjunct + " on branch " + this);
+		}
+
 		m_Node.addLabel(tracedDisjunct);
 		m_NextChoice++;
 	}
@@ -68,12 +76,12 @@ public class Branch {
 	@Override
 	public String toString() {
 		return new StringBuilder()
-			.append("[")
+			.append("<")
 			.append(m_Node).append(", ")
 			.append(m_Concept).append(", ")
 			.append(m_ThisPoint).append(", ")
 			.append(m_NextChoice)
-			.append("]")
+			.append(">")
 			.toString();
 	}
 	

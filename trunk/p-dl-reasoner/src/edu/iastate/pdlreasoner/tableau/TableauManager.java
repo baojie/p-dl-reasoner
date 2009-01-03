@@ -132,11 +132,6 @@ public class TableauManager {
 	public void tryNextChoiceOnClashedBranchWith(BranchPointSet clashCause) {
 		Branch branch = m_Graph.getLastBranch();
 		branch.setLastClashCause(clashCause);
-		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_Package.toDebugString() + "trying next choice on branch " + branch);
-		}
-		
 		branch.tryNext();
 	}
 
@@ -180,11 +175,7 @@ public class TableauManager {
 			}
 			
 			if (m_Token != null) {
-				hasChanged = expand(open.getLabelsFor(Or.class));
-				
-				if (LOGGER.isDebugEnabled() && hasChanged) {
-					LOGGER.debug(m_Package.toDebugString() + "applied OR rule on node " + open + ": " + open.getLabels());
-				}
+				expand(open.getLabelsFor(Or.class));
 			}
 		}
 	}
@@ -248,6 +239,11 @@ public class TableauManager {
 				GlobalNodeID importSource = GlobalNodeID.makeWithUnknownID(context);
 				GlobalNodeID importTarget = m_Node.getGlobalNodeID();
 				BackwardConceptReport backward = new BackwardConceptReport(importSource, importTarget, m_Concept);
+				
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(m_Package.toDebugString() + "sending " + backward);
+				}
+				
 				m_InterTableauMan.processConceptReport(backward);
 			} else {
 				List<DLPackage> importers = m_ImportGraph.getImportersOf(m_Package, c);
@@ -256,6 +252,11 @@ public class TableauManager {
 					for (DLPackage importer : importers) {
 						GlobalNodeID importTarget = GlobalNodeID.makeWithUnknownID(importer);
 						ForwardConceptReport forward = new ForwardConceptReport(importSource, importTarget, m_Concept);
+
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug(m_Package.toDebugString() + "sending " + forward);
+						}
+
 						m_InterTableauMan.processConceptReport(forward);
 					}
 				}
@@ -283,7 +284,7 @@ public class TableauManager {
 		public void visit(Or or) {
 			Branch branch = new Branch(m_Node, m_Concept, m_Token.makeNextBranchPoint());
 			m_Graph.addBranch(branch);
-			
+
 			for (Concept disjunct : or.getOperands()) {
 				if (m_Node.containsLabel(disjunct)) return;
 			}

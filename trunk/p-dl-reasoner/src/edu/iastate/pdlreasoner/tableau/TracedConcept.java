@@ -50,11 +50,11 @@ public class TracedConcept {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("[")
+		builder.append("<")
 			.append(m_Concept)
 			.append(", ")
 			.append(m_Dependency)
-			.append("]");
+			.append(">");
 		return builder.toString();
 	}
 }

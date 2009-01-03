@@ -13,5 +13,16 @@ public class BackwardConceptReport extends ConceptReport {
 	public void execute(MessageProcessor messageProcessor) {
 		messageProcessor.process(this);
 	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder()
+			.append("ConceptReport(")
+			.append(m_ImportSource).append(" <- ").append(m_ImportTarget)
+			.append(", ")
+			.append(m_Concept)
+			.append(")")
+			.toString();
+	}
 
 }

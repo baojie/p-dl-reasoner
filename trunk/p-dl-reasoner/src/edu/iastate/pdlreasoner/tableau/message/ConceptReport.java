@@ -26,5 +26,5 @@ public abstract class ConceptReport implements Message {
 	public TracedConcept getConcept() {
 		return m_Concept;
 	}
-
+	
 }

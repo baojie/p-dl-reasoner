@@ -44,4 +44,13 @@ public class GlobalNodeID {
 		return m_Package.hashCode() ^ m_LocalNodeID;
 	}
 	
+	@Override
+	public String toString() {
+		return new StringBuilder()
+			.append("(")
+			.append(m_Package).append(", ")
+			.append(m_LocalNodeID == UNKNOWN_ID ? "Unknown" : m_LocalNodeID)
+			.append(")")
+			.toString();
+	}
 }
