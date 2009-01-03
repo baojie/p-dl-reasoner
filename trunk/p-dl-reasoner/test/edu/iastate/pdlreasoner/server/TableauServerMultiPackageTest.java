@@ -20,6 +20,7 @@ import org.junit.Test;
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
+import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
@@ -53,6 +54,23 @@ public class TableauServerMultiPackageTest {
 		m_TableauServer.init();
 		assertTrue(m_TableauServer.isConsistent(p[0]));
 		assertTrue(m_TableauServer.isConsistent(p[1]));
+	}
+
+	@Test
+	public void pruneInterTableauxOnClash() {
+		Atom p0A = makeAtom(p[0], URI.create("#A"));
+		Atom p0B = makeAtom(p[0], URI.create("#B"));
+		
+		kb[0].addAxiom(p0A, Bottom.INSTANCE);
+		
+		for (int i = 0; i <= 1; i++) {
+			m_TableauServer.addKnowledgeBase(kb[i]);
+		}
+		
+		m_TableauServer.init();
+		Or AorB = makeOr(p0A, p0B);
+		assertTrue(m_TableauServer.isSatisfiable(AorB, p[0]));
+		assertTrue(m_TableauServer.isSatisfiable(AorB, p[1]));
 	}
 
 	@Test
