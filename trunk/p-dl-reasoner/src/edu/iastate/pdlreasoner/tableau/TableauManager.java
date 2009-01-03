@@ -3,6 +3,7 @@ package edu.iastate.pdlreasoner.tableau;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -70,6 +71,10 @@ public class TableauManager {
 		m_MessageProcessor = new MessageProcessorImpl();
 	}
 	
+	public DLPackage getPackage() {
+		return m_Package;
+	}
+	
 	public void setServer(TableauServer server) {
 		m_Server = server;
 	}
@@ -127,6 +132,11 @@ public class TableauManager {
 	public void tryNextChoiceOnClashedBranchWith(BranchPointSet clashCause) {
 		Branch branch = m_Graph.getLastBranch();
 		branch.setLastClashCause(clashCause);
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "trying next choice on branch " + branch);
+		}
+		
 		branch.tryNext();
 	}
 
@@ -156,30 +166,47 @@ public class TableauManager {
 		for (Node open : m_Graph.getOpenNodes()) {
 			m_ConceptExpander.reset(open);
 			
-			expand(open.getLabelsFor(Bottom.class));
-			expand(open.getLabelsFor(Top.class));
-			expand(open.getLabelsFor(Atom.class));
-			expand(open.getLabelsFor(Negation.class));
-			expand(open.getLabelsFor(And.class));
-			expand(open.getLabelsFor(SomeValues.class));
-			expand(open.getLabelsFor(AllValues.class));
+			boolean hasChanged = false;
+			hasChanged = hasChanged | expand(open.getLabelsFor(Bottom.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(Top.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(Atom.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(Negation.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(And.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(SomeValues.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(AllValues.class));
+			
+			if (LOGGER.isDebugEnabled() && hasChanged) {
+				LOGGER.debug(m_Package.toDebugString() + "applied deterministic rules on node " + open + ": " + open.getLabels());
+			}
+			
 			if (m_Token != null) {
-				expand(open.getLabelsFor(Or.class));
+				hasChanged = expand(open.getLabelsFor(Or.class));
+				
+				if (LOGGER.isDebugEnabled() && hasChanged) {
+					LOGGER.debug(m_Package.toDebugString() + "applied OR rule on node " + open + ": " + open.getLabels());
+				}
 			}
 		}
 	}
 	
-	private void expand(TracedConceptSet tcSet) {
-		if (tcSet != null) {
-			for (TracedConcept tc : tcSet.flush()) {
-				m_ConceptExpander.expand(tc);
-			}
+	private boolean expand(TracedConceptSet tcSet) {
+		if (tcSet == null) return false;
+			
+		Set<TracedConcept> tcs = tcSet.flush();
+		for (TracedConcept tc : tcs) {
+			m_ConceptExpander.expand(tc);
 		}
+		
+		return !tcs.isEmpty();
 	}
 	
 	private void processClash() {
 		BranchPointSet clashCause = m_Graph.getEarliestClashCause();
 		if (clashCause == null) return;
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "broadcasting clash " + clashCause);
+		}
 		
 		m_Server.processClash(clashCause);
 	}

@@ -83,6 +83,10 @@ public class TableauGraph {
 
 	public void addBranch(Branch branch) {
 		m_Branches.add(branch);
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "added branch = " + branch);
+		}
 	}
 	
 	public boolean hasBranch(BranchPoint bp) {
@@ -106,12 +110,20 @@ public class TableauGraph {
 	}
 	
 	public void pruneTo(BranchPoint restoreTarget) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "pruning starts with target = " + restoreTarget);
+		}
+		
 		//Prune nodes
 		m_PruneNodesCollector.reset(restoreTarget);
 		accept(m_PruneNodesCollector);
 		for (Node n : m_PruneNodesCollector.getNodes()) {
 			if (!m_Roots.remove(n)) {
 				n.removeFromParent();
+			}
+			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(m_Package.toDebugString() + "removed node " + n);
 			}
 		}
 		
@@ -137,6 +149,10 @@ public class TableauGraph {
 			
 			m_Branches.remove(i);
 			iBranch.reopenConceptOnNode();
+		}
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "branches = " + m_Branches);
 		}
 	}
 

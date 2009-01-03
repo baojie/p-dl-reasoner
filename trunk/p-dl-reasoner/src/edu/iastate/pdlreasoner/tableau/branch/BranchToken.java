@@ -22,4 +22,8 @@ public class BranchToken {
 		return bp;
 	}
 
+	@Override
+	public String toString() {
+		return String.valueOf(m_NextIndex);
+	}
 }

@@ -53,16 +53,33 @@ public class TableauServer {
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Import graph = " + m_ImportGraph);
+			LOGGER.debug("");
 		}
 	}
 	
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Query = satisfiability of " + c + " with witness " + witness.toDebugString());
+		}
+		
 		makeTableaux();
 		TableauManager witTableau = m_Tableaux.get(witness);
 		witTableau.addGlobalRootWith(c);
 		witTableau.receiveToken(BranchToken.make());
 		completeAll();
-		return !hasClashAtOrigin();
+		boolean hasClashAtOrigin = hasClashAtOrigin();
+		if (LOGGER.isDebugEnabled()) {
+			if (hasClashAtOrigin) {
+				LOGGER.debug("All branches clashed");
+				LOGGER.debug("Concept " + c + " is not satisfiable");
+			} else {
+				LOGGER.debug("Found clash-free completed tableaux");
+				LOGGER.debug("Concept " + c + " is satisfiable");
+			}
+			LOGGER.debug("");
+		}
+		
+		return !hasClashAtOrigin;
 	}
 	
 	public boolean isConsistent(DLPackage witness) {
@@ -143,6 +160,12 @@ public class TableauServer {
 		
 		TableauManager resumeTab = findOwnerOf(clashCause);
 		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("All prunings completed");
+			LOGGER.debug("Resuming completion on " + resumeTab.getPackage().toDebugString() + "with token " + token);
+		}
+		
 		resumeTab.receiveToken(token);
 		resumeTab.tryNextChoiceOnClashedBranchWith(clashCause);
 	}

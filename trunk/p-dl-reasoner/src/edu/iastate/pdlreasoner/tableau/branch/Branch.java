@@ -65,4 +65,16 @@ public class Branch {
 		tcSet.reopen(m_Concept);
 	}
 
+	@Override
+	public String toString() {
+		return new StringBuilder()
+			.append("[")
+			.append(m_Node).append(", ")
+			.append(m_Concept).append(", ")
+			.append(m_ThisPoint).append(", ")
+			.append(m_NextChoice)
+			.append("]")
+			.toString();
+	}
+	
 }

@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
@@ -26,6 +28,8 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class Node {
 
+	private static final Logger LOGGER = Logger.getLogger(Node.class);
+	
 	private int m_ID;
 	private GlobalNodeID m_GlobalID;
 	
@@ -184,6 +188,10 @@ public class Node {
 	
 	private void addClashCause(TracedConcept... clashes) {
 		m_ClashCauses.add(BranchPointSet.unionDependencies(clashes));
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Graph.getPackage().toDebugString() + "clash found on node " + this + " = " + CollectionUtil.asSet(clashes));
+		}
 	}
 	
 	public void pruneAndReopenLabels(BranchPoint restoreTarget) {
@@ -204,6 +212,10 @@ public class Node {
 				if (parentAllValues != null) {
 					parentAllValues.reopenAll();
 				}
+			}
+			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(m_Graph.getPackage().toDebugString() + "pruned and reopened node " + this + ": " + getLabels());
 			}
 		}
 	}
