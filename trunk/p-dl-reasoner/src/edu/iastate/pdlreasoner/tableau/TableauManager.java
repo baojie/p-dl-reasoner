@@ -134,6 +134,10 @@ public class TableauManager {
 		branch.setLastClashCause(clashCause);
 		branch.tryNext();
 	}
+	
+	public void reopenAtomsOnGlobalNodes(Set<GlobalNodeID> nodes) {
+		m_Graph.reopenAtomsOnGlobalNodes(nodes);
+	}
 
 	public void run() {
 		processMessages();

@@ -147,7 +147,26 @@ public class TableauGraph {
 			LOGGER.debug(m_Package.toDebugString() + "branches after pruning = " + m_Branches);
 		}
 	}
+	
+	public void reopenAtomsOnGlobalNodes(Set<GlobalNodeID> nodes) {
+		for (GlobalNodeID node : nodes) {
+			m_GlobalMap.get(node).reopenAtoms();
+		}
+	}
 
+	public BranchPointSet getEarliestClashCause() {
+		m_ClashCollector.reset();
+		accept(m_ClashCollector);
+		Set<BranchPointSet> clashCauses = m_ClashCollector.getClashCauses();
+		return clashCauses.isEmpty() ? null : Collections.min(clashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
+	}
+	
+	public Set<Node> getOpenNodes() {
+		m_OpenNodesCollector.reset();
+		accept(m_OpenNodesCollector);
+		return m_OpenNodesCollector.getNodes();
+	}
+	
 	private void pruneNodes(BranchPoint restoreTarget) {
 		m_PruneNodesCollector.reset(restoreTarget);
 		accept(m_PruneNodesCollector);
@@ -165,19 +184,7 @@ public class TableauGraph {
 		m_GlobalMap.values().removeAll(prunedNodes);
 	}
 
-	public BranchPointSet getEarliestClashCause() {
-		m_ClashCollector.reset();
-		accept(m_ClashCollector);
-		Set<BranchPointSet> clashCauses = m_ClashCollector.getClashCauses();
-		return clashCauses.isEmpty() ? null : Collections.min(clashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
-	}
-	
-	public Set<Node> getOpenNodes() {
-		m_OpenNodesCollector.reset();
-		accept(m_OpenNodesCollector);
-		return m_OpenNodesCollector.getNodes();
-	}
-	
+
 	private static class ClashCauseCollector implements NodeVisitor {
 		
 		private Set<BranchPointSet> m_ClashCauses;

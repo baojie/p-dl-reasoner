@@ -1,6 +1,8 @@
 package edu.iastate.pdlreasoner.server;
 
 import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultEdge;
@@ -88,6 +90,11 @@ public class InterTableauManager {
 	
 	public void pruneTo(BranchPoint restoreTarget) {
 		m_InterTableau.pruneTo(restoreTarget);
+		
+		for (Entry<DLPackage, Set<GlobalNodeID>> entry : m_InterTableau.getVerticesByPackage().entrySet()) {
+			TableauManager tab = m_Tableaux.get(entry.getKey());
+			tab.reopenAtomsOnGlobalNodes(entry.getValue());
+		}
 	}
 
 	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) {

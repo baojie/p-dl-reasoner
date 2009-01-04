@@ -220,7 +220,7 @@ public class Node {
 		}
 	}
 	
-	public void reopenAtomsOrTops() {
+	public void reopenAtoms() {
 		for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {
 			Class<? extends Concept> type = entry.getKey();
 			if (type.equals(Atom.class) || type.equals(Top.class)) {
