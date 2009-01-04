@@ -3,6 +3,7 @@ package edu.iastate.pdlreasoner.server;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -75,15 +76,17 @@ public class TableauServerMultiPackageTest {
 		Atom p0B = makeAtom(p[0], URI.create("#B"));
 		
 		kb[0].addAxiom(p0A, Bottom.INSTANCE);
+		kb[0].addAxiom(p0B, Bottom.INSTANCE);
+		kb[1].addAxiom(Bottom.INSTANCE, p0A);
 		
 		for (int i = 0; i <= 1; i++) {
 			m_TableauServer.addKnowledgeBase(kb[i]);
 		}
 		
 		m_TableauServer.init();
-		Or AorB = makeOr(p0A, p0B);
-		assertTrue(m_TableauServer.isSatisfiable(AorB, p[0]));
-		assertTrue(m_TableauServer.isSatisfiable(AorB, p[1]));
+		Or query = makeOr(p0A, p0B);
+		assertFalse(m_TableauServer.isSatisfiable(query, p[0]));
+		assertFalse(m_TableauServer.isSatisfiable(query, p[1]));
 	}
 
 }
