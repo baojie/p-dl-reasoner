@@ -40,16 +40,19 @@ public class ExternalConceptsExtractor extends ConceptTraverser {
 	
 	@Override
 	public void visit(Top top) {
+		super.visit(top);
 		visitContextualizedAtom(top);
 	}
 
 	@Override
 	public void visit(Atom atom) {
+		super.visit(atom);
 		visitContextualizedAtom(atom);
 	}
 	
 	@Override
 	public void visit(Negation negation) {
+		super.visit(negation);
 		DLPackage context = negation.getContext();
 		if (!m_HomePackage.equals(negation.getContext())) {
 			m_ExternalNegations.add(context);				
