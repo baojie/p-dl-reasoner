@@ -182,6 +182,8 @@ public class TableauServer {
 		m_ClashCauses.clear();
 		if (clashCause.isEmpty()) return;
 		
+		m_InterTableauMan.pruneTo(clashCause.getLatestBranchPoint());
+
 		TableauManager resumeTab = findOwnerOf(clashCause);
 		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
 		

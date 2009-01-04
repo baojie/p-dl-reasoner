@@ -11,6 +11,7 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.net.URI;
 
@@ -57,6 +58,15 @@ public class TableauServerSinglePackageTest {
 		role = makeRole(URI.create("#role"));
 	}
 
+	@Test
+	public void uninitialized() {
+		try {
+			m_TableauServer.isConsistent(p);
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException ex) {
+		}
+	}
+	
 	@Test
 	public void empty() {
 		m_TableauServer.init();
