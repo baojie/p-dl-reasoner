@@ -1,14 +1,17 @@
 package edu.iastate.pdlreasoner.server.graph;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
@@ -80,6 +83,18 @@ public class InterTableauTransitiveGraph {
 		}
 		
 		return newEdges;
+	}
+
+	public void pruneTo(BranchPoint restoreTarget) {
+		for (Iterator<Entry<GlobalNodeID, BranchPointSet>> it = m_NodeDependency.entrySet().iterator(); it.hasNext(); ) {
+			Entry<GlobalNodeID, BranchPointSet> entry = it.next();
+			GlobalNodeID v = entry.getKey();
+			BranchPointSet dependency = entry.getValue();
+			if (dependency.hasSameOrAfter(restoreTarget)) {
+				it.remove();
+				m_Graph.removeVertex(v);
+			}
+		}
 	}
 
 }

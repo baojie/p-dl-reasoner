@@ -24,7 +24,7 @@ public class TableauGraph {
 	
 	//Variables
 	private Set<Node> m_Roots;
-	private Map<GlobalNodeID,Node> m_GlobalMap; /////////////PRUNE ME WHEN BACKTRACKING
+	private Map<GlobalNodeID,Node> m_GlobalMap;
 	private NodeFactory m_NodeFactory;
 	private List<Branch> m_Branches;
 	private Blocking m_Blocking;
@@ -115,18 +115,7 @@ public class TableauGraph {
 			LOGGER.debug(m_Package.toDebugString() + "branches before pruning = " + m_Branches);
 		}
 		
-		//Prune nodes
-		m_PruneNodesCollector.reset(restoreTarget);
-		accept(m_PruneNodesCollector);
-		for (Node n : m_PruneNodesCollector.getNodes()) {
-			if (!m_Roots.remove(n)) {
-				n.removeFromParent();
-			}
-			
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_Package.toDebugString() + "removed node " + n);
-			}
-		}
+		pruneNodes(restoreTarget);
 		
 		//Prune and reopen concepts on remaining node
 		m_ConceptPruner.reset(restoreTarget);
@@ -154,8 +143,26 @@ public class TableauGraph {
 		}
 
 		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_Package.toDebugString() + "pruning completed");
 			LOGGER.debug(m_Package.toDebugString() + "branches after pruning = " + m_Branches);
 		}
+	}
+
+	private void pruneNodes(BranchPoint restoreTarget) {
+		m_PruneNodesCollector.reset(restoreTarget);
+		accept(m_PruneNodesCollector);
+		Set<Node> prunedNodes = m_PruneNodesCollector.getNodes();
+		for (Node n : prunedNodes) {
+			if (!m_Roots.remove(n)) {
+				n.removeFromParent();
+			}
+			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(m_Package.toDebugString() + "removed node " + n);
+			}
+		}
+		
+		m_GlobalMap.values().removeAll(prunedNodes);
 	}
 
 	public BranchPointSet getEarliestClashCause() {

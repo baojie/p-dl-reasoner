@@ -10,6 +10,7 @@ import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.server.graph.InterTableauTransitiveGraph;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
+import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
@@ -85,6 +86,10 @@ public class InterTableauManager {
 		importTargetTab.receive(forward);
 	}
 	
+	public void pruneTo(BranchPoint restoreTarget) {
+		m_InterTableau.pruneTo(restoreTarget);
+	}
+
 	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) {
 		List<DefaultEdge> newEdges = m_InterTableau.addEdgeAndCloseTransitivity(importSource, importTarget);
 		for (DefaultEdge e : newEdges) {

@@ -337,6 +337,7 @@ public class TableauManager {
 			} else {
 				BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
 				m_Graph.pruneTo(restoreTarget);
+				m_InterTableauMan.pruneTo(restoreTarget);
 			}
 		}
 
