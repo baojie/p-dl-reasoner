@@ -344,6 +344,10 @@ public class TableauManager {
 		public void process(ForwardConceptReport msg) {
 			Node node = m_Graph.get(msg.getImportTarget());
 			node.addLabel(msg.getConcept());
+			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(m_Package.toDebugString() + "applied forward concept report on node " + node + ": " + node.getLabels());
+			}
 		}
 
 		@Override
@@ -352,6 +356,10 @@ public class TableauManager {
 			TracedConcept concept = msg.getConcept();
 			BranchPointSet unionDepends = BranchPointSet.union(node.getDependency(), concept.getDependency());
 			node.addLabel(new TracedConcept(concept.getConcept(), unionDepends));
+
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(m_Package.toDebugString() + "applied backward concept report on node " + node + ": " + node.getLabels());
+			}
 		}
 		
 	}

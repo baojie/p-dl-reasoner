@@ -2,6 +2,7 @@ package edu.iastate.pdlreasoner.server;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultEdge;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
@@ -14,6 +15,8 @@ import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
 
 public class InterTableauManager {
+
+	private static final Logger LOGGER = Logger.getLogger(InterTableauManager.class);
 
 	//Constants
 	private ImportGraph m_ImportGraph;
@@ -51,11 +54,19 @@ public class InterTableauManager {
 		TableauManager importSourceTab = m_Tableaux.get(importSourcePackage);
 		GlobalNodeID importSource = m_InterTableau.getSourceVertexOf(importTarget, importSourcePackage);
 		if (importSource == null) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Creating new root on the source package " + importSourceTab.getPackage());
+			}
+			
 			importSource = importSourceTab.addRoot(sourceDependency);
 			m_InterTableau.addVertex(importSource, sourceDependency);
 			addEdge(importSource, importTarget);
 		}
-		
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Identified import source = " + importSource);
+		}
+
 		//Continue with reporting
 		requestedImportSource.copyIDFrom(importSource);
 		importSourceTab.receive(backward);
@@ -89,12 +100,16 @@ public class InterTableauManager {
 		for (DLPackage midPackage : midPackages) {
 			GlobalNodeID midNode = m_InterTableau.getSourceVertexOf(importTarget, midPackage);
 			if (midNode == null) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Creating new root for R-Rule on the mid package " + midPackage);
+				}
+
 				TableauManager midTab = m_Tableaux.get(midPackage);
 				midNode = midTab.addRoot(dependency);
 				m_InterTableau.addVertex(midNode, dependency);
 				addEdge(midNode, importTarget);
 			}
-			
+
 			addEdge(importSource, midNode);
 		}
 	}

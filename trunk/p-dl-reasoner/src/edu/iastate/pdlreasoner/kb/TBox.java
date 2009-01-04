@@ -5,14 +5,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.ContextualizedConcept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Subclass;
-import edu.iastate.pdlreasoner.model.Top;
-import edu.iastate.pdlreasoner.model.visitor.ConceptTraverser;
+import edu.iastate.pdlreasoner.model.visitor.ExternalConceptsExtractor;
 import edu.iastate.pdlreasoner.model.visitor.NNFConverter;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
@@ -82,39 +79,6 @@ public class TBox {
 		}
 				
 		return visitor.getExternalConcepts();
-	}
-	
-	private static class ExternalConceptsExtractor extends ConceptTraverser {
-		
-		private final DLPackage m_HomePackage;
-		private MultiValuedMap<DLPackage, Concept> m_ExternalConcepts;
-		
-		public ExternalConceptsExtractor(DLPackage homePackage) {
-			m_HomePackage = homePackage;
-			m_ExternalConcepts = new MultiValuedMap<DLPackage, Concept>();
-		}
-		
-		public MultiValuedMap<DLPackage, Concept> getExternalConcepts() {
-			return m_ExternalConcepts;
-		}
-		
-		private void visitContextualizedAtom(ContextualizedConcept c) {
-			DLPackage context = c.getContext();
-			if (!m_HomePackage.equals(context)) {
-				m_ExternalConcepts.add(context, c);				
-			}
-		}
-		
-		@Override
-		public void visit(Top top) {
-			visitContextualizedAtom(top);
-		}
-
-		@Override
-		public void visit(Atom atom) {
-			visitContextualizedAtom(atom);
-		}
-
 	}
 	
 }

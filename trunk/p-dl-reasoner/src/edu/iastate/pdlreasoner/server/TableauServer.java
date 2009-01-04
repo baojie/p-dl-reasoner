@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import edu.iastate.pdlreasoner.exception.IllegalQueryException;
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Concept;
@@ -13,6 +14,7 @@ import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
+import edu.iastate.pdlreasoner.model.visitor.ExternalConceptsExtractor;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -29,6 +31,7 @@ public class TableauServer {
 	private ImportGraph m_ImportGraph;
 	
 	//Variables (new per query)
+	private boolean m_HasInitialized;
 	private TableauTopology m_Tableaux;
 	private InterTableauManager m_InterTableauMan;
 	private Set<BranchPointSet> m_ClashCauses;
@@ -50,14 +53,35 @@ public class TableauServer {
 		}
 		
 		m_ImportGraph = new ImportGraph(m_KBs);
+		m_HasInitialized = true;
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Import graph = " + m_ImportGraph);
 			LOGGER.debug("");
 		}
 	}
-	
+
+	public boolean isUnderstandableBy(Concept c, DLPackage witness) {
+		if (!m_HasInitialized) throw new IllegalStateException("TableauServer has not been initialized.");
+		
+		ExternalConceptsExtractor visitor = new ExternalConceptsExtractor(witness);
+		c.accept(visitor);
+		
+		Set<DLPackage> externals = CollectionUtil.makeSet();
+		externals.addAll(visitor.getExternalConcepts().keySet());
+		externals.addAll(visitor.getExternalNegationContexts());
+		for (DLPackage external : externals) {
+			if (!m_ImportGraph.containsEdge(external, witness)) return false;
+		}
+		
+		return true;
+	}
+
 	public boolean isSatisfiable(Concept c, DLPackage witness) {
+		if (!isUnderstandableBy(c, witness)) {
+			throw new IllegalQueryException("Concept " + c + " is not understandable by " + witness);
+		}
+		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Query = satisfiability of " + c + " as witnessed by " + witness);
 		}
