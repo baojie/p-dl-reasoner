@@ -48,7 +48,7 @@ public class Node {
 	protected Node(int id, TableauGraph graph, BranchPointSet dependency) {
 		m_ID = id;
 		m_Graph = graph;
-		m_Children = new MultiValuedMap<Role, Edge>();
+		m_Children = CollectionUtil.makeMultiValuedMap();
 		m_Dependency = dependency;
 		m_Labels = CollectionUtil.makeMap();
 		m_ClashCauses = CollectionUtil.makeSet();
@@ -216,6 +216,15 @@ public class Node {
 			
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(m_Graph.getPackage().toDebugString() + "pruned and reopened node " + this + ": " + getLabels());
+			}
+		}
+	}
+	
+	public void reopenAtomsOrTops() {
+		for (Entry<Class<? extends Concept>, TracedConceptSet> entry : m_Labels.entrySet()) {
+			Class<? extends Concept> type = entry.getKey();
+			if (type.equals(Atom.class) || type.equals(Top.class)) {
+				entry.getValue().reopenAll();
 			}
 		}
 	}

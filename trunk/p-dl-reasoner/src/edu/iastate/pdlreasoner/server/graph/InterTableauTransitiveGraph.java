@@ -11,6 +11,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
@@ -95,6 +96,14 @@ public class InterTableauTransitiveGraph {
 				m_Graph.removeVertex(v);
 			}
 		}
+	}
+	
+	public MultiValuedMap<DLPackage,GlobalNodeID> getVerticesByPackage() {
+		MultiValuedMap<DLPackage,GlobalNodeID> vertices = CollectionUtil.makeMultiValuedMap();
+		for (GlobalNodeID v : m_NodeDependency.keySet()) {
+			vertices.add(v.getPackage(), v);
+		}
+		return vertices;
 	}
 
 }

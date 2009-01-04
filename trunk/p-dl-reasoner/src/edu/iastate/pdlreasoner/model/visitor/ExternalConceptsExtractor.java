@@ -19,7 +19,7 @@ public class ExternalConceptsExtractor extends ConceptTraverser {
 	
 	public ExternalConceptsExtractor(DLPackage homePackage) {
 		m_HomePackage = homePackage;
-		m_ExternalConcepts = new MultiValuedMap<DLPackage, Concept>();
+		m_ExternalConcepts = CollectionUtil.makeMultiValuedMap();
 		m_ExternalNegations = CollectionUtil.makeSet();
 	}
 	

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+
 public class CollectionUtil {
 
 	public static <T> List<T> makeList() {
@@ -22,7 +24,11 @@ public class CollectionUtil {
 	public static <K,V> Map<K,V> makeMap() {
 		return new HashMap<K,V>();
 	}
-	
+
+	public static <K,V> MultiValuedMap<K,V> makeMultiValuedMap() {
+		return new MultiValuedMap<K,V>();
+	}
+
 	public static <T> Set<T> asSet(T... as) {
 		Set<T> set = new HashSet<T>(as.length);
 		for (T a : as) {

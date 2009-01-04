@@ -21,6 +21,7 @@ import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TBoxTest {
 
@@ -51,7 +52,7 @@ public class TBoxTest {
 		m_TBox.addAxiom(makeSub(top1, atom1));
 		m_TBox.addAxiom(makeSub(not3, and2));
 		
-		MultiValuedMap<DLPackage, Concept> expected = new MultiValuedMap<DLPackage, Concept>();
+		MultiValuedMap<DLPackage, Concept> expected = CollectionUtil.makeMultiValuedMap();
 		expected.add(ex1, top1);
 		expected.add(ex1, atom1);
 		expected.add(ex2, top2);
