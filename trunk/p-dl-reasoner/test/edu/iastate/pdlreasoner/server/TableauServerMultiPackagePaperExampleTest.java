@@ -20,7 +20,6 @@ import org.junit.Test;
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
-import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
