@@ -22,9 +22,9 @@ import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.message.Clash;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
-public class TableauServer {
+public class TableauMaster {
 	
-	private static final Logger LOGGER = Logger.getLogger(TableauServer.class);
+	private static final Logger LOGGER = Logger.getLogger(TableauMaster.class);
 	
 	//Constants wrt KBs
 	private List<KnowledgeBase> m_KBs;
@@ -36,7 +36,7 @@ public class TableauServer {
 	private InterTableauManager m_InterTableauMan;
 	private Set<BranchPointSet> m_ClashCauses;
 	
-	public TableauServer() {
+	public TableauMaster() {
 		m_KBs = CollectionUtil.makeList();
 	}
 	
@@ -147,7 +147,7 @@ public class TableauServer {
 		m_Tableaux = new TableauTopology(m_KBs);
 		m_InterTableauMan = new InterTableauManager(m_ImportGraph, m_Tableaux);
 		for (TableauManager t : m_Tableaux) {
-			t.setServer(this);
+			t.setMaster(this);
 			t.setImportGraph(m_ImportGraph);
 			t.setInterTableauManager(m_InterTableauMan);
 		}

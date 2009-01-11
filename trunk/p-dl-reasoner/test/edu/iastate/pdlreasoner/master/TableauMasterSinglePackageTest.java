@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
-import edu.iastate.pdlreasoner.master.TableauServer;
+import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -31,9 +31,9 @@ import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
 
-public class TableauServerSinglePackageTest {
+public class TableauMasterSinglePackageTest {
 
-	private TableauServer m_TableauServer;
+	private TableauMaster m_TableauMaster;
 	private DLPackage p;
 	private KnowledgeBase kb;
 	private Top top;
@@ -43,10 +43,10 @@ public class TableauServerSinglePackageTest {
 	
 	@Before
 	public void setUp() {
-		m_TableauServer = new TableauServer();
+		m_TableauMaster = new TableauMaster();
 		p = makePackage(URI.create("#package"));
 		kb = new KnowledgeBase(p);
-		m_TableauServer.addKnowledgeBase(kb);
+		m_TableauMaster.addKnowledgeBase(kb);
 		top = makeTop(p);
 		atoms = new Atom[10];
 		for (int i = 0; i < atoms.length; i++) {
@@ -62,7 +62,7 @@ public class TableauServerSinglePackageTest {
 	@Test
 	public void uninitialized() {
 		try {
-			m_TableauServer.isConsistent(p);
+			m_TableauMaster.isConsistent(p);
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException ex) {
 		}
@@ -70,50 +70,50 @@ public class TableauServerSinglePackageTest {
 	
 	@Test
 	public void empty() {
-		m_TableauServer.init();
-		assertTrue(m_TableauServer.isConsistent(p));
+		m_TableauMaster.init();
+		assertTrue(m_TableauMaster.isConsistent(p));
 	}
 
 	@Test
 	public void bottom1() {
 		kb.addAxiom(top, Bottom.INSTANCE);
-		m_TableauServer.init();
-		assertFalse(m_TableauServer.isConsistent(p));
+		m_TableauMaster.init();
+		assertFalse(m_TableauMaster.isConsistent(p));
 	}
 	
 	@Test
 	public void nestedClashesWithBottom() {
 		kb.addAxiom(top, atoms[0]);
 		kb.addAxiom(atoms[0], Bottom.INSTANCE);
-		m_TableauServer.init();
-		assertFalse(m_TableauServer.isConsistent(p));
+		m_TableauMaster.init();
+		assertFalse(m_TableauMaster.isConsistent(p));
 	}
 	
 	@Test
 	public void nestedClashesWithNegatedAtom() {
 		And bottom = makeAnd(atoms[1], negatedAtoms[1]);
 		kb.addAxiom(atoms[0], bottom);
-		m_TableauServer.init();
-		assertFalse(m_TableauServer.isSatisfiable(atoms[0], p));
-		assertTrue(m_TableauServer.isSatisfiable(atoms[1], p));
+		m_TableauMaster.init();
+		assertFalse(m_TableauMaster.isSatisfiable(atoms[0], p));
+		assertTrue(m_TableauMaster.isSatisfiable(atoms[1], p));
 	}
 
 	@Test
 	public void and_Or1() {
 		Or negatedAtom0or1 = makeOr(negatedAtoms[0], negatedAtoms[1]);
 		kb.addAxiom(top, negatedAtom0or1);
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		And atom0and1 = makeAnd(atoms[0], atoms[1]);
-		assertFalse(m_TableauServer.isSatisfiable(atom0and1, p));
+		assertFalse(m_TableauMaster.isSatisfiable(atom0and1, p));
 	}
 
 	@Test
 	public void and_Or2() {
 		kb.addAxiom(top, atoms[0]);
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		And bottom = makeAnd(atoms[0], negatedAtoms[0]);
 		Or or = makeOr(bottom, atoms[1]);
-		assertTrue(m_TableauServer.isSatisfiable(or, p));
+		assertTrue(m_TableauMaster.isSatisfiable(or, p));
 	}
 
 	@Test
@@ -122,26 +122,26 @@ public class TableauServerSinglePackageTest {
 		Or negatedAtom0or1 = makeOr(negatedAtoms[0], negatedAtoms[1]);
 		kb.addAxiom(top, atom01or2);
 		kb.addAxiom(top, negatedAtom0or1);
-		m_TableauServer.init();
-		assertTrue(m_TableauServer.isConsistent(p));
+		m_TableauMaster.init();
+		assertTrue(m_TableauMaster.isConsistent(p));
 	}
 
 	@Test
 	public void some1() {
 		AllValues all = makeAllValues(role, negatedAtoms[0]);
 		kb.addAxiom(top, all);
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		SomeValues some = makeSomeValues(role, atoms[0]);
-		assertFalse(m_TableauServer.isSatisfiable(some, p));
+		assertFalse(m_TableauMaster.isSatisfiable(some, p));
 	}
 
 	@Test
 	public void some2() {
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		AllValues all = makeAllValues(role, negatedAtoms[0]);
 		SomeValues some = makeSomeValues(role, atoms[0]);
 		And and = makeAnd(all, makeAnd(top, some));
-		assertFalse(m_TableauServer.isSatisfiable(and, p));
+		assertFalse(m_TableauMaster.isSatisfiable(and, p));
 	}
 
 	@Test
@@ -150,70 +150,70 @@ public class TableauServerSinglePackageTest {
 		AllValues all1 = makeAllValues(role, negatedAtoms[1]);
 		kb.addAxiom(top, all0);
 		kb.addAxiom(top, all1);
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		Or atom0or1 = makeOr(atoms[0], atoms[1]);
 		SomeValues some = makeSomeValues(role, atom0or1);
-		assertFalse(m_TableauServer.isSatisfiable(some, p));
+		assertFalse(m_TableauMaster.isSatisfiable(some, p));
 	}
 
 	@Test
 	public void directSubsetBlocking1() {
 		kb.addAxiom(top, makeSomeValues(role, atoms[0]));
-		m_TableauServer.init();
-		assertTrue(m_TableauServer.isConsistent(p));
+		m_TableauMaster.init();
+		assertTrue(m_TableauMaster.isConsistent(p));
 	}
 
 	@Test
 	public void directSubsetBlocking2() {
 		And and = makeAnd(makeSomeValues(role, atoms[0]), makeSomeValues(role, atoms[1]));
 		kb.addAxiom(top, and);
-		m_TableauServer.init();
-		assertTrue(m_TableauServer.isConsistent(p));
+		m_TableauMaster.init();
+		assertTrue(m_TableauMaster.isConsistent(p));
 	}
 	
 	@Test
 	public void directSubsetBlockingWithBacktracking() {
 		kb.addAxiom(atoms[0], makeSomeValues(role, atoms[1]));
 		kb.addAxiom(atoms[1], makeSomeValues(role, atoms[0]));
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		And and = makeAnd(atoms[0], atoms[1]);
-		assertTrue(m_TableauServer.isSatisfiable(and, p));
+		assertTrue(m_TableauMaster.isSatisfiable(and, p));
 	}
 
 	@Test
 	public void indirectSubsetBlocking() {
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		SomeValues some = makeSomeValues(role, makeSomeValues(role, atoms[0]));
 		And and = makeAnd(makeSomeValues(role, atoms[0]), atoms[1]);
-		assertTrue(m_TableauServer.isSatisfiable(makeAnd(some, and), p));
+		assertTrue(m_TableauMaster.isSatisfiable(makeAnd(some, and), p));
 	}
 
 	@Test
 	public void contractictionAtChild() {
 		kb.addAxiom(top, makeSomeValues(role, atoms[0]));
 		kb.addAxiom(atoms[0], atoms[1]);
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		AllValues all = makeAllValues(role, negatedAtoms[1]);
-		assertFalse(m_TableauServer.isSatisfiable(all, p));
+		assertFalse(m_TableauMaster.isSatisfiable(all, p));
 	}
 
 	@Test
 	public void someValuesClash() {
 		kb.addAxiom(atoms[0], makeSomeValues(role, atoms[1]));
 		kb.addAxiom(makeSomeValues(role, top), negatedAtoms[0]);
-		m_TableauServer.init();
-		assertFalse(m_TableauServer.isSatisfiable(atoms[0], p));
+		m_TableauMaster.init();
+		assertFalse(m_TableauMaster.isSatisfiable(atoms[0], p));
 	}
 	
 	@Test
 	public void reopenParentAllValuesOnRestore() {
-		m_TableauServer.init();
+		m_TableauMaster.init();
 		And bottom = makeAnd(atoms[0], negatedAtoms[0]);
 		SomeValues some = makeSomeValues(role, makeOr(bottom, atoms[0]));
 		AllValues all = makeAllValues(role, bottom);
 		And wrapAll = makeAnd(atoms[2], makeAnd(atoms[1], all));
 		And and = makeAnd(some, wrapAll);
-		assertFalse(m_TableauServer.isSatisfiable(and, p));
+		assertFalse(m_TableauMaster.isSatisfiable(and, p));
 	}
 	
 }

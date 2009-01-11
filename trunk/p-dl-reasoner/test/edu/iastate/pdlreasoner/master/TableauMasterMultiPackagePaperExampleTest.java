@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
-import edu.iastate.pdlreasoner.master.TableauServer;
+import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.DLPackage;
@@ -26,11 +26,11 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
 
-public class TableauServerMultiPackagePaperExampleTest {
+public class TableauMasterMultiPackagePaperExampleTest {
 
 	private DLPackage[] p;
 	private KnowledgeBase[] kb;
-	private TableauServer m_TableauServer;
+	private TableauMaster m_TableauMaster;
 	
 	@Before
 	public void setUp() {
@@ -44,7 +44,7 @@ public class TableauServerMultiPackagePaperExampleTest {
 			kb[i] = new KnowledgeBase(p[i]);
 		}
 		
-		m_TableauServer = new TableauServer();
+		m_TableauMaster = new TableauMaster();
 	}
 
 	@Test
@@ -70,11 +70,11 @@ public class TableauServerMultiPackagePaperExampleTest {
 		kb[1].addAxiom(p1D1, p1D2);
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauServer.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addKnowledgeBase(kb[i]);
 		}
 		
-		m_TableauServer.init();
-		assertTrue(m_TableauServer.isConsistent(p[0]));
+		m_TableauMaster.init();
+		assertTrue(m_TableauMaster.isConsistent(p[0]));
 	}
 	
 	@Test
@@ -89,11 +89,11 @@ public class TableauServerMultiPackagePaperExampleTest {
 		kb[2].addAxiom(p1C, p2D);
 
 		for (int i = 0; i <= 2; i++) {
-			m_TableauServer.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addKnowledgeBase(kb[i]);
 		}
 
-		m_TableauServer.init();
-		assertTrue(m_TableauServer.isSubclassOf(p0A, p2D, p[2]));
+		m_TableauMaster.init();
+		assertTrue(m_TableauMaster.isSubclassOf(p0A, p2D, p[2]));
 	}
 
 
@@ -108,11 +108,11 @@ public class TableauServerMultiPackagePaperExampleTest {
 		kb[1].addAxiom(p1P, makeNegation(p[1], p0F));
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauServer.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addKnowledgeBase(kb[i]);
 		}
 		
-		m_TableauServer.init();
-		assertFalse(m_TableauServer.isSatisfiable(p1P, p[1]));
+		m_TableauMaster.init();
+		assertFalse(m_TableauMaster.isSatisfiable(p1P, p[1]));
 	}
 
 	@Test
@@ -127,12 +127,12 @@ public class TableauServerMultiPackagePaperExampleTest {
 		kb[1].addAxiom(p1B, makeAnd(p0A, makeNegation(p[1], p0C)));
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauServer.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addKnowledgeBase(kb[i]);
 		}
 		
-		m_TableauServer.init();
-		assertTrue(m_TableauServer.isSatisfiable(p0A, p[0]));
-		assertFalse(m_TableauServer.isSatisfiable(p0A, p[1]));
+		m_TableauMaster.init();
+		assertTrue(m_TableauMaster.isSatisfiable(p0A, p[0]));
+		assertFalse(m_TableauMaster.isSatisfiable(p0A, p[1]));
 	}
 
 }

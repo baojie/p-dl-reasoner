@@ -11,7 +11,7 @@ import edu.iastate.pdlreasoner.kb.KnowledgeBase;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.master.ImportGraph;
 import edu.iastate.pdlreasoner.master.InterTableauManager;
-import edu.iastate.pdlreasoner.master.TableauServer;
+import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
@@ -44,7 +44,7 @@ public class TableauManager {
 	private static final Logger LOGGER = Logger.getLogger(TableauManager.class);
 	
 	//Constants
-	private TableauServer m_Server;
+	private TableauMaster m_Master;
 	private ImportGraph m_ImportGraph;
 	private InterTableauManager m_InterTableauMan;
 	private DLPackage m_Package;
@@ -75,8 +75,8 @@ public class TableauManager {
 		return m_Package;
 	}
 	
-	public void setServer(TableauServer server) {
-		m_Server = server;
+	public void setMaster(TableauMaster master) {
+		m_Master = master;
 	}
 
 	public void setImportGraph(ImportGraph importGraph) {
@@ -142,7 +142,7 @@ public class TableauManager {
 	public void run() {
 		processMessages();
 		if (m_HasClashAtOrigin) return;
-		if (m_Server.isSynchronizingForClash()) {
+		if (m_Master.isSynchronizingForClash()) {
 			processClash();
 			return;
 		}
@@ -203,13 +203,13 @@ public class TableauManager {
 			LOGGER.debug(m_Package.toDebugString() + "broadcasting clash " + clashCause);
 		}
 		
-		m_Server.processClash(clashCause);
+		m_Master.processClash(clashCause);
 	}
 
 	private void releaseToken() {
 		BranchToken temp = m_Token;
 		m_Token = null;
-		m_Server.returnTokenFrom(this, temp);
+		m_Master.returnTokenFrom(this, temp);
 	}
 
 	private void applyUniversalRestriction(Node n) {
