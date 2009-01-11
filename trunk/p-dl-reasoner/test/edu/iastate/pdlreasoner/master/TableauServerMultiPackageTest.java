@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.server;
+package edu.iastate.pdlreasoner.master;
 
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.master.TableauServer;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;

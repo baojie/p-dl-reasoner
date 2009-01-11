@@ -7,8 +7,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.model.DLPackage;
-import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.Blocking;
 import edu.iastate.pdlreasoner.tableau.branch.Branch;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;

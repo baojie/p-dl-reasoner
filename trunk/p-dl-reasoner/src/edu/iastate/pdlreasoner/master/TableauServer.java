@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.server;
+package edu.iastate.pdlreasoner.master;
 
 import java.util.Collections;
 import java.util.List;

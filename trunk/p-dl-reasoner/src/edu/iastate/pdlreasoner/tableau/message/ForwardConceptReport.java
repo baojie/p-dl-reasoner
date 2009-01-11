@@ -1,6 +1,6 @@
 package edu.iastate.pdlreasoner.tableau.message;
 
-import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
+import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
 public class ForwardConceptReport extends ConceptReport {

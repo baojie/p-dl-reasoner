@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.server;
+package edu.iastate.pdlreasoner.master;
 
 import java.util.List;
 import java.util.Set;
@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultEdge;
 
+import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
+import edu.iastate.pdlreasoner.master.graph.InterTableauTransitiveGraph;
 import edu.iastate.pdlreasoner.model.DLPackage;
-import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
-import edu.iastate.pdlreasoner.server.graph.InterTableauTransitiveGraph;
 import edu.iastate.pdlreasoner.tableau.TableauManager;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;

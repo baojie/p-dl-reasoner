@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.server;
+package edu.iastate.pdlreasoner.master;
 
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAllValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAnd;
@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.master.TableauServer;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.DLPackage;

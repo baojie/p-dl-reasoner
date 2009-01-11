@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.server.graph;
+package edu.iastate.pdlreasoner.master.graph;
 
 import java.util.Collections;
 import java.util.Iterator;

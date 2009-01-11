@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
@@ -18,7 +19,6 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitorAdapter;
-import edu.iastate.pdlreasoner.server.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.TracedConceptSet;
