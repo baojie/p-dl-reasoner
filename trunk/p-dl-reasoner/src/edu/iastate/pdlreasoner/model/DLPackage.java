@@ -1,8 +1,11 @@
 package edu.iastate.pdlreasoner.model;
 
+import java.io.Serializable;
 import java.net.URI;
 
-public class DLPackage {
+public class DLPackage implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private URI m_URI;
 

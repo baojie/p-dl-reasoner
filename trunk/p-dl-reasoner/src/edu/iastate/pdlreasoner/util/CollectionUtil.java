@@ -16,11 +16,19 @@ public class CollectionUtil {
 	public static <T> List<T> makeList() {
 		return new ArrayList<T>();
 	}
-	
+
+	public static <T> List<T> makeList(Collection<? extends T> a) {
+		return new ArrayList<T>(a);
+	}
+
 	public static <T> Set<T> makeSet() {
 		return new HashSet<T>();
 	}
 	
+	public static <T> Set<T> makeSet(Collection<? extends T> a) {
+		return new HashSet<T>(a);
+	}
+
 	public static <K,V> Map<K,V> makeMap() {
 		return new HashMap<K,V>();
 	}
@@ -39,10 +47,6 @@ public class CollectionUtil {
 	
 	public static <T> boolean isSubsetOf(Collection<T> a, Collection<T> b) {
 		return (a.size() <= b.size()) && (b.containsAll(a));
-	}
-	
-	public static <T> Set<T> copy(Collection<? extends T> a) {
-		return new HashSet<T>(a);
 	}
 	
 	public static <T> Set<T> emptySetIfNull(Set<T> a) {

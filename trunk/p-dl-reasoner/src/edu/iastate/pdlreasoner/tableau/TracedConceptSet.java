@@ -28,7 +28,7 @@ public class TracedConceptSet {
 	
 	public Set<TracedConcept> flush() {
 		if (m_Open.isEmpty()) return Collections.emptySet();
-		Set<TracedConcept> openCopy = CollectionUtil.copy(m_Open.values());
+		Set<TracedConcept> openCopy = CollectionUtil.makeSet(m_Open.values());
 		m_Expanded.putAll(m_Open);
 		m_Open.clear();
 		return openCopy;
