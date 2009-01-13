@@ -45,24 +45,28 @@ public class PDLReasoner {
 		Query query = getExample1();
 		
 		if (isMaster) {
-			TableauMaster master = new TableauMaster(query);
+			TableauMaster master = new TableauMaster();
 			QueryResult result = null;
 			
 			try {
-				result = master.run();
+				result = master.run(query);
 			} catch (ChannelException e) {
 				e.printStackTrace();
 			} catch (NotEnoughSlavesException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
 			System.out.println(result);
 		} else {
-			Tableau slave = new Tableau(query);
+			Tableau slave = new Tableau();
 
 			try {
-				slave.run();
+				slave.run(query);
 			} catch (ChannelException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
