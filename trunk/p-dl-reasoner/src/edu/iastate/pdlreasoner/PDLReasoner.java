@@ -12,103 +12,67 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 
-import org.jgroups.Address;
 import org.jgroups.ChannelException;
-import org.jgroups.JChannel;
-import org.jgroups.Message;
-import org.jgroups.ReceiverAdapter;
-import org.jgroups.View;
 
 import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.Query;
+import edu.iastate.pdlreasoner.kb.QueryResult;
+import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
-import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
-import edu.iastate.pdlreasoner.util.CollectionUtil;
+import edu.iastate.pdlreasoner.tableau.Tableau;
 
 
 public class PDLReasoner {
 
-	private boolean m_IsMaster;
-	private List<KnowledgeBase> m_KBs;
-	private Concept m_Query;
-	private DLPackage m_QueryWitness;
-	
-	private Address m_MasterAdd;
-	private DLPackage m_AssignedPackage;
-	
-	public void setIsMaster(boolean isMaster) {
-		m_IsMaster = isMaster;
-	}
-	
-	public void setKBs(List<KnowledgeBase> kbs) {
-		m_KBs = kbs;
-	}
-
-	public void setQuery(Concept query) {
-		m_Query = query;
-	}
-
-	public void setQueryWitness(DLPackage queryWitness) {
-		m_QueryWitness = queryWitness;
-	}
-	
-	public void run() throws ChannelException, NotEnoughSlavesException {
-		if (m_IsMaster) {
-			runMaster();
+	public static void main(String[] args) {
+		boolean isMaster = false;
+		if ("-m".equalsIgnoreCase(args[0])) {
+			isMaster = true;
+		} else if ("-s".equalsIgnoreCase(args[0])) {
+			isMaster = false;
 		} else {
-			runSlave();
-		}
-	}
-	
-	private void runMaster() throws ChannelException, NotEnoughSlavesException {
-		JChannel channel = new JChannel();
-		channel.connect(getSessionName());
-		View view = channel.getView();
-		Address masterAdd = channel.getLocalAddress();
-		List<Address> members = CollectionUtil.makeList(view.getMembers());
-		members.remove(masterAdd);
-		if (members.size() < m_KBs.size()) {
-			channel.close();
-			throw new NotEnoughSlavesException("Ontology has " + m_KBs.size() + " packages but only " + members.size() + " slaves are available.");
-		}
-
-		for (int i = 0; i < m_KBs.size(); i++) {
-			Message msg = new Message(members.get(i), masterAdd, m_KBs.get(i).getPackage());
-			channel.send(msg);
+			printUsage();
+			System.exit(1);
 		}
 		
-		//channel.close();
+		Query query = getExample1();
+		
+		if (isMaster) {
+			TableauMaster master = new TableauMaster(query);
+			QueryResult result = null;
+			
+			try {
+				result = master.run();
+			} catch (ChannelException e) {
+				e.printStackTrace();
+			} catch (NotEnoughSlavesException e) {
+				e.printStackTrace();
+			}
+			
+			System.out.println(result);
+		} else {
+			Tableau slave = new Tableau(query);
+
+			try {
+				slave.run();
+			} catch (ChannelException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
-	private void runSlave() throws ChannelException {
-		JChannel channel = new JChannel();
-		channel.connect(getSessionName());
-	
-		channel.setReceiver(new ReceiverAdapter() {
-				@Override
-				public void receive(Message msg) {
-					m_MasterAdd = msg.getSrc();
-					m_AssignedPackage = (DLPackage) msg.getObject();
-					
-					System.out.println(m_MasterAdd);
-					System.out.println(m_AssignedPackage);
-				}
-			});
+	private static void printUsage() {
+		System.out.println("Usage: java PDLReasoner [-m|-s]");
 	}
 
-	private String getSessionName() {
-		return "PDL";
-	}
-	
-	
-	public void setExample1() {
+	private static Query getExample1() {
 		DLPackage[] p;
 		KnowledgeBase[] kbs;
 		
@@ -142,38 +106,7 @@ public class PDLReasoner {
 		
 		kbs[1].addAxiom(p1D1, p1D2);
 
-		setKBs(Arrays.asList(kbs));
-		setQuery(p0Top);
-		setQueryWitness(p[0]);
-	}
-	
-	
-
-	public static void main(String[] args) {
-		PDLReasoner reasoner = new PDLReasoner();
-		
-		if ("-m".equalsIgnoreCase(args[0])) {
-			reasoner.setIsMaster(true);
-		} else if ("-s".equalsIgnoreCase(args[0])) {
-			reasoner.setIsMaster(false);
-		} else {
-			printUsage();
-			System.exit(1);
-		}
-		
-		reasoner.setExample1();
-		
-		try {
-			reasoner.run();
-		} catch (ChannelException e) {
-			e.printStackTrace();
-		} catch (NotEnoughSlavesException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private static void printUsage() {
-		System.out.println("Usage: java PDLReasoner [-m|-s]");
+		return new Query(Arrays.asList(kbs), p0Top, p[0]);
 	}
 
 }
