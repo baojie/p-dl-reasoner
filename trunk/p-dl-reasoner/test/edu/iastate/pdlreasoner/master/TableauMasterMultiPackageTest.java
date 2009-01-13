@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
-import edu.iastate.pdlreasoner.master.TableauMaster;
+import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.DLPackage;
@@ -24,7 +24,7 @@ public class TableauMasterMultiPackageTest {
 
 	private DLPackage[] p;
 	private KnowledgeBase[] kb;
-	private TableauMaster m_TableauMaster;
+	private TableauMasterOld m_TableauMaster;
 	
 	@Before
 	public void setUp() {
@@ -38,7 +38,7 @@ public class TableauMasterMultiPackageTest {
 			kb[i] = new KnowledgeBase(p[i]);
 		}
 		
-		m_TableauMaster = new TableauMaster();
+		m_TableauMaster = new TableauMasterOld();
 	}
 
 	@Test

@@ -4,7 +4,7 @@ import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
-import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 
 public class KnowledgeBase {
 
@@ -38,7 +38,7 @@ public class KnowledgeBase {
 		return m_TBox;
 	}
 	
-	public TableauManager getTableau() {
-		return new TableauManager(this);
+	public TableauManagerOld getTableau() {
+		return new TableauManagerOld(this);
 	}
 }

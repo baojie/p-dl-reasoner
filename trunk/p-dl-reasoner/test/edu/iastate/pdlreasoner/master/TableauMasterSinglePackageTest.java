@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.kb.KnowledgeBase;
-import edu.iastate.pdlreasoner.master.TableauMaster;
+import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -33,7 +33,7 @@ import edu.iastate.pdlreasoner.model.Top;
 
 public class TableauMasterSinglePackageTest {
 
-	private TableauMaster m_TableauMaster;
+	private TableauMasterOld m_TableauMaster;
 	private DLPackage p;
 	private KnowledgeBase kb;
 	private Top top;
@@ -43,7 +43,7 @@ public class TableauMasterSinglePackageTest {
 	
 	@Before
 	public void setUp() {
-		m_TableauMaster = new TableauMaster();
+		m_TableauMaster = new TableauMasterOld();
 		p = makePackage(URI.create("#package"));
 		kb = new KnowledgeBase(p);
 		m_TableauMaster.addKnowledgeBase(kb);

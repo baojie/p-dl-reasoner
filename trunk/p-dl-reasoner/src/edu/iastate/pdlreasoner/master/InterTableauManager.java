@@ -10,7 +10,7 @@ import org.jgrapht.graph.DefaultEdge;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.master.graph.InterTableauTransitiveGraph;
 import edu.iastate.pdlreasoner.model.DLPackage;
-import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -54,7 +54,7 @@ public class InterTableauManager {
 		}
 		
 		//Add source to graph
-		TableauManager importSourceTab = m_Tableaux.get(importSourcePackage);
+		TableauManagerOld importSourceTab = m_Tableaux.get(importSourcePackage);
 		GlobalNodeID importSource = m_InterTableau.getSourceVertexOf(importTarget, importSourcePackage);
 		if (importSource == null) {
 			if (LOGGER.isDebugEnabled()) {
@@ -84,7 +84,7 @@ public class InterTableauManager {
 		if (importTarget == null) return;
 		
 		requestedImportTarget.copyIDFrom(importTarget);
-		TableauManager importTargetTab = m_Tableaux.get(importTargetPackage);
+		TableauManagerOld importTargetTab = m_Tableaux.get(importTargetPackage);
 		importTargetTab.receive(forward);
 	}
 	
@@ -92,7 +92,7 @@ public class InterTableauManager {
 		m_InterTableau.pruneTo(restoreTarget);
 		
 		for (Entry<DLPackage, Set<GlobalNodeID>> entry : m_InterTableau.getVerticesByPackage().entrySet()) {
-			TableauManager tab = m_Tableaux.get(entry.getKey());
+			TableauManagerOld tab = m_Tableaux.get(entry.getKey());
 			tab.reopenAtomsOnGlobalNodes(entry.getValue());
 		}
 	}
@@ -116,7 +116,7 @@ public class InterTableauManager {
 					LOGGER.debug("Creating new root for R-Rule on the mid package " + midPackage);
 				}
 
-				TableauManager midTab = m_Tableaux.get(midPackage);
+				TableauManagerOld midTab = m_Tableaux.get(midPackage);
 				midNode = midTab.addRoot(dependency);
 				m_InterTableau.addVertex(midNode, dependency);
 				addEdge(midNode, importTarget);

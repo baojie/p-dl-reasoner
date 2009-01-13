@@ -15,16 +15,16 @@ import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.model.visitor.ExternalConceptsExtractor;
-import edu.iastate.pdlreasoner.tableau.TableauManager;
+import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.message.Clash;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
-public class TableauMaster {
+public class TableauMasterOld {
 	
-	private static final Logger LOGGER = Logger.getLogger(TableauMaster.class);
+	private static final Logger LOGGER = Logger.getLogger(TableauMasterOld.class);
 	
 	//Constants wrt KBs
 	private List<KnowledgeBase> m_KBs;
@@ -36,7 +36,7 @@ public class TableauMaster {
 	private InterTableauManager m_InterTableauMan;
 	private Set<BranchPointSet> m_ClashCauses;
 	
-	public TableauMaster() {
+	public TableauMasterOld() {
 		m_KBs = CollectionUtil.makeList();
 	}
 	
@@ -87,7 +87,7 @@ public class TableauMaster {
 		}
 		
 		makeTableaux();
-		TableauManager witTableau = m_Tableaux.get(witness);
+		TableauManagerOld witTableau = m_Tableaux.get(witness);
 		witTableau.addGlobalRootWith(c);
 		witTableau.receiveToken(BranchToken.make());
 		completeAll();
@@ -123,7 +123,7 @@ public class TableauMaster {
 	public void processClash(BranchPointSet clashCause) {
 		if (m_ClashCauses.add(clashCause)) {
 			Clash clash = new Clash(clashCause);
-			for (TableauManager tab : m_Tableaux) {
+			for (TableauManagerOld tab : m_Tableaux) {
 				tab.receive(clash);
 			}
 		}
@@ -133,10 +133,10 @@ public class TableauMaster {
 		return !m_ClashCauses.isEmpty();
 	}
 	
-	public void returnTokenFrom(TableauManager tab, BranchToken token) {
+	public void returnTokenFrom(TableauManagerOld tab, BranchToken token) {
 		if (isSynchronizingForClash()) return;
 		
-		TableauManager next = m_Tableaux.getNext(tab);
+		TableauManagerOld next = m_Tableaux.getNext(tab);
 		next.receiveToken(token);
 	}
 	
@@ -146,7 +146,7 @@ public class TableauMaster {
 	private void makeTableaux() {
 		m_Tableaux = new TableauTopology(m_KBs);
 		m_InterTableauMan = new InterTableauManager(m_ImportGraph, m_Tableaux);
-		for (TableauManager t : m_Tableaux) {
+		for (TableauManagerOld t : m_Tableaux) {
 			t.setMaster(this);
 			t.setImportGraph(m_ImportGraph);
 			t.setInterTableauManager(m_InterTableauMan);
@@ -156,22 +156,22 @@ public class TableauMaster {
 	}
 
 	private boolean hasClashAtOrigin() {
-		for (TableauManager t : m_Tableaux) {
+		for (TableauManagerOld t : m_Tableaux) {
 			if (t.hasClashAtOrigin()) return true;
 		}
 		return false;
 	}
 	
 	private boolean hasPendingMessages() {
-		for (TableauManager t : m_Tableaux) {
+		for (TableauManagerOld t : m_Tableaux) {
 			if (t.hasPendingMessages()) return true;
 		}
 		return false;
 	}
 	
-	private TableauManager findOwnerOf(BranchPointSet clashCause) {
+	private TableauManagerOld findOwnerOf(BranchPointSet clashCause) {
 		BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
-		for (TableauManager t : m_Tableaux) {
+		for (TableauManagerOld t : m_Tableaux) {
 			if (t.isOwnerOf(restoreTarget)) return t;
 		}
 		return null;
@@ -184,7 +184,7 @@ public class TableauMaster {
 		
 		m_InterTableauMan.pruneTo(clashCause.getLatestBranchPoint());
 
-		TableauManager resumeTab = findOwnerOf(clashCause);
+		TableauManagerOld resumeTab = findOwnerOf(clashCause);
 		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
 		
 		if (LOGGER.isDebugEnabled()) {
@@ -204,7 +204,7 @@ public class TableauMaster {
 			}			
 			
 			hasChanged = false;
-			for (TableauManager tab : m_Tableaux) {
+			for (TableauManagerOld tab : m_Tableaux) {
 				if (!tab.isComplete()) {
 					tab.run();
 					hasChanged = true;
