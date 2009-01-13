@@ -20,31 +20,47 @@ import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
-public class TableauMaster extends ReceiverAdapter {
+public class TableauMaster {
 
+	private static enum State { INIT, EXPAND, FINAL }
+	
 	//Variables
 	private Channel m_Channel;
 	private BlockingQueue<Message> m_MessageQueue;
+	private State m_State;
 	
 	public TableauMaster() {
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
+		m_State = State.INIT;
 	}
 	
-	public void receive(Message msg) {
-		while (true) {
-			try {
-				m_MessageQueue.put(msg);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				continue;
-			}
+	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException, InterruptedException {
+		initChannel();
+		connectWithSlaves(query);
+		
+		while (m_State != State.FINAL) {
+			receive(m_MessageQueue.take());
 		}
+		
+		m_Channel.close();	
+		return new QueryResult(true);
 	}
-
+	
 	private void initChannel() throws ChannelException {
 		m_Channel = new JChannel();
 		m_Channel.connect(ChannelUtil.getSessionName());
-		m_Channel.setReceiver(this);
+		m_Channel.setReceiver(new ReceiverAdapter() {
+				public void receive(Message msg) {
+					while (true) {
+						try {
+							m_MessageQueue.put(msg);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							continue;
+						}
+					}
+				}
+			});
 	}
 
 	private void connectWithSlaves(Query query)	throws NotEnoughSlavesException, ChannelNotConnectedException, ChannelClosedException {
@@ -64,18 +80,8 @@ public class TableauMaster extends ReceiverAdapter {
 			m_Channel.send(msg);
 		}
 	}
-
-	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException, InterruptedException {
-		initChannel();
-		connectWithSlaves(query);
-		
-		while (true) {
-			Message msg = m_MessageQueue.take();
-			
-		}
-		
-		//channel.close();	
-		//return new QueryResult(true);
+	
+	private void receive(Message msg) {
 	}
 
 }
