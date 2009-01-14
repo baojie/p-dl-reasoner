@@ -10,7 +10,7 @@ import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -35,20 +35,20 @@ public class InterTableauTransitiveGraph {
 		return result;
 	}
 
-	public GlobalNodeID getSourceVertexOf(GlobalNodeID v, DLPackage dlPackage) {
+	public GlobalNodeID getSourceVertexOf(GlobalNodeID v, PackageID packageID) {
 		if (!m_Graph.containsVertex(v)) return null;
 		
 		for (GlobalNodeID source : Graphs.predecessorListOf(m_Graph, v)) {
-			if (source.getPackage().equals(dlPackage)) return source;
+			if (source.getPackageID().equals(packageID)) return source;
 		}
 		return null;
 	}
 	
-	public GlobalNodeID getTargetVertexOf(GlobalNodeID v, DLPackage dlPackage) {
+	public GlobalNodeID getTargetVertexOf(GlobalNodeID v, PackageID packageID) {
 		if (!m_Graph.containsVertex(v)) return null;
 		
 		for (GlobalNodeID target : Graphs.successorListOf(m_Graph, v)) {
-			if (target.getPackage().equals(dlPackage)) return target;
+			if (target.getPackageID().equals(packageID)) return target;
 		}
 		return null;
 	}
@@ -98,10 +98,10 @@ public class InterTableauTransitiveGraph {
 		}
 	}
 	
-	public MultiValuedMap<DLPackage,GlobalNodeID> getVerticesByPackage() {
-		MultiValuedMap<DLPackage,GlobalNodeID> vertices = CollectionUtil.makeMultiValuedMap();
+	public MultiValuedMap<PackageID,GlobalNodeID> getVerticesByPackage() {
+		MultiValuedMap<PackageID,GlobalNodeID> vertices = CollectionUtil.makeMultiValuedMap();
 		for (GlobalNodeID v : m_NodeDependency.keySet()) {
-			vertices.add(v.getPackage(), v);
+			vertices.add(v.getPackageID(), v);
 		}
 		return vertices;
 	}

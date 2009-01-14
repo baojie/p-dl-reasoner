@@ -4,8 +4,8 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
 public class Top extends ContextualizedConcept {
 
-	protected Top(DLPackage homePackage) {
-		super(homePackage);
+	protected Top(PackageID homePackageID) {
+		super(homePackageID);
 	}
 	
 	@Override

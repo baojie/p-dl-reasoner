@@ -11,7 +11,7 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 
 import edu.iastate.pdlreasoner.kb.Query;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 
 public class Tableau {
@@ -20,7 +20,7 @@ public class Tableau {
 	
 	//Constants once set
 	private Address m_MasterAdd;
-	private DLPackage m_AssignedPackage;
+	private PackageID m_AssignedPackageID;
 	
 	//Variables
 	private Channel m_Channel;
@@ -63,7 +63,7 @@ public class Tableau {
 		switch (m_State) {
 		case INIT:
 			m_MasterAdd = msg.getSrc();
-			m_AssignedPackage = (DLPackage) msg.getObject();
+			m_AssignedPackageID = (PackageID) msg.getObject();
 			
 			
 			

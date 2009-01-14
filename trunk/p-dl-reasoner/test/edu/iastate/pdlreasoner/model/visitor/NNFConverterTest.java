@@ -5,7 +5,7 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeAnd;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeNegation;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
-import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makePackageID;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
@@ -21,7 +21,7 @@ import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
@@ -31,7 +31,7 @@ import edu.iastate.pdlreasoner.model.visitor.NNFConverter;
 
 public class NNFConverterTest {
 	
-	private DLPackage[] p;
+	private PackageID[] p;
 	private Top[] top;
 	private Atom[] atoms;
 	private Negation[] negatedAtoms;
@@ -43,9 +43,9 @@ public class NNFConverterTest {
 	
 	@Before
 	public void setUp() {
-		p = new DLPackage[3];
+		p = new PackageID[3];
 		for (int i = 0; i < p.length; i++) {
-			p[i] = makePackage(URI.create("#package" + i));
+			p[i] = makePackageID(URI.create("#package" + i));
 		}
 		top = new Top[p.length];
 		for (int i = 0; i < top.length; i++) {

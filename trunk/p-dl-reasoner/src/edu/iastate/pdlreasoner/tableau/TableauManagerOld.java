@@ -19,7 +19,7 @@ import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.ContextualizedConcept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
@@ -47,7 +47,7 @@ public class TableauManagerOld {
 	private TableauMasterOld m_Master;
 	private ImportGraph m_ImportGraph;
 	private InterTableauManager m_InterTableauMan;
-	private DLPackage m_Package;
+	private PackageID m_PackageID;
 	private TBox m_TBox;
 	
 	//Variables
@@ -61,9 +61,9 @@ public class TableauManagerOld {
 	private MessageProcessor m_MessageProcessor;
 	
 	public TableauManagerOld(OntologyPackage pack) {
-		m_Package = pack.getID();
+		m_PackageID = pack.getID();
 		m_TBox = pack.getTBox();
-		m_Graph = new TableauGraph(m_Package);
+		m_Graph = new TableauGraph(m_PackageID);
 		m_Token = null;
 		m_ReceivedMsgs = new LinkedList<Message>();
 		m_HasClashAtOrigin = false;
@@ -71,8 +71,8 @@ public class TableauManagerOld {
 		m_MessageProcessor = new MessageProcessorImpl();
 	}
 	
-	public DLPackage getPackage() {
-		return m_Package;
+	public PackageID getPackageID() {
+		return m_PackageID;
 	}
 	
 	public void setMaster(TableauMasterOld master) {
@@ -92,7 +92,7 @@ public class TableauManagerOld {
 		root.addLabel(TracedConcept.makeOrigin(c));
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_Package.toDebugString() + "starting with global root " + root + ": " + root.getLabels());
+			LOGGER.debug(m_PackageID.toDebugString() + "starting with global root " + root + ": " + root.getLabels());
 		}
 		
 		applyUniversalRestriction(root);
@@ -175,7 +175,7 @@ public class TableauManagerOld {
 			hasChanged = hasChanged | expand(open.getLabelsFor(AllValues.class));
 			
 			if (LOGGER.isDebugEnabled() && hasChanged) {
-				LOGGER.debug(m_Package.toDebugString() + "applied deterministic rules on node " + open + ": " + open.getLabels());
+				LOGGER.debug(m_PackageID.toDebugString() + "applied deterministic rules on node " + open + ": " + open.getLabels());
 			}
 			
 			if (m_Token != null) {
@@ -200,7 +200,7 @@ public class TableauManagerOld {
 		if (clashCause == null) return;
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_Package.toDebugString() + "broadcasting clash " + clashCause);
+			LOGGER.debug(m_PackageID.toDebugString() + "broadcasting clash " + clashCause);
 		}
 		
 		m_Master.processClash(clashCause);
@@ -219,7 +219,7 @@ public class TableauManagerOld {
 		}
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_Package.toDebugString() + "applied UR on node " + n + ": " + n.getLabels());
+			LOGGER.debug(m_PackageID.toDebugString() + "applied UR on node " + n + ": " + n.getLabels());
 		}
 	}
 
@@ -238,27 +238,27 @@ public class TableauManagerOld {
 		}
 
 		private void visitAtomOrTop(ContextualizedConcept c) {
-			DLPackage context = c.getContext();
-			if (!m_Package.equals(context)) {
+			PackageID context = c.getContext();
+			if (!m_PackageID.equals(context)) {
 				GlobalNodeID importSource = GlobalNodeID.makeWithUnknownID(context);
 				GlobalNodeID importTarget = m_Node.getGlobalNodeID();
 				BackwardConceptReport backward = new BackwardConceptReport(importSource, importTarget, m_Concept);
 				
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(m_Package.toDebugString() + "sending " + backward);
+					LOGGER.debug(m_PackageID.toDebugString() + "sending " + backward);
 				}
 				
 				m_InterTableauMan.processConceptReport(backward);
 			} else {
-				List<DLPackage> importers = m_ImportGraph.getImportersOf(m_Package, c);
+				List<PackageID> importers = m_ImportGraph.getImportersOf(m_PackageID, c);
 				if (importers != null) {
 					GlobalNodeID importSource = m_Node.getGlobalNodeID();
-					for (DLPackage importer : importers) {
+					for (PackageID importer : importers) {
 						GlobalNodeID importTarget = GlobalNodeID.makeWithUnknownID(importer);
 						ForwardConceptReport forward = new ForwardConceptReport(importSource, importTarget, m_Concept);
 
 						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug(m_Package.toDebugString() + "sending " + forward);
+							LOGGER.debug(m_PackageID.toDebugString() + "sending " + forward);
 						}
 
 						m_InterTableauMan.processConceptReport(forward);
@@ -350,7 +350,7 @@ public class TableauManagerOld {
 			node.addLabel(msg.getConcept());
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_Package.toDebugString() + "applied forward concept report on node " + node + ": " + node.getLabels());
+				LOGGER.debug(m_PackageID.toDebugString() + "applied forward concept report on node " + node + ": " + node.getLabels());
 			}
 		}
 
@@ -362,7 +362,7 @@ public class TableauManagerOld {
 			node.addLabel(new TracedConcept(concept.getConcept(), unionDepends));
 
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_Package.toDebugString() + "applied backward concept report on node " + node + ": " + node.getLabels());
+				LOGGER.debug(m_PackageID.toDebugString() + "applied backward concept report on node " + node + ": " + node.getLabels());
 			}
 		}
 		

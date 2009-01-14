@@ -12,7 +12,7 @@ import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
@@ -57,7 +57,7 @@ public class Node {
 	
 	public GlobalNodeID getGlobalNodeID() {
 		if (m_GlobalID == null) {
-			m_GlobalID = GlobalNodeID.make(m_Graph.getPackage(), m_ID);
+			m_GlobalID = GlobalNodeID.make(m_Graph.getPackageID(), m_ID);
 			m_Graph.put(m_GlobalID, this);
 		}
 		return m_GlobalID;
@@ -140,7 +140,7 @@ public class Node {
 	private boolean isLocalTop(Concept c) {
 		if (c instanceof Top) {
 			Top top = (Top) c;
-			return m_Graph.getPackage().equals(top.getContext());
+			return m_Graph.getPackageID().equals(top.getContext());
 		}
 		return false;
 	}
@@ -190,7 +190,7 @@ public class Node {
 		m_ClashCauses.add(BranchPointSet.unionDependencies(clashes));
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_Graph.getPackage().toDebugString() + "clash found on node " + this + " = " + CollectionUtil.asSet(clashes));
+			LOGGER.debug(m_Graph.getPackageID().toDebugString() + "clash found on node " + this + " = " + CollectionUtil.asSet(clashes));
 		}
 	}
 	
@@ -215,7 +215,7 @@ public class Node {
 			}
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_Graph.getPackage().toDebugString() + "pruned and reopened node " + this + ": " + getLabels());
+				LOGGER.debug(m_Graph.getPackageID().toDebugString() + "pruned and reopened node " + this + ": " + getLabels());
 			}
 		}
 	}
@@ -232,11 +232,11 @@ public class Node {
 	//Only NNF Concepts
 	private class NodeClashDetector extends ConceptVisitorAdapter {
 		
-		private final DLPackage m_HomePackage;
+		private final PackageID m_HomePackageID;
 		private TracedConcept m_Suspect;
 		
 		public NodeClashDetector() {
-			m_HomePackage = m_Graph.getPackage();
+			m_HomePackageID = m_Graph.getPackageID();
 		}
 		
 		public void detect(TracedConcept tc) {
@@ -251,7 +251,7 @@ public class Node {
 		
 		@Override
 		public void visit(Atom atom) {
-			Negation negatedAtom = ModelFactory.makeNegation(m_HomePackage, atom);
+			Negation negatedAtom = ModelFactory.makeNegation(m_HomePackageID, atom);
 			TracedConcept tc = getTracedConceptWith(negatedAtom);
 			if (tc != null) {
 				addClashCause(m_Suspect, tc);
@@ -260,10 +260,10 @@ public class Node {
 
 		@Override
 		public void visit(Negation negation) {
-			DLPackage context = negation.getContext();
+			PackageID context = negation.getContext();
 			Concept negatedConcept = negation.getNegatedConcept();
 			TracedConcept tc = getTracedConceptWith(negatedConcept);
-			if (tc != null && m_HomePackage.equals(context)) {
+			if (tc != null && m_HomePackageID.equals(context)) {
 				addClashCause(m_Suspect, tc);
 			}
 		}

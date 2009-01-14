@@ -10,36 +10,36 @@ import org.jgrapht.alg.TransitiveClosure;
 
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.MultiLabeledDirectedGraph;
 import edu.iastate.pdlreasoner.struct.MultiLabeledEdge;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
-public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
+public class ImportGraph extends MultiLabeledDirectedGraph<PackageID,Concept> {
 
 	private static final long serialVersionUID = 1L;
 
 	public ImportGraph(List<OntologyPackage> packages) {
 		for (OntologyPackage pack : packages) {
-			DLPackage homePackage = pack.getID();
-			MultiValuedMap<DLPackage, Concept> externalConcepts = pack.getExternalConcepts();
-			for (Entry<DLPackage, Set<Concept>> entry : externalConcepts.entrySet()) {
-				addLabels(entry.getKey(), homePackage, entry.getValue());
+			PackageID homePackageID = pack.getID();
+			MultiValuedMap<PackageID, Concept> externalConcepts = pack.getExternalConcepts();
+			for (Entry<PackageID, Set<Concept>> entry : externalConcepts.entrySet()) {
+				addLabels(entry.getKey(), homePackageID, entry.getValue());
 			}
 		}
 		
 		TransitiveClosure.INSTANCE.closeSimpleDirectedGraph(this);
 	}
 
-	public List<DLPackage> getAllVerticesConnecting(DLPackage source, DLPackage target) {
+	public List<PackageID> getAllVerticesConnecting(PackageID source, PackageID target) {
 		if (getEdge(source, target) == null) {
 			throw new IllegalArgumentException("Missing an edge from the source vertex to the target vertex.");
 		}
 		
-		List<DLPackage> midVertices = Graphs.successorListOf(this, source);
-		for (Iterator<DLPackage> it = midVertices.iterator(); it.hasNext(); ) {
-			DLPackage midVertex = it.next();
+		List<PackageID> midVertices = Graphs.successorListOf(this, source);
+		for (Iterator<PackageID> it = midVertices.iterator(); it.hasNext(); ) {
+			PackageID midVertex = it.next();
 			if (getEdge(midVertex, target) == null) {
 				it.remove();
 			}
@@ -48,10 +48,10 @@ public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 		return midVertices;
 	}
 
-	public List<DLPackage> getImportersOf(DLPackage source, Concept c) {
+	public List<PackageID> getImportersOf(PackageID source, Concept c) {
 		if (!containsVertex(source)) return null;
 		
-		List<DLPackage> importers = null;
+		List<PackageID> importers = null;
 		for (MultiLabeledEdge<Concept> outgoingEdge : outgoingEdgesOf(source)) {
         	if (outgoingEdge.getLabels().contains(c)) {
         		if (importers == null) {

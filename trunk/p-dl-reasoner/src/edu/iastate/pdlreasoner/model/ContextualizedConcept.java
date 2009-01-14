@@ -2,13 +2,13 @@ package edu.iastate.pdlreasoner.model;
 
 public abstract class ContextualizedConcept extends Concept {
 	
-	protected DLPackage m_Context;
+	protected PackageID m_Context;
 		
-	protected ContextualizedConcept(DLPackage context) {
+	protected ContextualizedConcept(PackageID context) {
 		m_Context = context;
 	}
 	
-	public DLPackage getContext() {
+	public PackageID getContext() {
 		return m_Context;
 	}
 

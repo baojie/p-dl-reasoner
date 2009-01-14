@@ -3,13 +3,13 @@ package edu.iastate.pdlreasoner.model;
 import java.io.Serializable;
 import java.net.URI;
 
-public class DLPackage implements Serializable {
+public class PackageID implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private URI m_URI;
 
-	protected DLPackage(URI uri) {
+	protected PackageID(URI uri) {
 		m_URI = uri;
 	}
 	
@@ -28,8 +28,8 @@ public class DLPackage implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof DLPackage)) return false;
-		DLPackage other = (DLPackage) obj;
+		if (!(obj instanceof PackageID)) return false;
+		PackageID other = (PackageID) obj;
 		return m_URI.equals(other.m_URI);
 	}
 	

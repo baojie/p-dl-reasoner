@@ -5,7 +5,7 @@ import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
@@ -16,9 +16,9 @@ import edu.iastate.pdlreasoner.model.Top;
 
 public class NNFConverter {
 	
-	private final DLPackage m_NNFContext;
+	private final PackageID m_NNFContext;
 	
-	public NNFConverter(DLPackage context) {
+	public NNFConverter(PackageID context) {
 		m_NNFContext = context;
 	}
 
@@ -52,7 +52,7 @@ public class NNFConverter {
 
 		@Override
 		public void visit(Negation negation) {
-			DLPackage negationContext = negation.getContext();
+			PackageID negationContext = negation.getContext();
 			Concept negatedConcept = negation.getNegatedConcept();
 			m_Result = new NegationPropagator(negationContext).convert(negatedConcept);
 		}
@@ -97,11 +97,11 @@ public class NNFConverter {
 	
 	private class NegationPropagator implements ConceptVisitor {
 
-		private final DLPackage m_NegationContext;
+		private final PackageID m_NegationContext;
 		private final Top m_NegationContextTop;
 		private Concept m_Result;
 		
-		public NegationPropagator(DLPackage negationContext) {
+		public NegationPropagator(PackageID negationContext) {
 			m_NegationContext = negationContext;
 			m_NegationContextTop = ModelFactory.makeTop(m_NegationContext);
 		}
@@ -129,7 +129,7 @@ public class NNFConverter {
 		
 		@Override
 		public void visit(Top top) {
-			DLPackage topContext = top.getContext();
+			PackageID topContext = top.getContext();
 			if (topContext.equals(m_NegationContext)) {
 				m_Result = Bottom.INSTANCE;
 			} else {
@@ -144,7 +144,7 @@ public class NNFConverter {
 
 		@Override
 		public void visit(Negation negation) {
-			DLPackage innerNegationContext = negation.getContext();
+			PackageID innerNegationContext = negation.getContext();
 			Concept negatedConcept = negation.getNegatedConcept();
 			
 			m_Result = new NNFConverterImpl().convert(negatedConcept);

@@ -10,7 +10,7 @@ import edu.iastate.pdlreasoner.exception.IllegalQueryException;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Top;
@@ -61,23 +61,23 @@ public class TableauMasterOld {
 		}
 	}
 
-	public boolean isUnderstandableBy(Concept c, DLPackage witness) {
+	public boolean isUnderstandableBy(Concept c, PackageID witness) {
 		if (!m_HasInitialized) throw new IllegalStateException("TableauServer has not been initialized.");
 		
 		ExternalConceptsExtractor visitor = new ExternalConceptsExtractor(witness);
 		c.accept(visitor);
 		
-		Set<DLPackage> externals = CollectionUtil.makeSet();
+		Set<PackageID> externals = CollectionUtil.makeSet();
 		externals.addAll(visitor.getExternalConcepts().keySet());
 		externals.addAll(visitor.getExternalNegationContexts());
-		for (DLPackage external : externals) {
+		for (PackageID external : externals) {
 			if (!m_ImportGraph.containsEdge(external, witness)) return false;
 		}
 		
 		return true;
 	}
 
-	public boolean isSatisfiable(Concept c, DLPackage witness) {
+	public boolean isSatisfiable(Concept c, PackageID witness) {
 		if (!isUnderstandableBy(c, witness)) {
 			throw new IllegalQueryException("Concept " + c + " is not understandable by " + witness);
 		}
@@ -106,12 +106,12 @@ public class TableauMasterOld {
 		return !hasClashAtOrigin;
 	}
 	
-	public boolean isConsistent(DLPackage witness) {
+	public boolean isConsistent(PackageID witness) {
 		Top topW = ModelFactory.makeTop(witness);
 		return isSatisfiable(topW, witness);
 	}
 	
-	public boolean isSubclassOf(Concept sub, Concept sup, DLPackage witness) {
+	public boolean isSubclassOf(Concept sub, Concept sup, PackageID witness) {
 		Negation notSup = ModelFactory.makeNegation(witness, sup);
 		And sat = ModelFactory.makeAnd(sub, notSup);
 		return !isSatisfiable(sat, witness);
@@ -189,7 +189,7 @@ public class TableauMasterOld {
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("All prunings completed");
-			LOGGER.debug("Resuming completion on " + resumeTab.getPackage().toDebugString() + "with token " + token);
+			LOGGER.debug("Resuming completion on " + resumeTab.getPackageID().toDebugString() + "with token " + token);
 		}
 		
 		resumeTab.receiveToken(token);

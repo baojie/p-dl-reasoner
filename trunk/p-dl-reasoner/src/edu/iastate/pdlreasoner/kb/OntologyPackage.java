@@ -1,22 +1,22 @@
 package edu.iastate.pdlreasoner.kb;
 
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 
 public class OntologyPackage {
 
-	private DLPackage m_ID;
+	private PackageID m_ID;
 	private TBox m_TBox;
 	
-	public OntologyPackage(DLPackage id) {
+	public OntologyPackage(PackageID id) {
 		m_ID = id; 
 		m_TBox = new TBox(this);
 	}
 	
-	public DLPackage getID() {
+	public PackageID getID() {
 		return m_ID;
 	}
 	
@@ -30,7 +30,7 @@ public class OntologyPackage {
 		m_TBox.init();
 	}
 	
-	public MultiValuedMap<DLPackage, Concept> getExternalConcepts() {
+	public MultiValuedMap<PackageID, Concept> getExternalConcepts() {
 		return m_TBox.getExternalConcepts();
 	}
 

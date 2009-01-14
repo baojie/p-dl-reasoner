@@ -8,8 +8,8 @@ public class Atom extends ContextualizedConcept {
 	
 	protected URI m_URI;
 	
-	protected Atom(DLPackage homePackage, URI uri) {
-		super(homePackage);
+	protected Atom(PackageID homePackageID, URI uri) {
+		super(homePackageID);
 		m_URI = uri;
 	}
 

@@ -2,7 +2,7 @@ package edu.iastate.pdlreasoner.master;
 
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
-import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makePackageID;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -17,20 +17,20 @@ import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Or;
 
 public class TableauMasterMultiPackageTest {
 
-	private DLPackage[] p;
+	private PackageID[] p;
 	private OntologyPackage[] kb;
 	private TableauMasterOld m_TableauMaster;
 	
 	@Before
 	public void setUp() {
-		p = new DLPackage[3];
+		p = new PackageID[3];
 		for (int i = 0; i < p.length; i++) {
-			p[i] = makePackage(URI.create("#package" + i));
+			p[i] = makePackageID(URI.create("#package" + i));
 		}
 		
 		kb = new OntologyPackage[p.length];

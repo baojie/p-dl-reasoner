@@ -4,23 +4,23 @@ import java.net.URI;
 
 public class ModelFactory {
 
-	public static DLPackage makePackage(URI uri) {
-		return new DLPackage(uri);
+	public static PackageID makePackageID(URI uri) {
+		return new PackageID(uri);
 	}
 	
-	public static Top makeTop(DLPackage homePackage) {
-		return new Top(homePackage);
+	public static Top makeTop(PackageID homePackageID) {
+		return new Top(homePackageID);
 	}
 	
-	public static Atom makeAtom(DLPackage homePackage, URI uri) {
-		return new Atom(homePackage, uri);
+	public static Atom makeAtom(PackageID homePackageID, URI uri) {
+		return new Atom(homePackageID, uri);
 	}
 	
 	public static Role makeRole(URI uri) {
 		return new Role(uri);
 	}
 	
-	public static Negation makeNegation(DLPackage context, Concept negatedConcept) {
+	public static Negation makeNegation(PackageID context, Concept negatedConcept) {
 		return new Negation(context, negatedConcept);
 	}
 	

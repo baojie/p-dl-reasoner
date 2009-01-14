@@ -3,7 +3,7 @@ package edu.iastate.pdlreasoner.tableau;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAllValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeNegation;
-import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makePackageID;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
 import static edu.iastate.pdlreasoner.tableau.TracedConcept.makeOrigin;
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,7 @@ import org.junit.Test;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -31,8 +31,8 @@ import edu.iastate.pdlreasoner.tableau.graph.TableauGraph;
 public class NodeTest {
 	
 	private Node m_Node;
-	private DLPackage m_HomePackage;
-	private DLPackage m_ForeignPackage;
+	private PackageID m_HomePackageID;
+	private PackageID m_ForeignPackageID;
 	private Role role;
 	private Atom atom;
 	private TracedConcept atomTC;
@@ -41,12 +41,12 @@ public class NodeTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		m_HomePackage = makePackage(URI.create("#package"));
-		m_ForeignPackage = makePackage(URI.create("#package2"));
-		TableauGraph g = new TableauGraph(m_HomePackage);
+		m_HomePackageID = makePackageID(URI.create("#package"));
+		m_ForeignPackageID = makePackageID(URI.create("#package2"));
+		TableauGraph g = new TableauGraph(m_HomePackageID);
 		m_Node = g.makeRoot(BranchPointSet.EMPTY);
 		role = makeRole(URI.create("#role"));
-		atom = makeAtom(m_HomePackage, URI.create("#atom"));
+		atom = makeAtom(m_HomePackageID, URI.create("#atom"));
 		atomTC = makeOrigin(atom);
 		all = makeAllValues(role, atom);
 		allTC = makeOrigin(all);
@@ -98,8 +98,8 @@ public class NodeTest {
 
 	@Test
 	public void testHasClash_Atom1() {
-		Negation homeNotAtom = makeNegation(m_HomePackage, atom);
-		Negation foreignNotAtom = makeNegation(m_ForeignPackage, atom);
+		Negation homeNotAtom = makeNegation(m_HomePackageID, atom);
+		Negation foreignNotAtom = makeNegation(m_ForeignPackageID, atom);
 		
 		m_Node.addLabel(atomTC);
 		m_Node.addLabel(makeOrigin(foreignNotAtom));
@@ -111,7 +111,7 @@ public class NodeTest {
 
 	@Test
 	public void testHasClash_Atom2() {
-		Negation homeNotAtom = makeNegation(m_HomePackage, atom);
+		Negation homeNotAtom = makeNegation(m_HomePackageID, atom);
 		m_Node.addLabel(makeOrigin(homeNotAtom));
 		m_Node.addLabel(atomTC);
 		assertEquals(Collections.singleton(BranchPointSet.EMPTY), m_Node.getClashCauses());
@@ -119,7 +119,7 @@ public class NodeTest {
 
 	@Test
 	public void testHasClash_All() {
-		Negation homeNotAll = makeNegation(m_HomePackage, all);
+		Negation homeNotAll = makeNegation(m_HomePackageID, all);
 		m_Node.addLabel(makeOrigin(homeNotAll));
 		m_Node.addLabel(allTC);
 		//Only NNF support

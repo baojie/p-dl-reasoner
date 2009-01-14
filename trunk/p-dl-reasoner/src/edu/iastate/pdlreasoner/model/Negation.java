@@ -6,7 +6,7 @@ public class Negation extends ContextualizedConcept {
 	
 	protected Concept m_NegatedConcept;
 	
-	protected Negation(DLPackage context, Concept negatedConcept) {
+	protected Negation(PackageID context, Concept negatedConcept) {
 		super(context);
 		m_NegatedConcept = negatedConcept;
 	}

@@ -5,7 +5,7 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeAnd;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeNegation;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
-import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makePackageID;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
@@ -24,7 +24,7 @@ import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
@@ -34,7 +34,7 @@ import edu.iastate.pdlreasoner.model.Top;
 public class TableauMasterSinglePackageTest {
 
 	private TableauMasterOld m_TableauMaster;
-	private DLPackage p;
+	private PackageID p;
 	private OntologyPackage kb;
 	private Top top;
 	private Atom[] atoms;
@@ -44,7 +44,7 @@ public class TableauMasterSinglePackageTest {
 	@Before
 	public void setUp() {
 		m_TableauMaster = new TableauMasterOld();
-		p = makePackage(URI.create("#package"));
+		p = makePackageID(URI.create("#package"));
 		kb = new OntologyPackage(p);
 		m_TableauMaster.addPackage(kb);
 		top = makeTop(p);

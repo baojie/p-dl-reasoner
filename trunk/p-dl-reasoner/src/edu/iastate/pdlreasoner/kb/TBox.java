@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.Subclass;
 import edu.iastate.pdlreasoner.model.visitor.ExternalConceptsExtractor;
@@ -40,7 +40,7 @@ public class TBox {
 		normalizeAxioms();
 		
 		m_UC = CollectionUtil.makeList();
-		DLPackage homePackageID = m_HomePackage.getID();
+		PackageID homePackageID = m_HomePackage.getID();
 		NNFConverter converter = new NNFConverter(homePackageID);
 		for (Subclass subclass : m_Axioms) {
 			Concept notSub = ModelFactory.makeNegation(homePackageID, subclass.getSub());
@@ -70,9 +70,9 @@ public class TBox {
 	}
 	
 	// Assumption: normalizeAxioms() has been called
-	public MultiValuedMap<DLPackage, Concept> getExternalConcepts() {
-		DLPackage homePackage = m_HomePackage.getID();
-		ExternalConceptsExtractor visitor = new ExternalConceptsExtractor(homePackage);
+	public MultiValuedMap<PackageID, Concept> getExternalConcepts() {
+		PackageID homePackageID = m_HomePackage.getID();
+		ExternalConceptsExtractor visitor = new ExternalConceptsExtractor(homePackageID);
 		for (Subclass axiom : m_Axioms) {
 			axiom.getSub().accept(visitor);
 			axiom.getSup().accept(visitor);

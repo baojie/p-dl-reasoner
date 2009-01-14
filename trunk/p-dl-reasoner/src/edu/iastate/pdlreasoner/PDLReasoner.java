@@ -5,7 +5,7 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeAnd;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeNegation;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
-import static edu.iastate.pdlreasoner.model.ModelFactory.makePackage;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makePackageID;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
@@ -22,7 +22,7 @@ import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
@@ -77,12 +77,12 @@ public class PDLReasoner {
 	}
 
 	private static Query getExample1() {
-		DLPackage[] p;
+		PackageID[] p;
 		OntologyPackage[] packages;
 		
-		p = new DLPackage[3];
+		p = new PackageID[3];
 		for (int i = 0; i < p.length; i++) {
-			p[i] = makePackage(URI.create("#package" + i));
+			p[i] = makePackageID(URI.create("#package" + i));
 		}
 		
 		packages = new OntologyPackage[p.length];

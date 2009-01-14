@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauTopology implements Iterable<TableauManagerOld> {
 
-	private Map<DLPackage, TableauManagerOld> m_Tableaux;
+	private Map<PackageID, TableauManagerOld> m_Tableaux;
 	private Ring<TableauManagerOld> m_TableauxRing;
 
 	public TableauTopology(List<OntologyPackage> packages) {
@@ -24,8 +24,8 @@ public class TableauTopology implements Iterable<TableauManagerOld> {
 		m_TableauxRing = new Ring<TableauManagerOld>(m_Tableaux.values());
 	}
 	
-	public TableauManagerOld get(DLPackage dlPackage) {
-		return m_Tableaux.get(dlPackage);
+	public TableauManagerOld get(PackageID packageID) {
+		return m_Tableaux.get(packageID);
 	}
 
 	public TableauManagerOld getNext(TableauManagerOld man) {

@@ -9,7 +9,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.master.graph.InterTableauTransitiveGraph;
-import edu.iastate.pdlreasoner.model.DLPackage;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
@@ -36,7 +36,7 @@ public class InterTableauManager {
 
 	public void processConceptReport(BackwardConceptReport backward) {
 		GlobalNodeID requestedImportSource = backward.getImportSource();
-		DLPackage importSourcePackage = requestedImportSource.getPackage();
+		PackageID importSourcePackageID = requestedImportSource.getPackageID();
 		GlobalNodeID importTarget = backward.getImportTarget();
 		TracedConcept concept = backward.getConcept();
 		BranchPointSet conceptDependency = concept.getDependency();
@@ -54,11 +54,11 @@ public class InterTableauManager {
 		}
 		
 		//Add source to graph
-		TableauManagerOld importSourceTab = m_Tableaux.get(importSourcePackage);
-		GlobalNodeID importSource = m_InterTableau.getSourceVertexOf(importTarget, importSourcePackage);
+		TableauManagerOld importSourceTab = m_Tableaux.get(importSourcePackageID);
+		GlobalNodeID importSource = m_InterTableau.getSourceVertexOf(importTarget, importSourcePackageID);
 		if (importSource == null) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Creating new root on the source package " + importSourceTab.getPackage());
+				LOGGER.debug("Creating new root on the source package " + importSourceTab.getPackageID());
 			}
 			
 			importSource = importSourceTab.addRoot(sourceDependency);
@@ -77,21 +77,21 @@ public class InterTableauManager {
 
 	public void processConceptReport(ForwardConceptReport forward) {
 		GlobalNodeID requestedImportTarget = forward.getImportTarget();
-		DLPackage importTargetPackage = requestedImportTarget.getPackage();
+		PackageID importTargetPackageID = requestedImportTarget.getPackageID();
 		GlobalNodeID importSource = forward.getImportSource();
 		
-		GlobalNodeID importTarget = m_InterTableau.getTargetVertexOf(importSource, importTargetPackage);
+		GlobalNodeID importTarget = m_InterTableau.getTargetVertexOf(importSource, importTargetPackageID);
 		if (importTarget == null) return;
 		
 		requestedImportTarget.copyIDFrom(importTarget);
-		TableauManagerOld importTargetTab = m_Tableaux.get(importTargetPackage);
+		TableauManagerOld importTargetTab = m_Tableaux.get(importTargetPackageID);
 		importTargetTab.receive(forward);
 	}
 	
 	public void pruneTo(BranchPoint restoreTarget) {
 		m_InterTableau.pruneTo(restoreTarget);
 		
-		for (Entry<DLPackage, Set<GlobalNodeID>> entry : m_InterTableau.getVerticesByPackage().entrySet()) {
+		for (Entry<PackageID, Set<GlobalNodeID>> entry : m_InterTableau.getVerticesByPackage().entrySet()) {
 			TableauManagerOld tab = m_Tableaux.get(entry.getKey());
 			tab.reopenAtomsOnGlobalNodes(entry.getValue());
 		}
@@ -108,15 +108,15 @@ public class InterTableauManager {
 	}
 
 	private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) {
-		List<DLPackage> midPackages = m_ImportGraph.getAllVerticesConnecting(importSource.getPackage(), importTarget.getPackage());
-		for (DLPackage midPackage : midPackages) {
-			GlobalNodeID midNode = m_InterTableau.getSourceVertexOf(importTarget, midPackage);
+		List<PackageID> midPackageIDs = m_ImportGraph.getAllVerticesConnecting(importSource.getPackageID(), importTarget.getPackageID());
+		for (PackageID midPackageID : midPackageIDs) {
+			GlobalNodeID midNode = m_InterTableau.getSourceVertexOf(importTarget, midPackageID);
 			if (midNode == null) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Creating new root for R-Rule on the mid package " + midPackage);
+					LOGGER.debug("Creating new root for R-Rule on the mid package " + midPackageID);
 				}
 
-				TableauManagerOld midTab = m_Tableaux.get(midPackage);
+				TableauManagerOld midTab = m_Tableaux.get(midPackageID);
 				midNode = midTab.addRoot(dependency);
 				m_InterTableau.addVertex(midNode, dependency);
 				addEdge(midNode, importTarget);
