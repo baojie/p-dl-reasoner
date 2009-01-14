@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
@@ -15,10 +15,10 @@ public class TableauTopology implements Iterable<TableauManagerOld> {
 	private Map<DLPackage, TableauManagerOld> m_Tableaux;
 	private Ring<TableauManagerOld> m_TableauxRing;
 
-	public TableauTopology(List<KnowledgeBase> kbs) {
+	public TableauTopology(List<OntologyPackage> packages) {
 		m_Tableaux = CollectionUtil.makeMap();
-		for (KnowledgeBase kb : kbs) {
-			m_Tableaux.put(kb.getPackage(), kb.getTableau());
+		for (OntologyPackage pack : packages) {
+			m_Tableaux.put(pack.getID(), pack.getTableau());
 		}
 
 		m_TableauxRing = new Ring<TableauManagerOld>(m_Tableaux.values());

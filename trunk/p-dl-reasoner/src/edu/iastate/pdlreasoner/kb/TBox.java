@@ -19,7 +19,7 @@ public class TBox {
 	private static final Logger LOGGER = Logger.getLogger(TBox.class);
 	
 	//Constants
-	private KnowledgeBase m_HomeKB;
+	private OntologyPackage m_HomePackage;
 	
 	//Variables
 	private List<Subclass> m_Axioms;
@@ -27,8 +27,8 @@ public class TBox {
 	//Caches
 	private List<Concept> m_UC;
 	
-	public TBox(KnowledgeBase homeKB) {
-		m_HomeKB = homeKB;
+	public TBox(OntologyPackage homePackage) {
+		m_HomePackage = homePackage;
 		m_Axioms = CollectionUtil.makeList();
 	}
 
@@ -40,17 +40,17 @@ public class TBox {
 		normalizeAxioms();
 		
 		m_UC = CollectionUtil.makeList();
-		DLPackage homePackage = m_HomeKB.getPackage();
-		NNFConverter converter = new NNFConverter(homePackage);
+		DLPackage homePackageID = m_HomePackage.getID();
+		NNFConverter converter = new NNFConverter(homePackageID);
 		for (Subclass subclass : m_Axioms) {
-			Concept notSub = ModelFactory.makeNegation(homePackage, subclass.getSub());
+			Concept notSub = ModelFactory.makeNegation(homePackageID, subclass.getSub());
 			Concept nnfNotSub = converter.convert(notSub);
 			Concept uc = ModelFactory.makeOr(nnfNotSub, subclass.getSup());
 			m_UC.add(uc);
 		}
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_HomeKB.getPackage().toDebugString() + "UC = " + m_UC);
+			LOGGER.debug(m_HomePackage.getID().toDebugString() + "UC = " + m_UC);
 		}
 	}
 	
@@ -59,7 +59,7 @@ public class TBox {
 	}
 
 	private void normalizeAxioms() {
-		NNFConverter converter = new NNFConverter(m_HomeKB.getPackage());
+		NNFConverter converter = new NNFConverter(m_HomePackage.getID());
 		List<Subclass> nnfAxioms = new ArrayList<Subclass>();
 		for (Subclass subclass : m_Axioms) {
 			Concept nnfSub = converter.convert(subclass.getSub());
@@ -71,7 +71,7 @@ public class TBox {
 	
 	// Assumption: normalizeAxioms() has been called
 	public MultiValuedMap<DLPackage, Concept> getExternalConcepts() {
-		DLPackage homePackage = m_HomeKB.getPackage();
+		DLPackage homePackage = m_HomePackage.getID();
 		ExternalConceptsExtractor visitor = new ExternalConceptsExtractor(homePackage);
 		for (Subclass axiom : m_Axioms) {
 			axiom.getSub().accept(visitor);

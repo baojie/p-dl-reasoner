@@ -17,7 +17,7 @@ import java.net.URI;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -29,7 +29,7 @@ import edu.iastate.pdlreasoner.model.Top;
 public class TableauMasterMultiPackagePaperExampleTest {
 
 	private DLPackage[] p;
-	private KnowledgeBase[] kb;
+	private OntologyPackage[] kb;
 	private TableauMasterOld m_TableauMaster;
 	
 	@Before
@@ -39,9 +39,9 @@ public class TableauMasterMultiPackagePaperExampleTest {
 			p[i] = makePackage(URI.create("#package" + i));
 		}
 		
-		kb = new KnowledgeBase[p.length];
+		kb = new OntologyPackage[p.length];
 		for (int i = 0; i < kb.length; i++) {
-			kb[i] = new KnowledgeBase(p[i]);
+			kb[i] = new OntologyPackage(p[i]);
 		}
 		
 		m_TableauMaster = new TableauMasterOld();
@@ -70,7 +70,7 @@ public class TableauMasterMultiPackagePaperExampleTest {
 		kb[1].addAxiom(p1D1, p1D2);
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauMaster.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addPackage(kb[i]);
 		}
 		
 		m_TableauMaster.init();
@@ -89,7 +89,7 @@ public class TableauMasterMultiPackagePaperExampleTest {
 		kb[2].addAxiom(p1C, p2D);
 
 		for (int i = 0; i <= 2; i++) {
-			m_TableauMaster.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addPackage(kb[i]);
 		}
 
 		m_TableauMaster.init();
@@ -108,7 +108,7 @@ public class TableauMasterMultiPackagePaperExampleTest {
 		kb[1].addAxiom(p1P, makeNegation(p[1], p0F));
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauMaster.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addPackage(kb[i]);
 		}
 		
 		m_TableauMaster.init();
@@ -127,7 +127,7 @@ public class TableauMasterMultiPackagePaperExampleTest {
 		kb[1].addAxiom(p1B, makeAnd(p0A, makeNegation(p[1], p0C)));
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauMaster.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addPackage(kb[i]);
 		}
 		
 		m_TableauMaster.init();

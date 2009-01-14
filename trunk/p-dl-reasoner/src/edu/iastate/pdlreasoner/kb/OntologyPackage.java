@@ -6,18 +6,18 @@ import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
 import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 
-public class KnowledgeBase {
+public class OntologyPackage {
 
-	private DLPackage m_Package;
+	private DLPackage m_ID;
 	private TBox m_TBox;
 	
-	public KnowledgeBase(DLPackage homePackage) {
-		m_Package = homePackage; 
+	public OntologyPackage(DLPackage id) {
+		m_ID = id; 
 		m_TBox = new TBox(this);
 	}
 	
-	public DLPackage getPackage() {
-		return m_Package;
+	public DLPackage getID() {
+		return m_ID;
 	}
 	
 	public void addAxiom(Concept sub, Concept sup) {

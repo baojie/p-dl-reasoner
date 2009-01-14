@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.master.ImportGraph;
 import edu.iastate.pdlreasoner.master.InterTableauManager;
@@ -60,9 +60,9 @@ public class TableauManagerOld {
 	private ConceptExpander m_ConceptExpander;
 	private MessageProcessor m_MessageProcessor;
 	
-	public TableauManagerOld(KnowledgeBase kb) {
-		m_Package = kb.getPackage();
-		m_TBox = kb.getTBox();
+	public TableauManagerOld(OntologyPackage pack) {
+		m_Package = pack.getID();
+		m_TBox = pack.getTBox();
 		m_Graph = new TableauGraph(m_Package);
 		m_Token = null;
 		m_ReceivedMsgs = new LinkedList<Message>();

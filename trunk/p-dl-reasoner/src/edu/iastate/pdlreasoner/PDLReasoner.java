@@ -16,7 +16,7 @@ import java.util.Arrays;
 import org.jgroups.ChannelException;
 
 import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.master.TableauMaster;
@@ -78,16 +78,16 @@ public class PDLReasoner {
 
 	private static Query getExample1() {
 		DLPackage[] p;
-		KnowledgeBase[] kbs;
+		OntologyPackage[] packages;
 		
 		p = new DLPackage[3];
 		for (int i = 0; i < p.length; i++) {
 			p[i] = makePackage(URI.create("#package" + i));
 		}
 		
-		kbs = new KnowledgeBase[p.length];
-		for (int i = 0; i < kbs.length; i++) {
-			kbs[i] = new KnowledgeBase(p[i]);
+		packages = new OntologyPackage[p.length];
+		for (int i = 0; i < packages.length; i++) {
+			packages[i] = new OntologyPackage(p[i]);
 		}
 		
 		Top p0Top = makeTop(p[0]);
@@ -98,7 +98,7 @@ public class PDLReasoner {
 		Atom p1D2 = makeAtom(p[1], URI.create("#D2"));
 		Atom p1D3 = makeAtom(p[1], URI.create("#D3"));
 		
-		kbs[0].addAxiom(p0Top, p1D3);
+		packages[0].addAxiom(p0Top, p1D3);
 		
 		And bigAnd = makeAnd(
 				p1D1,
@@ -106,11 +106,11 @@ public class PDLReasoner {
 				makeAllValues(r, makeNegation(p[0], p0C))
 			);
 		Or bigOr = makeOr(bigAnd, makeNegation(p[1], p1D2));
-		kbs[0].addAxiom(p0Top, bigOr);
+		packages[0].addAxiom(p0Top, bigOr);
 		
-		kbs[1].addAxiom(p1D1, p1D2);
+		packages[1].addAxiom(p1D1, p1D2);
 
-		return new Query(Arrays.asList(kbs), p0Top, p[0]);
+		return new Query(Arrays.asList(packages), p0Top, p[0]);
 	}
 
 }

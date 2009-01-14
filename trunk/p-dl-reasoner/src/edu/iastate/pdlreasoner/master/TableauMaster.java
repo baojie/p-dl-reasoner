@@ -24,10 +24,11 @@ public class TableauMaster {
 
 	private static enum State { INIT, EXPAND, FINAL }
 	
-	//Variables
-	private Channel m_Channel;
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
+	private Channel m_Channel;
+	private Address m_Master;
+	private List<Address> m_Slaves;
 	
 	public TableauMaster() {
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
@@ -37,6 +38,8 @@ public class TableauMaster {
 	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException, InterruptedException {
 		initChannel();
 		connectWithSlaves(query);
+		
+		m_State = State.EXPAND;
 		
 		while (m_State != State.FINAL) {
 			receive(m_MessageQueue.take());
@@ -65,18 +68,18 @@ public class TableauMaster {
 
 	private void connectWithSlaves(Query query)	throws NotEnoughSlavesException, ChannelNotConnectedException, ChannelClosedException {
 		View view = m_Channel.getView();
-		Address masterAdd = m_Channel.getLocalAddress();
-		List<Address> members = CollectionUtil.makeList(view.getMembers());
-		members.remove(masterAdd);
-		if (members.size() < query.getKBs().size()) {
+		m_Master = m_Channel.getLocalAddress();
+		m_Slaves = CollectionUtil.makeList(view.getMembers());
+		m_Slaves.remove(m_Master);
+		if (m_Slaves.size() < query.getPackages().size()) {
 			m_Channel.close();
 			throw new NotEnoughSlavesException("Ontology has "
-					+ query.getKBs().size() + " packages but only "
-					+ members.size() + " slaves are available.");
+					+ query.getPackages().size() + " packages but only "
+					+ m_Slaves.size() + " slaves are available.");
 		}
 
-		for (int i = 0; i < query.getKBs().size(); i++) {
-			Message msg = new Message(members.get(i), masterAdd, query.getKBs().get(i).getPackage());
+		for (int i = 0; i < query.getPackages().size(); i++) {
+			Message msg = new Message(m_Slaves.get(i), m_Master, query.getPackages().get(i).getID());
 			m_Channel.send(msg);
 		}
 	}

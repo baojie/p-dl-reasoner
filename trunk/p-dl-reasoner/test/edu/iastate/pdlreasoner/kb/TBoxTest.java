@@ -31,8 +31,8 @@ public class TBoxTest {
 	@Before
 	public void setUp() {
 		m_HomePackage = makePackage(URI.create("#package0"));
-		KnowledgeBase kb = new KnowledgeBase(m_HomePackage);
-		m_TBox = new TBox(kb);
+		OntologyPackage pack = new OntologyPackage(m_HomePackage);
+		m_TBox = new TBox(pack);
 	}
 	
 	@Test

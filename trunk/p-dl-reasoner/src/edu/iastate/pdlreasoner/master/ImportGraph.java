@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.TransitiveClosure;
 
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
 import edu.iastate.pdlreasoner.struct.MultiLabeledDirectedGraph;
@@ -20,10 +20,10 @@ public class ImportGraph extends MultiLabeledDirectedGraph<DLPackage,Concept> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ImportGraph(List<KnowledgeBase> kbs) {
-		for (KnowledgeBase kb : kbs) {
-			DLPackage homePackage = kb.getPackage();
-			MultiValuedMap<DLPackage, Concept> externalConcepts = kb.getExternalConcepts();
+	public ImportGraph(List<OntologyPackage> packages) {
+		for (OntologyPackage pack : packages) {
+			DLPackage homePackage = pack.getID();
+			MultiValuedMap<DLPackage, Concept> externalConcepts = pack.getExternalConcepts();
 			for (Entry<DLPackage, Set<Concept>> entry : externalConcepts.entrySet()) {
 				addLabels(entry.getKey(), homePackage, entry.getValue());
 			}

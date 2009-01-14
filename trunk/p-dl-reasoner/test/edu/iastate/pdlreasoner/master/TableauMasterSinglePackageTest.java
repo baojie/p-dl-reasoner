@@ -18,7 +18,7 @@ import java.net.URI;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
@@ -35,7 +35,7 @@ public class TableauMasterSinglePackageTest {
 
 	private TableauMasterOld m_TableauMaster;
 	private DLPackage p;
-	private KnowledgeBase kb;
+	private OntologyPackage kb;
 	private Top top;
 	private Atom[] atoms;
 	private Negation[] negatedAtoms;
@@ -45,8 +45,8 @@ public class TableauMasterSinglePackageTest {
 	public void setUp() {
 		m_TableauMaster = new TableauMasterOld();
 		p = makePackage(URI.create("#package"));
-		kb = new KnowledgeBase(p);
-		m_TableauMaster.addKnowledgeBase(kb);
+		kb = new OntologyPackage(p);
+		m_TableauMaster.addPackage(kb);
 		top = makeTop(p);
 		atoms = new Atom[10];
 		for (int i = 0; i < atoms.length; i++) {

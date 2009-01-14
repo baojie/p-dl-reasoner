@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
@@ -23,7 +23,7 @@ import edu.iastate.pdlreasoner.model.Or;
 public class TableauMasterMultiPackageTest {
 
 	private DLPackage[] p;
-	private KnowledgeBase[] kb;
+	private OntologyPackage[] kb;
 	private TableauMasterOld m_TableauMaster;
 	
 	@Before
@@ -33,9 +33,9 @@ public class TableauMasterMultiPackageTest {
 			p[i] = makePackage(URI.create("#package" + i));
 		}
 		
-		kb = new KnowledgeBase[p.length];
+		kb = new OntologyPackage[p.length];
 		for (int i = 0; i < kb.length; i++) {
-			kb[i] = new KnowledgeBase(p[i]);
+			kb[i] = new OntologyPackage(p[i]);
 		}
 		
 		m_TableauMaster = new TableauMasterOld();
@@ -43,8 +43,8 @@ public class TableauMasterMultiPackageTest {
 
 	@Test
 	public void empty() {
-		m_TableauMaster.addKnowledgeBase(kb[0]);
-		m_TableauMaster.addKnowledgeBase(kb[1]);
+		m_TableauMaster.addPackage(kb[0]);
+		m_TableauMaster.addPackage(kb[1]);
 		m_TableauMaster.init();
 		assertTrue(m_TableauMaster.isConsistent(p[0]));
 		assertTrue(m_TableauMaster.isConsistent(p[1]));
@@ -58,7 +58,7 @@ public class TableauMasterMultiPackageTest {
 		kb[0].addAxiom(p0A, Bottom.INSTANCE);
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauMaster.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addPackage(kb[i]);
 		}
 		
 		m_TableauMaster.init();
@@ -81,7 +81,7 @@ public class TableauMasterMultiPackageTest {
 		kb[1].addAxiom(Bottom.INSTANCE, p0A);
 		
 		for (int i = 0; i <= 1; i++) {
-			m_TableauMaster.addKnowledgeBase(kb[i]);
+			m_TableauMaster.addPackage(kb[i]);
 		}
 		
 		m_TableauMaster.init();

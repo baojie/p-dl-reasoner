@@ -16,7 +16,7 @@ import edu.iastate.pdlreasoner.net.ChannelUtil;
 
 public class Tableau {
 	
-	private static enum State { INIT, EXPAND, FINAL }
+	private static enum State { INIT, READY, EXPAND, FINAL }
 	
 	//Constants once set
 	private Address m_MasterAdd;
@@ -60,11 +60,20 @@ public class Tableau {
 	}
 
 	private void receive(Message msg) {
-		m_MasterAdd = msg.getSrc();
-		m_AssignedPackage = (DLPackage) msg.getObject();
-		
-		System.out.println(m_MasterAdd);
-		System.out.println(m_AssignedPackage);
+		switch (m_State) {
+		case INIT:
+			m_MasterAdd = msg.getSrc();
+			m_AssignedPackage = (DLPackage) msg.getObject();
+			
+			
+			
+			
+			m_State = State.READY;
+			break;
+		case READY:
+			
+			break;
+		}
 	}
 	
 }

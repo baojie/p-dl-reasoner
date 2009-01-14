@@ -7,7 +7,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
-import edu.iastate.pdlreasoner.kb.KnowledgeBase;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.DLPackage;
@@ -27,7 +27,7 @@ public class TableauMasterOld {
 	private static final Logger LOGGER = Logger.getLogger(TableauMasterOld.class);
 	
 	//Constants wrt KBs
-	private List<KnowledgeBase> m_KBs;
+	private List<OntologyPackage> m_Packages;
 	private ImportGraph m_ImportGraph;
 	
 	//Variables (new per query)
@@ -37,22 +37,22 @@ public class TableauMasterOld {
 	private Set<BranchPointSet> m_ClashCauses;
 	
 	public TableauMasterOld() {
-		m_KBs = CollectionUtil.makeList();
+		m_Packages = CollectionUtil.makeList();
 	}
 	
 	
 	//Upper Interfaces
 	
-	public void addKnowledgeBase(KnowledgeBase kb) {
-		m_KBs.add(kb);
+	public void addPackage(OntologyPackage pack) {
+		m_Packages.add(pack);
 	}
 	
 	public void init() {
-		for (KnowledgeBase kb : m_KBs) {
-			kb.init();
+		for (OntologyPackage pack : m_Packages) {
+			pack.init();
 		}
 		
-		m_ImportGraph = new ImportGraph(m_KBs);
+		m_ImportGraph = new ImportGraph(m_Packages);
 		m_HasInitialized = true;
 		
 		if (LOGGER.isDebugEnabled()) {
@@ -144,7 +144,7 @@ public class TableauMasterOld {
 	//Private
 
 	private void makeTableaux() {
-		m_Tableaux = new TableauTopology(m_KBs);
+		m_Tableaux = new TableauTopology(m_Packages);
 		m_InterTableauMan = new InterTableauManager(m_ImportGraph, m_Tableaux);
 		for (TableauManagerOld t : m_Tableaux) {
 			t.setMaster(this);
