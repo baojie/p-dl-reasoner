@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultEdge;
 
+import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.master.graph.InterTableauTransitiveGraph;
 import edu.iastate.pdlreasoner.model.PackageID;

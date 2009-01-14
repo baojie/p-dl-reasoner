@@ -71,15 +71,15 @@ public class TableauMaster {
 		m_Master = m_Channel.getLocalAddress();
 		m_Slaves = CollectionUtil.makeList(view.getMembers());
 		m_Slaves.remove(m_Master);
-		if (m_Slaves.size() < query.getPackages().size()) {
+		if (m_Slaves.size() < query.getOntology().getPackages().size()) {
 			m_Channel.close();
 			throw new NotEnoughSlavesException("Ontology has "
-					+ query.getPackages().size() + " packages but only "
+					+ query.getOntology().getPackages().size() + " packages but only "
 					+ m_Slaves.size() + " slaves are available.");
 		}
 
-		for (int i = 0; i < query.getPackages().size(); i++) {
-			Message msg = new Message(m_Slaves.get(i), m_Master, query.getPackages().get(i).getID());
+		for (int i = 0; i < query.getOntology().getPackages().size(); i++) {
+			Message msg = new Message(m_Slaves.get(i), m_Master, query.getOntology().getPackages().get(i).getID());
 			m_Channel.send(msg);
 		}
 	}

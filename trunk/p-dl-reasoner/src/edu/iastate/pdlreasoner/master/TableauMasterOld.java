@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
+import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Concept;

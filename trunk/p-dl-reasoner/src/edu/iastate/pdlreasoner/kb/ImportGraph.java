@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.master;
+package edu.iastate.pdlreasoner.kb;
 
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.TransitiveClosure;
 
-import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.MultiLabeledDirectedGraph;

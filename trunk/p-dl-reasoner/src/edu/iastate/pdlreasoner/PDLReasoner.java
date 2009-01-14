@@ -11,19 +11,19 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.jgroups.ChannelException;
 
 import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
+import edu.iastate.pdlreasoner.kb.Ontology;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
-import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Or;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.tableau.Tableau;
@@ -110,7 +110,7 @@ public class PDLReasoner {
 		
 		packages[1].addAxiom(p1D1, p1D2);
 
-		return new Query(Arrays.asList(packages), p0Top, p[0]);
+		return new Query(new Ontology(packages), p0Top, p[0]);
 	}
 
 }

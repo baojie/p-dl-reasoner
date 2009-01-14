@@ -7,9 +7,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.TBox;
-import edu.iastate.pdlreasoner.master.ImportGraph;
 import edu.iastate.pdlreasoner.master.InterTableauManager;
 import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
