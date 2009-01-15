@@ -3,7 +3,9 @@ package edu.iastate.pdlreasoner.tableau.message;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
-public abstract class ConceptReport implements Message {
+public abstract class ConceptReport implements TableauMessage {
+	
+	private static final long serialVersionUID = 1L;
 	
 	protected GlobalNodeID m_ImportSource;
 	protected GlobalNodeID m_ImportTarget;

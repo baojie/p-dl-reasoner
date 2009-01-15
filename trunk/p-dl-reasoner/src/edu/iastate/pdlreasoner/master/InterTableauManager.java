@@ -6,36 +6,42 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgroups.ChannelClosedException;
+import org.jgroups.ChannelNotConnectedException;
 
 import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.master.graph.InterTableauTransitiveGraph;
 import edu.iastate.pdlreasoner.model.PackageID;
-import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
+import edu.iastate.pdlreasoner.struct.CounterMap;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
+import edu.iastate.pdlreasoner.tableau.message.MakePreImage;
+import edu.iastate.pdlreasoner.tableau.message.ReopenAtoms;
 
 public class InterTableauManager {
 
 	private static final Logger LOGGER = Logger.getLogger(InterTableauManager.class);
 
 	//Constants
+	private TableauMaster m_TableauMaster;
 	private ImportGraph m_ImportGraph;
-	private TableauTopology m_Tableaux;
 	
 	//Variables
 	private InterTableauTransitiveGraph m_InterTableau;
+	private CounterMap<PackageID> m_NodeIDCounters;
 
-	public InterTableauManager(ImportGraph importGraph, TableauTopology tableaux) {
+	public InterTableauManager(TableauMaster tableauMaster, ImportGraph importGraph) {
+		m_TableauMaster = tableauMaster;
 		m_ImportGraph = importGraph;
-		m_Tableaux = tableaux;
 		m_InterTableau = new InterTableauTransitiveGraph();
+		m_NodeIDCounters = new CounterMap<PackageID>();
 	}
 
-	public void processConceptReport(BackwardConceptReport backward) {
+	public void processConceptReport(BackwardConceptReport backward) throws ChannelNotConnectedException, ChannelClosedException {
 		GlobalNodeID requestedImportSource = backward.getImportSource();
 		PackageID importSourcePackageID = requestedImportSource.getPackageID();
 		GlobalNodeID importTarget = backward.getImportTarget();
@@ -55,14 +61,14 @@ public class InterTableauManager {
 		}
 		
 		//Add source to graph
-		TableauManagerOld importSourceTab = m_Tableaux.get(importSourcePackageID);
 		GlobalNodeID importSource = m_InterTableau.getSourceVertexOf(importTarget, importSourcePackageID);
 		if (importSource == null) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Creating new root on the source package " + importSourceTab.getPackageID());
+				LOGGER.debug("Creating new root on the source package " + importSourcePackageID);
 			}
 			
-			importSource = importSourceTab.addRoot(sourceDependency);
+			importSource = makeGlobalNodeID(importSourcePackageID);
+			m_TableauMaster.send(importSourcePackageID, new MakePreImage(importSource, sourceDependency)); 
 			m_InterTableau.addVertex(importSource, sourceDependency);
 			addEdge(importSource, importTarget);
 		}
@@ -72,11 +78,11 @@ public class InterTableauManager {
 		}
 
 		//Continue with reporting
-		requestedImportSource.copyIDFrom(importSource);
-		importSourceTab.receive(backward);
+		requestedImportSource.copyLocalIDFrom(importSource);
+		m_TableauMaster.send(importSourcePackageID, backward);
 	}
 
-	public void processConceptReport(ForwardConceptReport forward) {
+	public void processConceptReport(ForwardConceptReport forward) throws ChannelNotConnectedException, ChannelClosedException {
 		GlobalNodeID requestedImportTarget = forward.getImportTarget();
 		PackageID importTargetPackageID = requestedImportTarget.getPackageID();
 		GlobalNodeID importSource = forward.getImportSource();
@@ -84,21 +90,24 @@ public class InterTableauManager {
 		GlobalNodeID importTarget = m_InterTableau.getTargetVertexOf(importSource, importTargetPackageID);
 		if (importTarget == null) return;
 		
-		requestedImportTarget.copyIDFrom(importTarget);
-		TableauManagerOld importTargetTab = m_Tableaux.get(importTargetPackageID);
-		importTargetTab.receive(forward);
+		requestedImportTarget.copyLocalIDFrom(importTarget);
+		m_TableauMaster.send(importTargetPackageID, forward);
 	}
 	
-	public void pruneTo(BranchPoint restoreTarget) {
+	public void pruneTo(BranchPoint restoreTarget) throws ChannelNotConnectedException, ChannelClosedException {
 		m_InterTableau.pruneTo(restoreTarget);
 		
 		for (Entry<PackageID, Set<GlobalNodeID>> entry : m_InterTableau.getVerticesByPackage().entrySet()) {
-			TableauManagerOld tab = m_Tableaux.get(entry.getKey());
-			tab.reopenAtomsOnGlobalNodes(entry.getValue());
+			m_TableauMaster.send(entry.getKey(), new ReopenAtoms(entry.getValue()));
 		}
 	}
+	
+	private GlobalNodeID makeGlobalNodeID(PackageID packageID) {
+		int nodeID = m_NodeIDCounters.next(packageID);
+		return GlobalNodeID.make(packageID, false, nodeID);
+	}
 
-	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) {
+	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) throws ChannelNotConnectedException, ChannelClosedException {
 		List<DefaultEdge> newEdges = m_InterTableau.addEdgeAndCloseTransitivity(importSource, importTarget);
 		for (DefaultEdge e : newEdges) {
 			GlobalNodeID eSource = m_InterTableau.getEdgeSource(e);
@@ -108,7 +117,7 @@ public class InterTableauManager {
 		}
 	}
 
-	private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) {
+	private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) throws ChannelNotConnectedException, ChannelClosedException {
 		List<PackageID> midPackageIDs = m_ImportGraph.getAllVerticesConnecting(importSource.getPackageID(), importTarget.getPackageID());
 		for (PackageID midPackageID : midPackageIDs) {
 			GlobalNodeID midNode = m_InterTableau.getSourceVertexOf(importTarget, midPackageID);
@@ -117,8 +126,8 @@ public class InterTableauManager {
 					LOGGER.debug("Creating new root for R-Rule on the mid package " + midPackageID);
 				}
 
-				TableauManagerOld midTab = m_Tableaux.get(midPackageID);
-				midNode = midTab.addRoot(dependency);
+				midNode = makeGlobalNodeID(midPackageID);
+				m_TableauMaster.send(midPackageID, new MakePreImage(midNode, dependency));
 				m_InterTableau.addVertex(midNode, dependency);
 				addEdge(midNode, importTarget);
 			}

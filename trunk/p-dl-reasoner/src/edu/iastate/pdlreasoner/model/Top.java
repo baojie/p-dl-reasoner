@@ -4,6 +4,8 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
 public class Top extends ContextualizedConcept {
 
+	private static final long serialVersionUID = 1L;
+
 	protected Top(PackageID homePackageID) {
 		super(homePackageID);
 	}

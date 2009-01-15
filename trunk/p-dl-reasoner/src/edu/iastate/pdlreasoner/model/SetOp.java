@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public abstract class SetOp extends Concept {
 	
+	private static final long serialVersionUID = 1L;
+
 	protected Concept[] m_Operands;
 
 	protected SetOp(Concept... operands) {

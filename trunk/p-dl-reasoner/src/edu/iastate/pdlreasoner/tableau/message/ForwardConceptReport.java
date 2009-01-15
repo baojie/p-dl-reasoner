@@ -5,12 +5,14 @@ import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
 public class ForwardConceptReport extends ConceptReport {
 
+	private static final long serialVersionUID = 1L;
+
 	public ForwardConceptReport(GlobalNodeID importSource, GlobalNodeID importTarget, TracedConcept concept) {
 		super(importSource, importTarget, concept);
 	}
 
 	@Override
-	public void execute(MessageProcessor messageProcessor) {
+	public void execute(TableauMessageProcessor messageProcessor) {
 		messageProcessor.process(this);
 	}
 

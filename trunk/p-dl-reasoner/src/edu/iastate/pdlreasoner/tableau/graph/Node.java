@@ -30,6 +30,7 @@ public class Node {
 
 	private static final Logger LOGGER = Logger.getLogger(Node.class);
 	
+	private boolean m_IsOrigin;
 	private int m_ID;
 	private GlobalNodeID m_GlobalID;
 	
@@ -44,9 +45,7 @@ public class Node {
 	private Set<BranchPointSet> m_ClashCauses;
 	private NodeClashDetector m_ClashDetector;
 
-	
-	protected Node(int id, TableauGraph graph, BranchPointSet dependency) {
-		m_ID = id;
+	private Node(TableauGraph graph, BranchPointSet dependency) {
 		m_Graph = graph;
 		m_Children = CollectionUtil.makeMultiValuedMap();
 		m_Dependency = dependency;
@@ -55,9 +54,22 @@ public class Node {
 		m_ClashDetector = new NodeClashDetector();
 	}
 	
+	protected Node(int id, TableauGraph graph, BranchPointSet dependency) {
+		this(graph, dependency);
+		m_IsOrigin = true;
+		m_ID = id;
+	}
+	
+	protected Node(GlobalNodeID globalNodeID, TableauGraph graph, BranchPointSet dependency) {
+		this(graph, dependency);
+		m_IsOrigin = false;
+		m_ID = globalNodeID.getLocalNodeID();
+		m_GlobalID = globalNodeID;
+	}
+
 	public GlobalNodeID getGlobalNodeID() {
 		if (m_GlobalID == null) {
-			m_GlobalID = GlobalNodeID.make(m_Graph.getPackageID(), m_ID);
+			m_GlobalID = GlobalNodeID.make(m_Graph.getPackageID(), m_IsOrigin, m_ID);
 			m_Graph.put(m_GlobalID, this);
 		}
 		return m_GlobalID;

@@ -2,6 +2,8 @@ package edu.iastate.pdlreasoner.model;
 
 public abstract class ContextualizedConcept extends Concept {
 	
+	private static final long serialVersionUID = 1L;
+
 	protected PackageID m_Context;
 		
 	protected ContextualizedConcept(PackageID context) {

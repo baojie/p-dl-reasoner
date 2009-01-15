@@ -4,6 +4,8 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
 public class SomeValues extends Restriction {
 
+	private static final long serialVersionUID = 1L;
+
 	protected SomeValues(Role role, Concept filler) {
 		super(role, filler);
 	}

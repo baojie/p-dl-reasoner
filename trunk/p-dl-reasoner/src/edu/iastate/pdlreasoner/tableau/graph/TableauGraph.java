@@ -62,15 +62,16 @@ public class TableauGraph {
 		return m_NodeFactory.make(dependency);
 	}
 	
-	public Node makeRoot(BranchPointSet dependency) {
-		Node n = makeNode(dependency);
+	public Node makeNode(GlobalNodeID globalNodeID, BranchPointSet dependency) {
+		return m_NodeFactory.make(globalNodeID, dependency);
+	}
+	
+	public void addRoot(Node n) {
 		m_Roots.add(n);
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(m_PackageID.toDebugString() + "added root " + n + ", all roots = " + m_Roots);
 		}
-		
-		return n;
 	}
 
 	public void put(GlobalNodeID globalID, Node node) {

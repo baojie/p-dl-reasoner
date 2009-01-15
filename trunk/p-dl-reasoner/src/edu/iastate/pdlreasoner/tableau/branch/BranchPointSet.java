@@ -1,12 +1,15 @@
 package edu.iastate.pdlreasoner.tableau.branch;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Comparator;
 
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
-public class BranchPointSet {
+public class BranchPointSet implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	private BitSet m_BranchPoints;
 
 	public static final BranchPointSet EMPTY = new BranchPointSet();

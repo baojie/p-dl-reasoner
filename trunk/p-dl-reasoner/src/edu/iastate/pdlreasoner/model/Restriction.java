@@ -2,6 +2,8 @@ package edu.iastate.pdlreasoner.model;
 
 public abstract class Restriction extends Concept {
 	
+	private static final long serialVersionUID = 1L;
+
 	protected Role m_Role;
 	protected Concept m_Filler;
 	

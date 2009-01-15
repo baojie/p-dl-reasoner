@@ -4,6 +4,8 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
 public class Negation extends ContextualizedConcept {
 	
+	private static final long serialVersionUID = 1L;
+
 	protected Concept m_NegatedConcept;
 	
 	protected Negation(PackageID context, Concept negatedConcept) {

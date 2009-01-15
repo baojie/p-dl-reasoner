@@ -2,8 +2,10 @@ package edu.iastate.pdlreasoner.tableau.message;
 
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 
-public class Clash implements Message {
+public class Clash implements TableauMessage {
 
+	private static final long serialVersionUID = 1L;
+	
 	private BranchPointSet m_Cause;
 
 	public Clash(BranchPointSet cause) {
@@ -15,7 +17,7 @@ public class Clash implements Message {
 	}
 
 	@Override
-	public void execute(MessageProcessor messageProcessor) {
+	public void execute(TableauMessageProcessor messageProcessor) {
 		messageProcessor.process(this);
 	}
 	

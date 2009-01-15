@@ -4,6 +4,8 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
 public class And extends SetOp {
 
+	private static final long serialVersionUID = 1L;
+	
 	protected And(Concept... operands) {
 		super(operands);
 	}

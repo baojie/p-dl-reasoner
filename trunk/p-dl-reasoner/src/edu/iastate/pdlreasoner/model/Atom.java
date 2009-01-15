@@ -6,6 +6,8 @@ import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
 public class Atom extends ContextualizedConcept {
 	
+	private static final long serialVersionUID = 1L;
+
 	protected URI m_URI;
 	
 	protected Atom(PackageID homePackageID, URI uri) {

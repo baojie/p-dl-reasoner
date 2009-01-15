@@ -1,12 +1,16 @@
 package edu.iastate.pdlreasoner.tableau;
 
+import java.io.Serializable;
+
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 
 
-public class TracedConcept {
+public class TracedConcept implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Concept m_Concept;
 	private BranchPointSet m_Dependency;
 	

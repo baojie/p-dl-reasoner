@@ -3,37 +3,45 @@ package edu.iastate.pdlreasoner.master;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import org.jgroups.Address;
 
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.Ring;
-import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
-public class TableauTopology implements Iterable<TableauManagerOld> {
+public class TableauTopology implements Iterable<Address> {
 
-	private Map<PackageID, TableauManagerOld> m_Tableaux;
-	private Ring<TableauManagerOld> m_TableauxRing;
+	private Map<PackageID, Address> m_Tableaux;
+	private Ring<Address> m_TableauxRing;
 
-	public TableauTopology(List<OntologyPackage> packages) {
+	public TableauTopology(List<OntologyPackage> packages, List<Address> addresses) {
 		m_Tableaux = CollectionUtil.makeMap();
-		for (OntologyPackage pack : packages) {
-			m_Tableaux.put(pack.getID(), pack.getTableau());
+		for (int i = 0; i < packages.size(); i++) {
+			m_Tableaux.put(packages.get(i).getID(), addresses.get(i));
 		}
 
-		m_TableauxRing = new Ring<TableauManagerOld>(m_Tableaux.values());
+		m_TableauxRing = new Ring<Address>(m_Tableaux.values());
 	}
 	
-	public TableauManagerOld get(PackageID packageID) {
+	public Address get(PackageID packageID) {
 		return m_Tableaux.get(packageID);
 	}
 
-	public TableauManagerOld getNext(TableauManagerOld man) {
-		return m_TableauxRing.getNext(man);
+	public Address getNext(Address a) {
+		return m_TableauxRing.getNext(a);
 	}
 
 	@Override
-	public Iterator<TableauManagerOld> iterator() {
+	public Iterator<Address> iterator() {
 		return m_Tableaux.values().iterator();
 	}
+	
+	public Set<Entry<PackageID, Address>> entrySet() {
+		return m_Tableaux.entrySet();
+	}
+	
 }
