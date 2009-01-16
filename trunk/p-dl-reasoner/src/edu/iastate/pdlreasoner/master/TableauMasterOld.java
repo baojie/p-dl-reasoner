@@ -121,25 +121,25 @@ public class TableauMasterOld {
 	
 	//Lower Interfaces
 	
-	public void processClash(BranchPointSet clashCause) {
-		if (m_ClashCauses.add(clashCause)) {
-			Clash clash = new Clash(clashCause);
-			for (TableauManagerOld tab : m_Tableaux) {
-				tab.receive(clash);
-			}
-		}
-	}
+//	public void processClash(BranchPointSet clashCause) {
+//		if (m_ClashCauses.add(clashCause)) {
+//			Clash clash = new Clash(clashCause);
+//			for (TableauManagerOld tab : m_Tableaux) {
+//				tab.receive(clash);
+//			}
+//		}
+//	}
 
-	public boolean isSynchronizingForClash() {
-		return !m_ClashCauses.isEmpty();
-	}
+//	public boolean isSynchronizingForClash() {
+//		return !m_ClashCauses.isEmpty();
+//	}
 	
-	public void returnTokenFrom(TableauManagerOld tab, BranchToken token) {
-		if (isSynchronizingForClash()) return;
-		
-		TableauManagerOld next = m_Tableaux.getNext(tab);
-		next.receiveToken(token);
-	}
+//	public void returnTokenFrom(TableauManagerOld tab, BranchToken token) {
+//		if (isSynchronizingForClash()) return;
+//		
+//		TableauManagerOld next = m_Tableaux.getNext(tab);
+//		next.receiveToken(token);
+//	}
 	
 	
 	//Private

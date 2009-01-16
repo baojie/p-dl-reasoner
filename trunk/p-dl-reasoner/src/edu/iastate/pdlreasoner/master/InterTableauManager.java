@@ -41,7 +41,7 @@ public class InterTableauManager {
 		m_NodeIDCounters = new CounterMap<PackageID>();
 	}
 
-	public void processConceptReport(BackwardConceptReport backward) throws ChannelNotConnectedException, ChannelClosedException {
+	public void processConceptReport(BackwardConceptReport backward) {
 		GlobalNodeID requestedImportSource = backward.getImportSource();
 		PackageID importSourcePackageID = requestedImportSource.getPackageID();
 		GlobalNodeID importTarget = backward.getImportTarget();
@@ -82,7 +82,7 @@ public class InterTableauManager {
 		m_TableauMaster.send(importSourcePackageID, backward);
 	}
 
-	public void processConceptReport(ForwardConceptReport forward) throws ChannelNotConnectedException, ChannelClosedException {
+	public void processConceptReport(ForwardConceptReport forward) {
 		GlobalNodeID requestedImportTarget = forward.getImportTarget();
 		PackageID importTargetPackageID = requestedImportTarget.getPackageID();
 		GlobalNodeID importSource = forward.getImportSource();
@@ -107,7 +107,7 @@ public class InterTableauManager {
 		return GlobalNodeID.make(packageID, false, nodeID);
 	}
 
-	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) throws ChannelNotConnectedException, ChannelClosedException {
+	private void addEdge(GlobalNodeID importSource, GlobalNodeID importTarget) {
 		List<DefaultEdge> newEdges = m_InterTableau.addEdgeAndCloseTransitivity(importSource, importTarget);
 		for (DefaultEdge e : newEdges) {
 			GlobalNodeID eSource = m_InterTableau.getEdgeSource(e);
@@ -117,7 +117,7 @@ public class InterTableauManager {
 		}
 	}
 
-	private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) throws ChannelNotConnectedException, ChannelClosedException {
+	private void doRRule(GlobalNodeID importSource, GlobalNodeID importTarget, BranchPointSet dependency) {
 		List<PackageID> midPackageIDs = m_ImportGraph.getAllVerticesConnecting(importSource.getPackageID(), importTarget.getPackageID());
 		for (PackageID midPackageID : midPackageIDs) {
 			GlobalNodeID midNode = m_InterTableau.getSourceVertexOf(importTarget, midPackageID);

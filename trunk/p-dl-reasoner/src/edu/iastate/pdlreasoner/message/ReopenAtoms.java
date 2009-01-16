@@ -8,7 +8,7 @@ public class ReopenAtoms implements MessageToSlave {
 	
 	private static final long serialVersionUID = 1L;
 
-	private final Set<GlobalNodeID> m_Nodes;
+	private Set<GlobalNodeID> m_Nodes;
 
 	public ReopenAtoms(Set<GlobalNodeID> nodes) {
 		m_Nodes = nodes;

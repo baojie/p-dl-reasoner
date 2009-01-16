@@ -6,7 +6,7 @@ public class MakeGlobalRoot implements MessageToSlave {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final Concept m_Concept;
+	private Concept m_Concept;
 
 	public MakeGlobalRoot(Concept c) {
 		m_Concept = c;

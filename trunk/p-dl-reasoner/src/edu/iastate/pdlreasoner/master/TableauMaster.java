@@ -26,6 +26,8 @@ import edu.iastate.pdlreasoner.message.BranchTokenMessage;
 import edu.iastate.pdlreasoner.message.Clash;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
+import edu.iastate.pdlreasoner.message.MessageToMaster;
+import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
 import edu.iastate.pdlreasoner.message.TableauMasterMessageProcessor;
 import edu.iastate.pdlreasoner.model.PackageID;
@@ -35,7 +37,7 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauMaster {
 
-	private static enum State { ENTRY, EXPAND, EXIT }
+	private static enum State { ENTRY, EXPAND, CLASH_SYNC, EXIT }
 	
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
@@ -61,9 +63,19 @@ public class TableauMaster {
 		startExpansion(query);
 		
 		while (m_State != State.EXIT) {
-			m_MessageQueue.take();
+			Message msg = null;
 			switch (m_State) {
 			case EXPAND:
+				msg = m_MessageQueue.take();
+				MessageToMaster tabMsg = (MessageToMaster) msg.getObject();
+				tabMsg.execute(m_MessageProcessor);
+				
+				if (!m_ClashCauses.isEmpty()) {
+					m_State = State.CLASH_SYNC;
+				}
+				break;
+				
+			case CLASH_SYNC:
 				
 				break;
 			}
@@ -82,6 +94,12 @@ public class TableauMaster {
 			throw new RuntimeException(e);
 		} catch (ChannelClosedException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	private void broadcast(MessageToSlave msg) {
+		for (PackageID packageID : m_Tableaux) {
+			send(packageID, msg);
 		}
 	}
 
@@ -144,18 +162,28 @@ public class TableauMaster {
 
 		@Override
 		public void process(Clash msg) {
+			BranchPointSet clashCause = msg.getCause();
+			if (m_ClashCauses.add(clashCause)) {
+				broadcast(msg);
+			}
 		}
 
 		@Override
 		public void process(ForwardConceptReport msg) {
+			m_InterTableauMan.processConceptReport(msg);
 		}
 
 		@Override
 		public void process(BackwardConceptReport msg) {
+			m_InterTableauMan.processConceptReport(msg);
 		}
 
 		@Override
 		public void process(BranchTokenMessage msg) {
+			if (m_State == State.CLASH_SYNC) return;
+
+			PackageID nextPackageID = m_Tableaux.getNext(msg.getPackageID());
+			send(nextPackageID, msg);
 		}
 		
 	}

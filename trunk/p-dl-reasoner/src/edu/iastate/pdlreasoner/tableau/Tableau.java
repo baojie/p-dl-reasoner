@@ -107,6 +107,7 @@ public class Tableau {
 				break;
 				
 			case EXPAND:
+				//We don't want to block until m_State == COMPLETE
 				while (!m_MessageQueue.isEmpty()) {
 					processOneTableauMessage();
 				}
@@ -130,6 +131,9 @@ public class Tableau {
 				
 			case COMPLETE:
 				processOneTableauMessage();
+				if (m_State != State.EXIT) {
+					m_State = State.EXPAND;
+				}
 				break;
 			}
 		}
@@ -242,7 +246,7 @@ public class Tableau {
 	private void releaseToken() {
 		BranchToken temp = m_Token;
 		m_Token = null;
-		sendToMaster(new BranchTokenMessage(temp));
+		sendToMaster(new BranchTokenMessage(m_AssignedPackageID, temp));
 	}
 
 	
