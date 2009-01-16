@@ -107,10 +107,10 @@ public class TableauManagerOld {
 //		return root.getGlobalNodeID();
 //	}
 	
-	public boolean isComplete() {
-		return m_ReceivedMsgs.isEmpty() && 
-			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
-	}
+//	public boolean isComplete() {
+//		return m_ReceivedMsgs.isEmpty() && 
+//			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
+//	}
 	
 	public boolean hasPendingMessages() {
 		return !m_ReceivedMsgs.isEmpty();

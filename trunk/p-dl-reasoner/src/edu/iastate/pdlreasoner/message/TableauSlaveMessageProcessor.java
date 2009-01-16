@@ -10,5 +10,6 @@ public interface TableauSlaveMessageProcessor {
 	void process(MakeGlobalRoot msg);
 	void process(Null msg);
 	void process(BranchTokenMessage msg);
+	void process(Exit msg);
 	
 }

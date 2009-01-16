@@ -22,6 +22,7 @@ import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.message.Clash;
+import edu.iastate.pdlreasoner.message.Exit;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MakePreImage;
@@ -57,7 +58,7 @@ public class Tableau {
 	
 	private static final Logger LOGGER = Logger.getLogger(Tableau.class);
 	
-	private static enum State { ENTRY, READY, EXPAND, EXIT }
+	private static enum State { ENTRY, READY, EXPAND, COMPLETE, EXIT }
 	
 	//Constants once set
 	private Query m_Query;
@@ -74,6 +75,7 @@ public class Tableau {
 	private State m_State;
 	private TableauGraph m_Graph;
 	private BranchToken m_Token;
+	private boolean m_HasClashAtOrigin;
 	
 	//Processors
 	private ConceptExpander m_ConceptExpander;
@@ -109,12 +111,25 @@ public class Tableau {
 					processOneTableauMessage();
 				}
 				
+				if (m_HasClashAtOrigin) {
+					m_State = State.EXIT;
+					break;
+				}
+				
 				expandGraph();
 				processClash();
 				
 				if (m_Token != null) {
 					releaseToken();
 				}
+				
+				if (isComplete()) {
+					m_State = State.COMPLETE;
+				}
+				break;
+				
+			case COMPLETE:
+				processOneTableauMessage();
 				break;
 			}
 		}
@@ -166,6 +181,11 @@ public class Tableau {
 		m_Token = null;
 		m_ConceptExpander = new ConceptExpander();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
+	}
+	
+	private boolean isComplete() {
+		return m_MessageQueue.isEmpty() && 
+			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
 	}
 	
 	private void processOneTableauMessage() throws InterruptedException {
@@ -352,7 +372,7 @@ public class Tableau {
 		public void process(Clash msg) {
 			BranchPointSet clashCause = msg.getCause();
 			if (clashCause.isEmpty()) {
-				m_State = State.EXIT;
+				m_HasClashAtOrigin = true;
 			} else {
 				BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
 				m_Graph.pruneTo(restoreTarget);
@@ -414,6 +434,11 @@ public class Tableau {
 
 		@Override
 		public void process(BranchTokenMessage msg) {
+		}
+
+		@Override
+		public void process(Exit msg) {
+			m_State = State.EXIT;
 		}
 		
 	}
