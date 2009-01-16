@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
 import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
+import edu.iastate.pdlreasoner.message.Clash;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.PackageID;
@@ -20,7 +21,6 @@ import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
-import edu.iastate.pdlreasoner.tableau.message.Clash;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauMasterOld {

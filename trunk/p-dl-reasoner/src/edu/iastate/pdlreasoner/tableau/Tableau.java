@@ -22,6 +22,15 @@ import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.master.InterTableauManager;
 import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
+import edu.iastate.pdlreasoner.message.BackwardConceptReport;
+import edu.iastate.pdlreasoner.message.Clash;
+import edu.iastate.pdlreasoner.message.ForwardConceptReport;
+import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
+import edu.iastate.pdlreasoner.message.MakePreImage;
+import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.ReopenAtoms;
+import edu.iastate.pdlreasoner.message.TableauMessage;
+import edu.iastate.pdlreasoner.message.TableauMessageProcessor;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -43,15 +52,6 @@ import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.graph.Edge;
 import edu.iastate.pdlreasoner.tableau.graph.Node;
 import edu.iastate.pdlreasoner.tableau.graph.TableauGraph;
-import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
-import edu.iastate.pdlreasoner.tableau.message.Clash;
-import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
-import edu.iastate.pdlreasoner.tableau.message.MakeGlobalRoot;
-import edu.iastate.pdlreasoner.tableau.message.MakePreImage;
-import edu.iastate.pdlreasoner.tableau.message.Null;
-import edu.iastate.pdlreasoner.tableau.message.ReopenAtoms;
-import edu.iastate.pdlreasoner.tableau.message.TableauMessage;
-import edu.iastate.pdlreasoner.tableau.message.TableauMessageProcessor;
 
 public class Tableau {
 	

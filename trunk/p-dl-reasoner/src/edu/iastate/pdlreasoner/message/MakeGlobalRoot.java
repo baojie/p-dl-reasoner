@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.tableau.message;
+package edu.iastate.pdlreasoner.message;
 
 import edu.iastate.pdlreasoner.model.Concept;
 

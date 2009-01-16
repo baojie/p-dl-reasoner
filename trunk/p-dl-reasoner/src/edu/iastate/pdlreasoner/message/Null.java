@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.tableau.message;
+package edu.iastate.pdlreasoner.message;
 
 public class Null implements TableauMessage {
 

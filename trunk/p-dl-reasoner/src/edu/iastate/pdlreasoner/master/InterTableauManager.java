@@ -12,15 +12,15 @@ import org.jgroups.ChannelNotConnectedException;
 import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.master.graph.InterTableauTransitiveGraph;
+import edu.iastate.pdlreasoner.message.BackwardConceptReport;
+import edu.iastate.pdlreasoner.message.ForwardConceptReport;
+import edu.iastate.pdlreasoner.message.MakePreImage;
+import edu.iastate.pdlreasoner.message.ReopenAtoms;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.CounterMap;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPoint;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
-import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
-import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
-import edu.iastate.pdlreasoner.tableau.message.MakePreImage;
-import edu.iastate.pdlreasoner.tableau.message.ReopenAtoms;
 
 public class InterTableauManager {
 

@@ -21,12 +21,12 @@ import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
+import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
+import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.TableauMessage;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
-import edu.iastate.pdlreasoner.tableau.message.MakeGlobalRoot;
-import edu.iastate.pdlreasoner.tableau.message.Null;
-import edu.iastate.pdlreasoner.tableau.message.TableauMessage;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauMaster {
