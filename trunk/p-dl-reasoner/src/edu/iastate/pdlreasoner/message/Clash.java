@@ -2,7 +2,7 @@ package edu.iastate.pdlreasoner.message;
 
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 
-public class Clash implements TableauMessage {
+public class Clash implements MessageToSlave {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -17,7 +17,7 @@ public class Clash implements TableauMessage {
 	}
 
 	@Override
-	public void execute(TableauMessageProcessor messageProcessor) {
+	public void execute(TableauSlaveMessageProcessor messageProcessor) {
 		messageProcessor.process(this);
 	}
 	

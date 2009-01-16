@@ -18,7 +18,7 @@ import edu.iastate.pdlreasoner.message.Clash;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakePreImage;
 import edu.iastate.pdlreasoner.message.TableauMessage;
-import edu.iastate.pdlreasoner.message.TableauMessageProcessor;
+import edu.iastate.pdlreasoner.message.TableauSlaveMessageProcessor;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -59,7 +59,7 @@ public class TableauManagerOld {
 	
 	//Processors
 	private ConceptExpander m_ConceptExpander;
-	private TableauMessageProcessor m_MessageProcessor;
+	private TableauSlaveMessageProcessor m_MessageProcessor;
 	
 	public TableauManagerOld(OntologyPackage pack) {
 		m_PackageID = pack.getID();

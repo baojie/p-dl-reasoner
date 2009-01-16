@@ -1,6 +1,6 @@
 package edu.iastate.pdlreasoner.message;
 
-public interface TableauMessageProcessor {
+public interface TableauSlaveMessageProcessor {
 
 	void process(Clash msg);
 	void process(ForwardConceptReport msg);

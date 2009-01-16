@@ -4,7 +4,7 @@ import java.util.Set;
 
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 
-public class ReopenAtoms implements TableauMessage {
+public class ReopenAtoms implements MessageToSlave {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -19,7 +19,7 @@ public class ReopenAtoms implements TableauMessage {
 	}
 
 	@Override
-	public void execute(TableauMessageProcessor messageProcessor) {
+	public void execute(TableauSlaveMessageProcessor messageProcessor) {
 		messageProcessor.process(this);
 	}
 	

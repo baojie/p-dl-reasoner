@@ -12,7 +12,7 @@ public class BackwardConceptReport extends ConceptReport {
 	}
 	
 	@Override
-	public void execute(TableauMessageProcessor messageProcessor) {
+	public void execute(TableauSlaveMessageProcessor messageProcessor) {
 		messageProcessor.process(this);
 	}
 	

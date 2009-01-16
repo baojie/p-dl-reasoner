@@ -21,8 +21,12 @@ import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
+import edu.iastate.pdlreasoner.message.BackwardConceptReport;
+import edu.iastate.pdlreasoner.message.Clash;
+import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.TableauMasterMessageProcessor;
 import edu.iastate.pdlreasoner.message.TableauMessage;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
@@ -41,6 +45,9 @@ public class TableauMaster {
 	private TableauTopology m_Tableaux;
 	private InterTableauManager m_InterTableauMan;
 	private Set<BranchPointSet> m_ClashCauses;
+	
+	//Processors
+	private TableauMasterMessageProcessor m_MessageProcessor;
 	
 	public TableauMaster() {
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
@@ -112,6 +119,7 @@ public class TableauMaster {
 	private void initMaster(ImportGraph importGraph) {
 		m_InterTableauMan = new InterTableauManager(this, importGraph);
 		m_ClashCauses = CollectionUtil.makeSet();
+		m_MessageProcessor = new TableauMessageProcessorImpl();
 	}
 
 	private void startExpansion(Query query) throws ChannelNotConnectedException, ChannelClosedException {
@@ -126,4 +134,21 @@ public class TableauMaster {
 		m_State = State.EXPAND;
 	}
 
+	
+	private class TableauMessageProcessorImpl implements TableauMasterMessageProcessor {
+
+		@Override
+		public void process(Clash msg) {
+		}
+
+		@Override
+		public void process(ForwardConceptReport msg) {
+		}
+
+		@Override
+		public void process(BackwardConceptReport msg) {
+		}
+		
+	}
+	
 }

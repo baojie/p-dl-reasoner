@@ -3,7 +3,7 @@ package edu.iastate.pdlreasoner.message;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 
-public class MakePreImage implements TableauMessage {
+public class MakePreImage implements MessageToSlave {
 
 	private static final long serialVersionUID = 1L;
 
@@ -24,7 +24,7 @@ public class MakePreImage implements TableauMessage {
 	}
 
 	@Override
-	public void execute(TableauMessageProcessor messageProcessor) {
+	public void execute(TableauSlaveMessageProcessor messageProcessor) {
 		messageProcessor.process(this);
 	}
 	

@@ -1,8 +1,6 @@
 package edu.iastate.pdlreasoner.tableau;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -19,18 +17,16 @@ import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.TBox;
-import edu.iastate.pdlreasoner.master.InterTableauManager;
-import edu.iastate.pdlreasoner.master.TableauMasterOld;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.message.Clash;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MakePreImage;
+import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
 import edu.iastate.pdlreasoner.message.ReopenAtoms;
-import edu.iastate.pdlreasoner.message.TableauMessage;
-import edu.iastate.pdlreasoner.message.TableauMessageProcessor;
+import edu.iastate.pdlreasoner.message.TableauSlaveMessageProcessor;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -76,7 +72,7 @@ public class Tableau {
 	
 	//Processors
 	private ConceptExpander m_ConceptExpander;
-	private TableauMessageProcessor m_MessageProcessor;
+	private TableauSlaveMessageProcessor m_MessageProcessor;
 	
 	public Tableau() {
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
@@ -157,7 +153,7 @@ public class Tableau {
 	
 	private void processOneTableauMessage() throws InterruptedException {
 		Message msg = m_MessageQueue.take();
-		TableauMessage tabMsg = (TableauMessage) msg.getObject();
+		MessageToSlave tabMsg = (MessageToSlave) msg.getObject();
 		tabMsg.execute(m_MessageProcessor);
 	}
 	
@@ -333,13 +329,13 @@ public class Tableau {
 
 	}
 	
-	private class TableauMessageProcessorImpl implements TableauMessageProcessor {
+	private class TableauMessageProcessorImpl implements TableauSlaveMessageProcessor {
 		
 		@Override
 		public void process(Clash msg) {
 			BranchPointSet clashCause = msg.getCause();
 			if (clashCause.isEmpty()) {
-				m_HasClashAtOrigin = true;
+				m_State = State.EXIT;
 			} else {
 				BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
 				m_Graph.pruneTo(restoreTarget);
