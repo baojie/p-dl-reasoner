@@ -24,12 +24,14 @@ import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
+import edu.iastate.pdlreasoner.tableau.message.MakeGlobalRoot;
+import edu.iastate.pdlreasoner.tableau.message.Null;
 import edu.iastate.pdlreasoner.tableau.message.TableauMessage;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauMaster {
 
-	private static enum State { INIT, EXPAND, FINAL }
+	private static enum State { ENTRY, EXPAND, EXIT }
 	
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
@@ -42,7 +44,7 @@ public class TableauMaster {
 	
 	public TableauMaster() {
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
-		m_State = State.INIT;
+		m_State = State.ENTRY;
 	}
 	
 	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException, InterruptedException {
@@ -51,8 +53,13 @@ public class TableauMaster {
 		initMaster(query.getOntology().getImportGraph());
 		startExpansion(query);
 		
-		while (m_State != State.FINAL) {
-			receive(m_MessageQueue.take());
+		while (m_State != State.EXIT) {
+			m_MessageQueue.take();
+			switch (m_State) {
+			case EXPAND:
+				
+				break;
+			}
 		}
 		
 		m_Channel.close();	
@@ -107,19 +114,16 @@ public class TableauMaster {
 		m_ClashCauses = CollectionUtil.makeSet();
 	}
 
-	private void startExpansion(Query query) {
-		Address witnessAdd = m_Tableaux.get(query.getWitnessID());
-		//addglobalroot
+	private void startExpansion(Query query) throws ChannelNotConnectedException, ChannelClosedException {
+		PackageID witnessID = query.getWitnessID();
+		send(witnessID, new MakeGlobalRoot(query.getSatConcept()));
 		
-		for (Address other : m_Tableaux) {
-			if (other.equals(witnessAdd)) continue;
-			//ping
+		for (PackageID otherID : m_Tableaux) {
+			if (otherID.equals(witnessID)) continue;
+			send(otherID, new Null());
 		}
 		
 		m_State = State.EXPAND;
-	}
-
-	private void receive(Message msg) {
 	}
 
 }

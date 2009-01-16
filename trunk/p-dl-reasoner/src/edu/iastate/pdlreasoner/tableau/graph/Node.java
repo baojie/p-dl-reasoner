@@ -65,6 +65,8 @@ public class Node {
 		m_IsOrigin = false;
 		m_ID = globalNodeID.getLocalNodeID();
 		m_GlobalID = globalNodeID;
+		
+		graph.put(m_GlobalID, this);
 	}
 
 	public GlobalNodeID getGlobalNodeID() {

@@ -3,6 +3,7 @@ package edu.iastate.pdlreasoner.tableau;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -24,8 +25,10 @@ import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
+import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.ContextualizedConcept;
+import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Role;
@@ -43,15 +46,18 @@ import edu.iastate.pdlreasoner.tableau.graph.TableauGraph;
 import edu.iastate.pdlreasoner.tableau.message.BackwardConceptReport;
 import edu.iastate.pdlreasoner.tableau.message.Clash;
 import edu.iastate.pdlreasoner.tableau.message.ForwardConceptReport;
+import edu.iastate.pdlreasoner.tableau.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.tableau.message.MakePreImage;
+import edu.iastate.pdlreasoner.tableau.message.Null;
 import edu.iastate.pdlreasoner.tableau.message.ReopenAtoms;
+import edu.iastate.pdlreasoner.tableau.message.TableauMessage;
 import edu.iastate.pdlreasoner.tableau.message.TableauMessageProcessor;
 
 public class Tableau {
 	
 	private static final Logger LOGGER = Logger.getLogger(Tableau.class);
 	
-	private static enum State { INIT, READY, EXPAND, FINAL }
+	private static enum State { ENTRY, READY, EXPAND, EXIT }
 	
 	//Constants once set
 	private Query m_Query;
@@ -65,21 +71,8 @@ public class Tableau {
 	private Channel m_Channel;
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
-	
-	
-	//Old
-	//Constants
-	private TableauMasterOld m_Master;
-	//private ImportGraph m_ImportGraph;
-	private InterTableauManager m_InterTableauMan;
-	//private PackageID m_PackageID;
-	//private TBox m_TBox;
-	
-	//Variables
 	private TableauGraph m_Graph;
 	private BranchToken m_Token;
-	private Queue<Message> m_ReceivedMsgs;
-	private boolean m_HasClashAtOrigin;
 	
 	//Processors
 	private ConceptExpander m_ConceptExpander;
@@ -87,15 +80,42 @@ public class Tableau {
 	
 	public Tableau() {
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
-		m_State = State.INIT;
+		m_State = State.ENTRY;
 	}
 	
 	public void run(Query query) throws ChannelException, InterruptedException {
 		m_Query = query;
 		initChannel();
 		
-		while (m_State != State.FINAL) {
-			receive(m_MessageQueue.take());
+		while (m_State != State.EXIT) {
+			Message msg = null;
+			switch (m_State) {
+			case ENTRY:
+				msg = m_MessageQueue.take();
+				m_MasterAdd = msg.getSrc();
+				m_AssignedPackageID = (PackageID) msg.getObject();
+				initTableau();
+				m_State = State.READY;
+				break;
+				
+			case READY:
+				processOneTableauMessage();
+				m_State = State.EXPAND;
+				break;
+				
+			case EXPAND:
+				while (!m_MessageQueue.isEmpty()) {
+					processOneTableauMessage();
+				}
+				
+				expandGraph();
+				processClash();
+				
+				if (m_Token != null) {
+					releaseToken();
+				}
+				break;
+			}
 		}
 		
 		m_Channel.close();
@@ -118,20 +138,6 @@ public class Tableau {
 			});
 	}
 
-	private void receive(Message msg) {
-		switch (m_State) {
-		case INIT:
-			m_MasterAdd = msg.getSrc();
-			m_AssignedPackageID = (PackageID) msg.getObject();
-			initTableau();
-			m_State = State.READY;
-			break;
-		case READY:
-			
-			break;
-		}
-	}
-
 	private void initTableau() {
 		m_ImportGraph = m_Query.getOntology().getImportGraph();
 		
@@ -145,12 +151,67 @@ public class Tableau {
 		m_TBox = m_AssignedPackage.getTBox();
 		m_Graph = new TableauGraph(m_AssignedPackageID);
 		m_Token = null;
-		m_ReceivedMsgs = new LinkedList<Message>();
-		m_HasClashAtOrigin = false;
 		m_ConceptExpander = new ConceptExpander();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
 	}
 	
+	private void processOneTableauMessage() throws InterruptedException {
+		Message msg = m_MessageQueue.take();
+		TableauMessage tabMsg = (TableauMessage) msg.getObject();
+		tabMsg.execute(m_MessageProcessor);
+	}
+	
+	private void expandGraph() {
+		for (Node open : m_Graph.getOpenNodes()) {
+			m_ConceptExpander.reset(open);
+			
+			boolean hasChanged = false;
+			hasChanged = hasChanged | expand(open.getLabelsFor(Bottom.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(Top.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(Atom.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(Negation.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(And.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(SomeValues.class));
+			hasChanged = hasChanged | expand(open.getLabelsFor(AllValues.class));
+			
+			if (LOGGER.isDebugEnabled() && hasChanged) {
+				LOGGER.debug(m_AssignedPackageID.toDebugString() + "applied deterministic rules on node " + open + ": " + open.getLabels());
+			}
+			
+			if (m_Token != null) {
+				expand(open.getLabelsFor(Or.class));
+			}
+		}
+	}
+	
+	private boolean expand(TracedConceptSet tcSet) {
+		if (tcSet == null) return false;
+			
+		Set<TracedConcept> tcs = tcSet.flush();
+		for (TracedConcept tc : tcs) {
+			m_ConceptExpander.expand(tc);
+		}
+		
+		return !tcs.isEmpty();
+	}
+	
+	private void processClash() {
+		BranchPointSet clashCause = m_Graph.getEarliestClashCause();
+		if (clashCause == null) return;
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(m_AssignedPackageID.toDebugString() + "broadcasting clash " + clashCause);
+		}
+		
+		m_Master.processClash(clashCause);
+	}
+
+	private void releaseToken() {
+		BranchToken temp = m_Token;
+		m_Token = null;
+		m_Master.returnTokenFrom(this, temp);
+	}
+
 	
 	private void applyUniversalRestriction(Node n) {
 		BranchPointSet nodeDependency = n.getDependency();
@@ -317,6 +378,25 @@ public class Tableau {
 		@Override
 		public void process(ReopenAtoms msg) {
 			m_Graph.reopenAtomsOnGlobalNodes(msg.getNodes());
+		}
+
+		@Override
+		public void process(MakeGlobalRoot msg) {
+			Node root = m_Graph.makeNode(BranchPointSet.EMPTY);
+			m_Graph.addRoot(root);
+			root.addLabel(TracedConcept.makeOrigin(msg.getConcept()));
+			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(m_AssignedPackageID.toDebugString() + "starting with global root " + root + ": " + root.getLabels());
+			}
+			
+			applyUniversalRestriction(root);
+			
+			m_Token = BranchToken.make();
+		}
+
+		@Override
+		public void process(Null msg) {
 		}
 		
 	}

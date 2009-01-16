@@ -72,33 +72,33 @@ public class TableauManagerOld {
 		m_MessageProcessor = new MessageProcessorImpl();
 	}
 	
-	public PackageID getPackageID() {
-		return m_PackageID;
-	}
+//	public PackageID getPackageID() {
+//		return m_PackageID;
+//	}
+//	
+//	public void setMaster(TableauMasterOld master) {
+//		m_Master = master;
+//	}
+//
+//	public void setImportGraph(ImportGraph importGraph) {
+//		m_ImportGraph = importGraph;
+//	}
+//
+//	public void setInterTableauManager(InterTableauManager interTableauMan) {
+//		m_InterTableauMan = interTableauMan;
+//	}
 	
-	public void setMaster(TableauMasterOld master) {
-		m_Master = master;
-	}
-
-	public void setImportGraph(ImportGraph importGraph) {
-		m_ImportGraph = importGraph;
-	}
-
-	public void setInterTableauManager(InterTableauManager interTableauMan) {
-		m_InterTableauMan = interTableauMan;
-	}
-	
-	public void addGlobalRootWith(Concept c) {
-		Node root = m_Graph.makeNode(BranchPointSet.EMPTY);
-		m_Graph.addRoot(root);
-		root.addLabel(TracedConcept.makeOrigin(c));
-		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_PackageID.toDebugString() + "starting with global root " + root + ": " + root.getLabels());
-		}
-		
-		applyUniversalRestriction(root);
-	}
+//	public void addGlobalRootWith(Concept c) {
+//		Node root = m_Graph.makeNode(BranchPointSet.EMPTY);
+//		m_Graph.addRoot(root);
+//		root.addLabel(TracedConcept.makeOrigin(c));
+//		
+//		if (LOGGER.isDebugEnabled()) {
+//			LOGGER.debug(m_PackageID.toDebugString() + "starting with global root " + root + ": " + root.getLabels());
+//		}
+//		
+//		applyUniversalRestriction(root);
+//	}
 	
 //	public GlobalNodeID addRoot(BranchPointSet dependency) {
 //		Node root = m_Graph.makeNode(dependency);
@@ -142,78 +142,78 @@ public class TableauManagerOld {
 //		m_Graph.reopenAtomsOnGlobalNodes(nodes);
 //	}
 
-	public void run() {
-		processMessages();
-		if (m_HasClashAtOrigin) return;
-		if (m_Master.isSynchronizingForClash()) {
-			processClash();
-			return;
-		}
-		
-		expandGraph();
-		processClash();
-		
-		if (m_Token != null) {
-			releaseToken();
-		}
-	}
+//	public void run() {
+//		processMessages();
+//		if (m_HasClashAtOrigin) return;
+//		if (m_Master.isSynchronizingForClash()) {
+//			processClash();
+//			return;
+//		}
+//		
+//		expandGraph();
+//		processClash();
+//		
+//		if (m_Token != null) {
+//			releaseToken();
+//		}
+//	}
 
-	private void processMessages() {
-		while (!m_ReceivedMsgs.isEmpty()) {
-			m_ReceivedMsgs.remove().execute(m_MessageProcessor);
-		}		
-	}
+//	private void processMessages() {
+//		while (!m_ReceivedMsgs.isEmpty()) {
+//			m_ReceivedMsgs.remove().execute(m_MessageProcessor);
+//		}		
+//	}
 	
-	private void expandGraph() {
-		for (Node open : m_Graph.getOpenNodes()) {
-			m_ConceptExpander.reset(open);
-			
-			boolean hasChanged = false;
-			hasChanged = hasChanged | expand(open.getLabelsFor(Bottom.class));
-			hasChanged = hasChanged | expand(open.getLabelsFor(Top.class));
-			hasChanged = hasChanged | expand(open.getLabelsFor(Atom.class));
-			hasChanged = hasChanged | expand(open.getLabelsFor(Negation.class));
-			hasChanged = hasChanged | expand(open.getLabelsFor(And.class));
-			hasChanged = hasChanged | expand(open.getLabelsFor(SomeValues.class));
-			hasChanged = hasChanged | expand(open.getLabelsFor(AllValues.class));
-			
-			if (LOGGER.isDebugEnabled() && hasChanged) {
-				LOGGER.debug(m_PackageID.toDebugString() + "applied deterministic rules on node " + open + ": " + open.getLabels());
-			}
-			
-			if (m_Token != null) {
-				expand(open.getLabelsFor(Or.class));
-			}
-		}
-	}
-	
-	private boolean expand(TracedConceptSet tcSet) {
-		if (tcSet == null) return false;
-			
-		Set<TracedConcept> tcs = tcSet.flush();
-		for (TracedConcept tc : tcs) {
-			m_ConceptExpander.expand(tc);
-		}
-		
-		return !tcs.isEmpty();
-	}
-	
-	private void processClash() {
-		BranchPointSet clashCause = m_Graph.getEarliestClashCause();
-		if (clashCause == null) return;
-		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_PackageID.toDebugString() + "broadcasting clash " + clashCause);
-		}
-		
-		m_Master.processClash(clashCause);
-	}
-
-	private void releaseToken() {
-		BranchToken temp = m_Token;
-		m_Token = null;
-		m_Master.returnTokenFrom(this, temp);
-	}
+//	private void expandGraph() {
+//		for (Node open : m_Graph.getOpenNodes()) {
+//			m_ConceptExpander.reset(open);
+//			
+//			boolean hasChanged = false;
+//			hasChanged = hasChanged | expand(open.getLabelsFor(Bottom.class));
+//			hasChanged = hasChanged | expand(open.getLabelsFor(Top.class));
+//			hasChanged = hasChanged | expand(open.getLabelsFor(Atom.class));
+//			hasChanged = hasChanged | expand(open.getLabelsFor(Negation.class));
+//			hasChanged = hasChanged | expand(open.getLabelsFor(And.class));
+//			hasChanged = hasChanged | expand(open.getLabelsFor(SomeValues.class));
+//			hasChanged = hasChanged | expand(open.getLabelsFor(AllValues.class));
+//			
+//			if (LOGGER.isDebugEnabled() && hasChanged) {
+//				LOGGER.debug(m_PackageID.toDebugString() + "applied deterministic rules on node " + open + ": " + open.getLabels());
+//			}
+//			
+//			if (m_Token != null) {
+//				expand(open.getLabelsFor(Or.class));
+//			}
+//		}
+//	}
+//	
+//	private boolean expand(TracedConceptSet tcSet) {
+//		if (tcSet == null) return false;
+//			
+//		Set<TracedConcept> tcs = tcSet.flush();
+//		for (TracedConcept tc : tcs) {
+//			m_ConceptExpander.expand(tc);
+//		}
+//		
+//		return !tcs.isEmpty();
+//	}
+//	
+//	private void processClash() {
+//		BranchPointSet clashCause = m_Graph.getEarliestClashCause();
+//		if (clashCause == null) return;
+//		
+//		if (LOGGER.isDebugEnabled()) {
+//			LOGGER.debug(m_PackageID.toDebugString() + "broadcasting clash " + clashCause);
+//		}
+//		
+//		m_Master.processClash(clashCause);
+//	}
+//
+//	private void releaseToken() {
+//		BranchToken temp = m_Token;
+//		m_Token = null;
+//		m_Master.returnTokenFrom(this, temp);
+//	}
 
 //	private void applyUniversalRestriction(Node n) {
 //		BranchPointSet nodeDependency = n.getDependency();

@@ -7,5 +7,7 @@ public interface TableauMessageProcessor {
 	void process(BackwardConceptReport msg);
 	void process(MakePreImage msg);
 	void process(ReopenAtoms msg);
+	void process(MakeGlobalRoot msg);
+	void process(Null msg);
 	
 }

@@ -13,10 +13,10 @@ import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 
-public class TableauTopology implements Iterable<Address> {
+public class TableauTopology implements Iterable<PackageID> {
 
 	private Map<PackageID, Address> m_Tableaux;
-	private Ring<Address> m_TableauxRing;
+	private Ring<PackageID> m_TableauxRing;
 
 	public TableauTopology(List<OntologyPackage> packages, List<Address> addresses) {
 		m_Tableaux = CollectionUtil.makeMap();
@@ -24,20 +24,20 @@ public class TableauTopology implements Iterable<Address> {
 			m_Tableaux.put(packages.get(i).getID(), addresses.get(i));
 		}
 
-		m_TableauxRing = new Ring<Address>(m_Tableaux.values());
+		m_TableauxRing = new Ring<PackageID>(m_Tableaux.keySet());
 	}
 	
 	public Address get(PackageID packageID) {
 		return m_Tableaux.get(packageID);
 	}
 
-	public Address getNext(Address a) {
-		return m_TableauxRing.getNext(a);
+	public PackageID getNext(PackageID packageID) {
+		return m_TableauxRing.getNext(packageID);
 	}
 
 	@Override
-	public Iterator<Address> iterator() {
-		return m_Tableaux.values().iterator();
+	public Iterator<PackageID> iterator() {
+		return m_Tableaux.keySet().iterator();
 	}
 	
 	public Set<Entry<PackageID, Address>> entrySet() {
