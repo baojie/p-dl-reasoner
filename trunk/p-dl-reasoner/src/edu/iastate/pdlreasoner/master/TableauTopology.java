@@ -3,8 +3,6 @@ package edu.iastate.pdlreasoner.master;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.jgroups.Address;
 
@@ -38,10 +36,6 @@ public class TableauTopology implements Iterable<PackageID> {
 	@Override
 	public Iterator<PackageID> iterator() {
 		return m_Tableaux.keySet().iterator();
-	}
-	
-	public Set<Entry<PackageID, Address>> entrySet() {
-		return m_Tableaux.entrySet();
 	}
 	
 }

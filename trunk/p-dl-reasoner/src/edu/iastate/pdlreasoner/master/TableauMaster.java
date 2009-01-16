@@ -1,8 +1,8 @@
 package edu.iastate.pdlreasoner.master;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -22,12 +22,12 @@ import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.message.BackwardConceptReport;
+import edu.iastate.pdlreasoner.message.BranchTokenMessage;
 import edu.iastate.pdlreasoner.message.Clash;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.Null;
 import edu.iastate.pdlreasoner.message.TableauMasterMessageProcessor;
-import edu.iastate.pdlreasoner.message.TableauMessage;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
@@ -40,7 +40,7 @@ public class TableauMaster {
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
 	private Channel m_Channel;
-	private Address m_Master;
+	private Address m_Self;
 	
 	private TableauTopology m_Tableaux;
 	private InterTableauManager m_InterTableauMan;
@@ -73,10 +73,16 @@ public class TableauMaster {
 		return new QueryResult(true);
 	}
 	
-	public void send(PackageID packageID, TableauMessage msg) throws ChannelNotConnectedException, ChannelClosedException {
+	public void send(PackageID packageID, Serializable msg) {
 		Address dest = m_Tableaux.get(packageID);
-		Message channelMsg = new Message(dest, m_Master, msg);
-		m_Channel.send(channelMsg);
+		Message channelMsg = new Message(dest, m_Self, msg);
+		try {
+			m_Channel.send(channelMsg);
+		} catch (ChannelNotConnectedException e) {
+			throw new RuntimeException(e);
+		} catch (ChannelClosedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void initChannel() throws ChannelException {
@@ -94,13 +100,13 @@ public class TableauMaster {
 					}
 				}
 			});
+		m_Self = m_Channel.getLocalAddress();
 	}
 
-	private void connectWithSlaves(List<OntologyPackage> packages) throws NotEnoughSlavesException, ChannelNotConnectedException, ChannelClosedException {
+	private void connectWithSlaves(List<OntologyPackage> packages) throws NotEnoughSlavesException {
 		View view = m_Channel.getView();
-		m_Master = m_Channel.getLocalAddress();
 		List<Address> m_SlaveAdds = CollectionUtil.makeList(view.getMembers());
-		m_SlaveAdds.remove(m_Master);
+		m_SlaveAdds.remove(m_Self);
 		if (m_SlaveAdds.size() < packages.size()) {
 			m_Channel.close();
 			throw new NotEnoughSlavesException("Ontology has "
@@ -110,9 +116,8 @@ public class TableauMaster {
 
 		m_Tableaux = new TableauTopology(packages, m_SlaveAdds);
 		
-		for (Entry<PackageID, Address> entry : m_Tableaux.entrySet()) {
-			Message msg = new Message(entry.getValue(), m_Master, entry.getKey());
-			m_Channel.send(msg);
+		for (PackageID packageID : m_Tableaux) {
+			send(packageID, packageID);
 		}
 	}
 
@@ -147,6 +152,10 @@ public class TableauMaster {
 
 		@Override
 		public void process(BackwardConceptReport msg) {
+		}
+
+		@Override
+		public void process(BranchTokenMessage msg) {
 		}
 		
 	}

@@ -44,23 +44,23 @@ public class TableauMasterOld {
 	
 	//Upper Interfaces
 	
-	public void addPackage(OntologyPackage pack) {
-		m_Packages.add(pack);
-	}
-	
-	public void init() {
-		for (OntologyPackage pack : m_Packages) {
-			pack.init();
-		}
-		
-		m_ImportGraph = new ImportGraph(m_Packages);
-		m_HasInitialized = true;
-		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Import graph = " + m_ImportGraph);
-			LOGGER.debug("");
-		}
-	}
+//	public void addPackage(OntologyPackage pack) {
+//		m_Packages.add(pack);
+//	}
+//	
+//	public void init() {
+//		for (OntologyPackage pack : m_Packages) {
+//			pack.init();
+//		}
+//		
+//		m_ImportGraph = new ImportGraph(m_Packages);
+//		m_HasInitialized = true;
+//		
+//		if (LOGGER.isDebugEnabled()) {
+//			LOGGER.debug("Import graph = " + m_ImportGraph);
+//			LOGGER.debug("");
+//		}
+//	}
 
 	public boolean isUnderstandableBy(Concept c, PackageID witness) {
 		if (!m_HasInitialized) throw new IllegalStateException("TableauServer has not been initialized.");
@@ -144,17 +144,17 @@ public class TableauMasterOld {
 	
 	//Private
 
-	private void makeTableaux() {
-		m_Tableaux = new TableauTopology(m_Packages);
-		m_InterTableauMan = new InterTableauManager(m_ImportGraph, m_Tableaux);
-		for (TableauManagerOld t : m_Tableaux) {
-			t.setMaster(this);
-			t.setImportGraph(m_ImportGraph);
-			t.setInterTableauManager(m_InterTableauMan);
-		}
-		
-		m_ClashCauses = CollectionUtil.makeSet();
-	}
+//	private void makeTableaux() {
+//		m_Tableaux = new TableauTopology(m_Packages);
+//		m_InterTableauMan = new InterTableauManager(m_ImportGraph, m_Tableaux);
+//		for (TableauManagerOld t : m_Tableaux) {
+//			t.setMaster(this);
+//			t.setImportGraph(m_ImportGraph);
+//			t.setInterTableauManager(m_InterTableauMan);
+//		}
+//		
+//		m_ClashCauses = CollectionUtil.makeSet();
+//	}
 
 	private boolean hasClashAtOrigin() {
 		for (TableauManagerOld t : m_Tableaux) {

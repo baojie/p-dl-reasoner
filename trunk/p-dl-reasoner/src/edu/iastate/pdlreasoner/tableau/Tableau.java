@@ -8,7 +8,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.jgroups.Address;
 import org.jgroups.Channel;
+import org.jgroups.ChannelClosedException;
 import org.jgroups.ChannelException;
+import org.jgroups.ChannelNotConnectedException;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
@@ -23,10 +25,12 @@ import edu.iastate.pdlreasoner.message.Clash;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MakePreImage;
+import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
 import edu.iastate.pdlreasoner.message.ReopenAtoms;
 import edu.iastate.pdlreasoner.message.TableauSlaveMessageProcessor;
+import edu.iastate.pdlreasoner.message.BranchTokenMessage;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -57,14 +61,15 @@ public class Tableau {
 	
 	//Constants once set
 	private Query m_Query;
-	private Address m_MasterAdd;
+	private Channel m_Channel;
+	private Address m_Self;
+	private Address m_Master;
 	private PackageID m_AssignedPackageID;
 	private OntologyPackage m_AssignedPackage;
 	private ImportGraph m_ImportGraph;
 	private TBox m_TBox;
 	
 	//Variables
-	private Channel m_Channel;
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
 	private TableauGraph m_Graph;
@@ -88,7 +93,7 @@ public class Tableau {
 			switch (m_State) {
 			case ENTRY:
 				msg = m_MessageQueue.take();
-				m_MasterAdd = msg.getSrc();
+				m_Master = msg.getSrc();
 				m_AssignedPackageID = (PackageID) msg.getObject();
 				initTableau();
 				m_State = State.READY;
@@ -116,6 +121,17 @@ public class Tableau {
 		
 		m_Channel.close();
 	}
+	
+	public void sendToMaster(MessageToMaster msg) {
+		Message channelMsg = new Message(m_Master, m_Self, msg);
+		try {
+			m_Channel.send(channelMsg);
+		} catch (ChannelNotConnectedException e) {
+			throw new RuntimeException(e);
+		} catch (ChannelClosedException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	private void initChannel() throws ChannelException {
 		m_Channel = new JChannel();
@@ -132,6 +148,7 @@ public class Tableau {
 					}
 				}
 			});
+		m_Self = m_Channel.getLocalAddress(); 
 	}
 
 	private void initTableau() {
@@ -199,13 +216,13 @@ public class Tableau {
 			LOGGER.debug(m_AssignedPackageID.toDebugString() + "broadcasting clash " + clashCause);
 		}
 		
-		m_Master.processClash(clashCause);
+		sendToMaster(new Clash(clashCause));
 	}
 
 	private void releaseToken() {
 		BranchToken temp = m_Token;
 		m_Token = null;
-		m_Master.returnTokenFrom(this, temp);
+		sendToMaster(new BranchTokenMessage(temp));
 	}
 
 	
@@ -246,7 +263,7 @@ public class Tableau {
 					LOGGER.debug(m_AssignedPackageID.toDebugString() + "sending " + backward);
 				}
 				
-				m_InterTableauMan.processConceptReport(backward);
+				sendToMaster(backward);
 			} else {
 				List<PackageID> importers = m_ImportGraph.getImportersOf(m_AssignedPackageID, c);
 				if (importers != null) {
@@ -259,7 +276,7 @@ public class Tableau {
 							LOGGER.debug(m_AssignedPackageID.toDebugString() + "sending " + forward);
 						}
 
-						m_InterTableauMan.processConceptReport(forward);
+						sendToMaster(forward);
 					}
 				}
 			}
@@ -393,6 +410,10 @@ public class Tableau {
 
 		@Override
 		public void process(Null msg) {
+		}
+
+		@Override
+		public void process(BranchTokenMessage msg) {
 		}
 		
 	}

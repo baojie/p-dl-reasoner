@@ -1,6 +1,10 @@
 package edu.iastate.pdlreasoner.tableau.branch;
 
-public class BranchToken {
+import java.io.Serializable;
+
+public class BranchToken implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private int m_NextIndex;
 
