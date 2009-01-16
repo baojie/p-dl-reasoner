@@ -3,7 +3,7 @@ package edu.iastate.pdlreasoner.message;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.tableau.TracedConcept;
 
-public abstract class ConceptReport implements MessageToSlave {
+public abstract class ConceptReport implements MessageToSlave, MessageToMaster {
 	
 	private static final long serialVersionUID = 1L;
 	

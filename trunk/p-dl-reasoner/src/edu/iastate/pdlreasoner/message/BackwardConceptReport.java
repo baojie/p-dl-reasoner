@@ -17,6 +17,11 @@ public class BackwardConceptReport extends ConceptReport {
 	}
 	
 	@Override
+	public void execute(TableauMasterMessageProcessor messageProcessor) {
+		messageProcessor.process(this);
+	}
+
+	@Override
 	public String toString() {
 		return new StringBuilder()
 			.append("ConceptReport(")
