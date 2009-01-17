@@ -29,6 +29,7 @@ import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.Ping;
 import edu.iastate.pdlreasoner.message.TableauMasterMessageProcessor;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
@@ -46,6 +47,7 @@ public class TableauMaster {
 	
 	private TableauTopology m_Tableaux;
 	private InterTableauManager m_InterTableauMan;
+	private PingManager m_PingMan;
 	private Set<BranchPointSet> m_ClashCauses;
 	
 	//Processors
@@ -141,6 +143,7 @@ public class TableauMaster {
 
 	private void initMaster(ImportGraph importGraph) {
 		m_InterTableauMan = new InterTableauManager(this, importGraph);
+		m_PingMan = new PingManager(m_Tableaux);
 		m_ClashCauses = CollectionUtil.makeSet();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
 	}
@@ -184,6 +187,10 @@ public class TableauMaster {
 
 			PackageID nextPackageID = m_Tableaux.getNext(msg.getPackageID());
 			send(nextPackageID, msg);
+		}
+
+		@Override
+		public void process(Ping msg) {
 		}
 		
 	}

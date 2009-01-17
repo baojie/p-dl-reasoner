@@ -29,6 +29,7 @@ import edu.iastate.pdlreasoner.message.MakePreImage;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.Ping;
 import edu.iastate.pdlreasoner.message.ReopenAtoms;
 import edu.iastate.pdlreasoner.message.TableauSlaveMessageProcessor;
 import edu.iastate.pdlreasoner.message.BranchTokenMessage;
@@ -58,7 +59,7 @@ public class Tableau {
 	
 	private static final Logger LOGGER = Logger.getLogger(Tableau.class);
 	
-	private static enum State { ENTRY, READY, EXPAND, COMPLETE, EXIT }
+	private static enum State { ENTRY, READY, EXPAND, CLASH_SYNC, COMPLETE, EXIT }
 	
 	//Constants once set
 	private Query m_Query;
@@ -75,7 +76,6 @@ public class Tableau {
 	private State m_State;
 	private TableauGraph m_Graph;
 	private BranchToken m_Token;
-	private boolean m_HasClashAtOrigin;
 	
 	//Processors
 	private ConceptExpander m_ConceptExpander;
@@ -102,33 +102,31 @@ public class Tableau {
 				break;
 				
 			case READY:
-				processOneTableauMessage();
 				m_State = State.EXPAND;
+				processOneTableauMessage();
 				break;
 				
 			case EXPAND:
 				//We don't want to block until m_State == COMPLETE
 				while (!m_MessageQueue.isEmpty()) {
 					processOneTableauMessage();
+					if (m_State != State.EXPAND) break;
 				}
-				
-				if (m_HasClashAtOrigin) {
-					m_State = State.EXIT;
-					break;
-				}
+				if (m_State != State.EXPAND) break;
 				
 				expandGraph();
 				processClash();
-				
-				if (m_Token != null) {
-					releaseToken();
-				}
+				releaseToken();
 				
 				if (isComplete()) {
 					m_State = State.COMPLETE;
 				}
 				break;
+			
+			case CLASH_SYNC:
 				
+				break;
+
 			case COMPLETE:
 				processOneTableauMessage();
 				if (m_State != State.EXIT) {
@@ -188,8 +186,7 @@ public class Tableau {
 	}
 	
 	private boolean isComplete() {
-		return m_MessageQueue.isEmpty() && 
-			(m_HasClashAtOrigin || m_Graph.getOpenNodes().isEmpty());
+		return m_MessageQueue.isEmpty() && m_Graph.getOpenNodes().isEmpty();
 	}
 	
 	private void processOneTableauMessage() throws InterruptedException {
@@ -244,6 +241,8 @@ public class Tableau {
 	}
 
 	private void releaseToken() {
+		if (m_Token == null) return;
+		
 		BranchToken temp = m_Token;
 		m_Token = null;
 		sendToMaster(new BranchTokenMessage(m_AssignedPackageID, temp));
@@ -376,10 +375,12 @@ public class Tableau {
 		public void process(Clash msg) {
 			BranchPointSet clashCause = msg.getCause();
 			if (clashCause.isEmpty()) {
-				m_HasClashAtOrigin = true;
+				m_State = State.EXIT;
 			} else {
 				BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
 				m_Graph.pruneTo(restoreTarget);
+				releaseToken();
+				m_State = State.CLASH_SYNC;
 			}
 		}
 
@@ -443,6 +444,10 @@ public class Tableau {
 		@Override
 		public void process(Exit msg) {
 			m_State = State.EXIT;
+		}
+
+		@Override
+		public void process(Ping msg) {
 		}
 		
 	}
