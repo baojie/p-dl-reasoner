@@ -29,7 +29,7 @@ import edu.iastate.pdlreasoner.message.MakePreImage;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
-import edu.iastate.pdlreasoner.message.Ping;
+import edu.iastate.pdlreasoner.message.SyncPing;
 import edu.iastate.pdlreasoner.message.ReopenAtoms;
 import edu.iastate.pdlreasoner.message.TableauSlaveMessageProcessor;
 import edu.iastate.pdlreasoner.message.BranchTokenMessage;
@@ -447,7 +447,7 @@ public class Tableau {
 		}
 
 		@Override
-		public void process(Ping msg) {
+		public void process(SyncPing msg) {
 		}
 		
 	}

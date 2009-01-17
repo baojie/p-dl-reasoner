@@ -3,14 +3,14 @@ package edu.iastate.pdlreasoner.message;
 import edu.iastate.pdlreasoner.model.PackageID;
 
 
-public class Ping implements MessageToSlave, MessageToMaster {
+public class SyncPing implements MessageToSlave, MessageToMaster {
 
 	private static final long serialVersionUID = 1L;
 	
 	private PackageID m_Target;
 	private int m_ID;
 	
-	public Ping(PackageID target) {
+	public SyncPing(PackageID target) {
 		m_Target = target;
 	}
 	
@@ -38,8 +38,8 @@ public class Ping implements MessageToSlave, MessageToMaster {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Ping)) return false;
-		Ping other = (Ping) obj;
+		if (!(obj instanceof SyncPing)) return false;
+		SyncPing other = (SyncPing) obj;
 		return m_Target.equals(other.m_Target) && m_ID == other.m_ID;
 	}
 	

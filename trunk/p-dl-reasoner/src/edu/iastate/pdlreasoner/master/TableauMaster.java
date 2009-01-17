@@ -29,7 +29,7 @@ import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
-import edu.iastate.pdlreasoner.message.Ping;
+import edu.iastate.pdlreasoner.message.SyncPing;
 import edu.iastate.pdlreasoner.message.TableauMasterMessageProcessor;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
@@ -47,7 +47,7 @@ public class TableauMaster {
 	
 	private TableauTopology m_Tableaux;
 	private InterTableauManager m_InterTableauMan;
-	private PingManager m_PingMan;
+	private SyncManager m_SyncMan;
 	private Set<BranchPointSet> m_ClashCauses;
 	
 	//Processors
@@ -87,8 +87,8 @@ public class TableauMaster {
 		return new QueryResult(true);
 	}
 	
-	public void send(PackageID packageID, Serializable msg) {
-		Address dest = m_Tableaux.get(packageID);
+	public void send(PackageID destID, Serializable msg) {
+		Address dest = m_Tableaux.get(destID);
 		Message channelMsg = new Message(dest, m_Self, msg);
 		try {
 			m_Channel.send(channelMsg);
@@ -97,6 +97,8 @@ public class TableauMaster {
 		} catch (ChannelClosedException e) {
 			throw new RuntimeException(e);
 		}
+		
+		m_SyncMan.resyncFor(destID, msg);
 	}
 	
 	private void broadcast(MessageToSlave msg) {
@@ -143,7 +145,7 @@ public class TableauMaster {
 
 	private void initMaster(ImportGraph importGraph) {
 		m_InterTableauMan = new InterTableauManager(this, importGraph);
-		m_PingMan = new PingManager(m_Tableaux);
+		m_SyncMan = new SyncManager(this, m_Tableaux);
 		m_ClashCauses = CollectionUtil.makeSet();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
 	}
@@ -190,7 +192,8 @@ public class TableauMaster {
 		}
 
 		@Override
-		public void process(Ping msg) {
+		public void process(SyncPing msg) {
+			m_SyncMan.receiveResponse(msg);
 		}
 		
 	}
