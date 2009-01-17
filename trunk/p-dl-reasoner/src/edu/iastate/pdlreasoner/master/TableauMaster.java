@@ -1,11 +1,13 @@
 package edu.iastate.pdlreasoner.master;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.log4j.Logger;
 import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.ChannelClosedException;
@@ -29,6 +31,7 @@ import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.ResumeExpansion;
 import edu.iastate.pdlreasoner.message.SyncPing;
 import edu.iastate.pdlreasoner.message.TableauMasterMessageProcessor;
 import edu.iastate.pdlreasoner.model.PackageID;
@@ -38,6 +41,8 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class TableauMaster {
 
+	private static final Logger LOGGER = Logger.getLogger(TableauMaster.class);
+	
 	private static enum State { ENTRY, EXPAND, CLASH_SYNC, EXIT }
 	
 	private BlockingQueue<Message> m_MessageQueue;
@@ -49,6 +54,7 @@ public class TableauMaster {
 	private InterTableauManager m_InterTableauMan;
 	private SyncManager m_SyncMan;
 	private Set<BranchPointSet> m_ClashCauses;
+	private QueryResult m_Result;
 	
 	//Processors
 	private TableauMasterMessageProcessor m_MessageProcessor;
@@ -58,19 +64,16 @@ public class TableauMaster {
 		m_State = State.ENTRY;
 	}
 	
-	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException, InterruptedException {
+	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException {
 		initChannel();
 		connectWithSlaves(query.getOntology().getPackages());
 		initMaster(query.getOntology().getImportGraph());
 		startExpansion(query);
 		
 		while (m_State != State.EXIT) {
-			Message msg = null;
 			switch (m_State) {
 			case EXPAND:
-				msg = m_MessageQueue.take();
-				MessageToMaster tabMsg = (MessageToMaster) msg.getObject();
-				tabMsg.execute(m_MessageProcessor);
+				processOneTableauMessage();
 				
 				if (!m_ClashCauses.isEmpty()) {
 					m_State = State.CLASH_SYNC;
@@ -78,13 +81,23 @@ public class TableauMaster {
 				break;
 				
 			case CLASH_SYNC:
+				while (!m_MessageQueue.isEmpty()) {
+					processOneTableauMessage();
+				}
 				
+				m_SyncMan.restart();
+				while (!m_MessageQueue.isEmpty() || !m_SyncMan.isSynchronized()) {
+					processOneTableauMessage();
+				}
+				m_SyncMan.stop();
+				
+				resumeExpansion();
 				break;
 			}
 		}
 		
 		m_Channel.close();	
-		return new QueryResult(true);
+		return m_Result;
 	}
 	
 	public void send(PackageID destID, Serializable msg) {
@@ -99,6 +112,22 @@ public class TableauMaster {
 		}
 		
 		m_SyncMan.resyncFor(destID, msg);
+	}
+
+	private Message takeOneMessage() {
+		Message msg = null;
+		do {
+			try {
+				msg = m_MessageQueue.take();
+			} catch (InterruptedException e) {}
+		} while (msg == null);
+		return msg;
+	}
+
+	private void processOneTableauMessage() {
+		Message msg = takeOneMessage();
+		MessageToMaster tabMsg = (MessageToMaster) msg.getObject();
+		tabMsg.execute(m_MessageProcessor);
 	}
 	
 	private void broadcast(MessageToSlave msg) {
@@ -148,6 +177,7 @@ public class TableauMaster {
 		m_SyncMan = new SyncManager(this, m_Tableaux);
 		m_ClashCauses = CollectionUtil.makeSet();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
+		m_Result = new QueryResult();
 	}
 
 	private void startExpansion(Query query) throws ChannelNotConnectedException, ChannelClosedException {
@@ -159,6 +189,28 @@ public class TableauMaster {
 			send(otherID, new Null());
 		}
 		
+		m_State = State.EXPAND;
+	}
+	
+	private void resumeExpansion() {
+		BranchPointSet clashCause = Collections.min(m_ClashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
+		m_ClashCauses.clear();
+		if (clashCause.isEmpty()) {
+			m_Result.setIsSatisfiable(false);
+			m_State = State.EXIT;
+			return;
+		}
+		
+		m_InterTableauMan.pruneTo(clashCause.getLatestBranchPoint());
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("All prunings completed, resuming expansion.");
+		}
+		
+//		TableauManagerOld resumeTab = findOwnerOf(clashCause);
+//		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
+//		resumeTab.receiveToken(token);
+//		resumeTab.tryNextChoiceOnClashedBranchWith(clashCause);
+		broadcast(new ResumeExpansion(clashCause));
 		m_State = State.EXPAND;
 	}
 

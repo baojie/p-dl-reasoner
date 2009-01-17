@@ -4,8 +4,8 @@ public class QueryResult {
 
 	private boolean m_IsSat;
 
-	public QueryResult(boolean isSat) {
-		m_IsSat = isSat;
+	public void setIsSatisfiable(boolean v) {
+		m_IsSat = v;
 	}
 
 	public boolean isSatisfiable() {

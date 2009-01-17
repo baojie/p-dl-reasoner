@@ -12,5 +12,6 @@ public interface TableauSlaveMessageProcessor {
 	void process(BranchTokenMessage msg);
 	void process(Exit msg);
 	void process(SyncPing msg);
+	void process(ResumeExpansion msg);
 	
 }

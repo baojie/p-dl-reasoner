@@ -163,12 +163,12 @@ public class TableauMasterOld {
 		return false;
 	}
 	
-	private boolean hasPendingMessages() {
-		for (TableauManagerOld t : m_Tableaux) {
-			if (t.hasPendingMessages()) return true;
-		}
-		return false;
-	}
+//	private boolean hasPendingMessages() {
+//		for (TableauManagerOld t : m_Tableaux) {
+//			if (t.hasPendingMessages()) return true;
+//		}
+//		return false;
+//	}
 	
 	private TableauManagerOld findOwnerOf(BranchPointSet clashCause) {
 		BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
@@ -178,24 +178,24 @@ public class TableauMasterOld {
 		return null;
 	}
 
-	private void resumeCompletion() {
-		BranchPointSet clashCause = Collections.min(m_ClashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
-		m_ClashCauses.clear();
-		if (clashCause.isEmpty()) return;
-		
-		m_InterTableauMan.pruneTo(clashCause.getLatestBranchPoint());
-
-		TableauManagerOld resumeTab = findOwnerOf(clashCause);
-		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
-		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("All prunings completed");
-			LOGGER.debug("Resuming completion on " + resumeTab.getPackageID().toDebugString() + "with token " + token);
-		}
-		
-		resumeTab.receiveToken(token);
-		resumeTab.tryNextChoiceOnClashedBranchWith(clashCause);
-	}
+//	private void resumeCompletion() {
+//		BranchPointSet clashCause = Collections.min(m_ClashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
+//		m_ClashCauses.clear();
+//		if (clashCause.isEmpty()) return;
+//		
+//		m_InterTableauMan.pruneTo(clashCause.getLatestBranchPoint());
+//
+//		TableauManagerOld resumeTab = findOwnerOf(clashCause);
+//		BranchToken token = BranchToken.make(clashCause.getLatestBranchPoint());
+//		
+//		if (LOGGER.isDebugEnabled()) {
+//			LOGGER.debug("All prunings completed");
+//			LOGGER.debug("Resuming completion on " + resumeTab.getPackageID().toDebugString() + "with token " + token);
+//		}
+//		
+//		resumeTab.receiveToken(token);
+//		resumeTab.tryNextChoiceOnClashedBranchWith(clashCause);
+//	}
 
 	private void completeAll() {
 		boolean hasChanged = true;

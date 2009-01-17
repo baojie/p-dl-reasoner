@@ -6,8 +6,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgroups.ChannelClosedException;
-import org.jgroups.ChannelNotConnectedException;
 
 import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
@@ -94,7 +92,7 @@ public class InterTableauManager {
 		m_TableauMaster.send(importTargetPackageID, forward);
 	}
 	
-	public void pruneTo(BranchPoint restoreTarget) throws ChannelNotConnectedException, ChannelClosedException {
+	public void pruneTo(BranchPoint restoreTarget) {
 		m_InterTableau.pruneTo(restoreTarget);
 		
 		for (Entry<PackageID, Set<GlobalNodeID>> entry : m_InterTableau.getVerticesByPackage().entrySet()) {

@@ -66,8 +66,6 @@ public class PDLReasoner {
 				slave.run(query);
 			} catch (ChannelException e) {
 				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 		}
 	}

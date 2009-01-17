@@ -29,6 +29,7 @@ import edu.iastate.pdlreasoner.message.MakePreImage;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.ResumeExpansion;
 import edu.iastate.pdlreasoner.message.SyncPing;
 import edu.iastate.pdlreasoner.message.ReopenAtoms;
 import edu.iastate.pdlreasoner.message.TableauSlaveMessageProcessor;
@@ -86,7 +87,7 @@ public class Tableau {
 		m_State = State.ENTRY;
 	}
 	
-	public void run(Query query) throws ChannelException, InterruptedException {
+	public void run(Query query) throws ChannelException {
 		m_Query = query;
 		initChannel();
 		
@@ -94,7 +95,7 @@ public class Tableau {
 			Message msg = null;
 			switch (m_State) {
 			case ENTRY:
-				msg = m_MessageQueue.take();
+				msg = takeOneMessage();
 				m_Master = msg.getSrc();
 				m_AssignedPackageID = (PackageID) msg.getObject();
 				initTableau();
@@ -189,12 +190,22 @@ public class Tableau {
 		return m_MessageQueue.isEmpty() && m_Graph.getOpenNodes().isEmpty();
 	}
 	
-	private void processOneTableauMessage() throws InterruptedException {
-		Message msg = m_MessageQueue.take();
+	private Message takeOneMessage() {
+		Message msg = null;
+		do {
+			try {
+				msg = m_MessageQueue.take();
+			} catch (InterruptedException e) {}
+		} while (msg == null);
+		return msg;
+	}
+
+	private void processOneTableauMessage() {
+		Message msg = takeOneMessage();
 		MessageToSlave tabMsg = (MessageToSlave) msg.getObject();
 		tabMsg.execute(m_MessageProcessor);
 	}
-	
+
 	private void expandGraph() {
 		for (Node open : m_Graph.getOpenNodes()) {
 			m_ConceptExpander.reset(open);
@@ -439,6 +450,7 @@ public class Tableau {
 
 		@Override
 		public void process(BranchTokenMessage msg) {
+			m_Token = msg.getToken();
 		}
 
 		@Override
@@ -448,6 +460,10 @@ public class Tableau {
 
 		@Override
 		public void process(SyncPing msg) {
+		}
+
+		@Override
+		public void process(ResumeExpansion msg) {
 		}
 		
 	}
