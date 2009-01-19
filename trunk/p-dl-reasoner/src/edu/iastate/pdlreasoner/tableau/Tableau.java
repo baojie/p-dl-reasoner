@@ -140,6 +140,10 @@ public class Tableau {
 			}
 		}
 		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Disconnecting and closing channel");
+		}
+		
 		m_Channel.disconnect();
 		m_Channel.close();
 	}

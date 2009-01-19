@@ -75,22 +75,22 @@ public class TableauMaster {
 			switch (m_State) {
 			case EXPAND:
 				m_SyncMan.restartSync();
-				while (!m_MessageQueue.isEmpty() || !m_SyncMan.isSynchronized()) {
+				while (m_State == State.EXPAND && (!m_MessageQueue.isEmpty() || !m_SyncMan.isSynchronized())) {
 					processOneTableauMessage();
-					if (!m_ClashCauses.isEmpty()) {
-						m_State = State.CLASH;
-						break;
-					}
 				}
+				
+				if (m_State != State.EXPAND) break;
 				
 				exitWithResult(true);
 				break;
 				
 			case CLASH:
 				m_SyncMan.restartSync();
-				while (!m_MessageQueue.isEmpty() || !m_SyncMan.isSynchronized()) {
+				while (m_State == State.CLASH && (!m_MessageQueue.isEmpty() || !m_SyncMan.isSynchronized())) {
 					processOneTableauMessage();
 				}
+				
+				if (m_State != State.CLASH) break;
 				
 				resume();
 				break;
@@ -229,6 +229,7 @@ public class TableauMaster {
 			BranchPointSet clashCause = msg.getCause();
 			if (m_ClashCauses.add(clashCause)) {
 				broadcast(msg);
+				m_State = State.CLASH;
 			}
 		}
 

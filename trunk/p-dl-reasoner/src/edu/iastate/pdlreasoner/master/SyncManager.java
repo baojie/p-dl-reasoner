@@ -3,6 +3,8 @@ package edu.iastate.pdlreasoner.master;
 import java.io.Serializable;
 import java.util.Map;
 
+import edu.iastate.pdlreasoner.message.BranchTokenMessage;
+import edu.iastate.pdlreasoner.message.Null;
 import edu.iastate.pdlreasoner.message.SyncPing;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
@@ -31,7 +33,8 @@ public class SyncManager {
 	}
 
 	public void intercept(PackageID destID, Serializable msg) {
-		if (msg instanceof SyncPing) return;
+		//These do not invalidate the completeness of a tableau nor the synchronization state during a clash
+		if (msg instanceof SyncPing || msg instanceof BranchTokenMessage || msg instanceof Null) return;
 		
 		m_IsInVerifyingPhase = false;
 	}
