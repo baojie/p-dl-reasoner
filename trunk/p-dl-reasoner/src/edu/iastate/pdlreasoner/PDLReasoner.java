@@ -9,8 +9,6 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makePackageID;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeRole;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeSomeValues;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 
@@ -50,7 +48,7 @@ public class PDLReasoner {
 			System.exit(1);
 		}
 		
-		Query query = getExample4b();
+		Query query = getExample1();
 		
 		if (isMaster) {
 			TableauMaster master = new TableauMaster();
