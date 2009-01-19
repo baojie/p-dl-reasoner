@@ -1,5 +1,8 @@
 package edu.iastate.pdlreasoner.message;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import edu.iastate.pdlreasoner.model.Concept;
 
 public class MakeGlobalRoot implements MessageToSlave {
@@ -19,6 +22,11 @@ public class MakeGlobalRoot implements MessageToSlave {
 	@Override
 	public void execute(TableauSlaveMessageProcessor messageProcessor) {
 		messageProcessor.process(this);
+	}
+	
+	@Override
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 
 }

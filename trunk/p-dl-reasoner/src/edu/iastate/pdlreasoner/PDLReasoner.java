@@ -33,6 +33,11 @@ public class PDLReasoner {
 
 	public static void main(String[] args) {
 		boolean isMaster = false;
+		if (args.length != 1) {
+			printUsage();
+			System.exit(1);
+		}
+		
 		if ("-m".equalsIgnoreCase(args[0])) {
 			isMaster = true;
 		} else if ("-s".equalsIgnoreCase(args[0])) {
@@ -53,8 +58,6 @@ public class PDLReasoner {
 			} catch (ChannelException e) {
 				e.printStackTrace();
 			} catch (NotEnoughSlavesException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			

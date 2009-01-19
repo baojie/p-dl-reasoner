@@ -60,7 +60,7 @@ public class Tableau {
 	
 	private static final Logger LOGGER = Logger.getLogger(Tableau.class);
 	
-	private static enum State { ENTRY, READY, EXPAND, CLASH_SYNC, COMPLETE, EXIT }
+	private static enum State { ENTRY, READY, EXPAND, CLASH, EXIT }
 	
 	//Constants once set
 	private Query m_Query;
@@ -77,6 +77,7 @@ public class Tableau {
 	private State m_State;
 	private TableauGraph m_Graph;
 	private BranchToken m_Token;
+	private SyncPing m_LastPingRequest;
 	
 	//Processors
 	private ConceptExpander m_ConceptExpander;
@@ -108,38 +109,41 @@ public class Tableau {
 				break;
 				
 			case EXPAND:
-				//We don't want to block until m_State == COMPLETE
-				while (!m_MessageQueue.isEmpty()) {
+				while (m_State == State.EXPAND && !m_MessageQueue.isEmpty()) {
 					processOneTableauMessage();
-					if (m_State != State.EXPAND) break;
 				}
 				if (m_State != State.EXPAND) break;
 				
 				expandGraph();
-				processClash();
+				checkForClash();
 				releaseToken();
 				
 				if (isComplete()) {
-					m_State = State.COMPLETE;
+					replyPing();
+					//Block, until we get a new message
+					processOneTableauMessage();
 				}
 				break;
 			
-			case CLASH_SYNC:
-				
-				break;
-
-			case COMPLETE:
-				processOneTableauMessage();
-				if (m_State != State.EXIT) {
-					m_State = State.EXPAND;
+			case CLASH:
+				while (!m_MessageQueue.isEmpty()) {
+					processOneTableauMessage();
 				}
+				//New messages may generate clashes
+				checkForClash();
+				
+				replyPing();
+				
+				//Block, the only way to get out of CLASH_SYNC is to get a ResumeExpansion Or an Exit
+				processOneTableauMessage();
 				break;
 			}
 		}
 		
+		m_Channel.disconnect();
 		m_Channel.close();
 	}
-	
+
 	public void sendToMaster(MessageToMaster msg) {
 		Message channelMsg = new Message(m_Master, m_Self, msg);
 		try {
@@ -159,10 +163,8 @@ public class Tableau {
 					while (true) {
 						try {
 							m_MessageQueue.put(msg);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							continue;
-						}
+							return;
+						} catch (InterruptedException e) {}
 					}
 				}
 			});
@@ -182,6 +184,7 @@ public class Tableau {
 		m_TBox = m_AssignedPackage.getTBox();
 		m_Graph = new TableauGraph(m_AssignedPackageID);
 		m_Token = null;
+		m_LastPingRequest = null;
 		m_ConceptExpander = new ConceptExpander();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
 	}
@@ -203,6 +206,11 @@ public class Tableau {
 	private void processOneTableauMessage() {
 		Message msg = takeOneMessage();
 		MessageToSlave tabMsg = (MessageToSlave) msg.getObject();
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Received " + tabMsg);
+		}
+		
 		tabMsg.execute(m_MessageProcessor);
 	}
 
@@ -240,7 +248,7 @@ public class Tableau {
 		return !tcs.isEmpty();
 	}
 	
-	private void processClash() {
+	private void checkForClash() {
 		BranchPointSet clashCause = m_Graph.getEarliestClashCause();
 		if (clashCause == null) return;
 		
@@ -251,12 +259,19 @@ public class Tableau {
 		sendToMaster(new Clash(clashCause));
 	}
 
+	private void replyPing() {
+		if (m_LastPingRequest != null) {
+			sendToMaster(m_LastPingRequest);
+			m_LastPingRequest = null;
+		}
+	}
+
 	private void releaseToken() {
-		if (m_Token == null) return;
-		
-		BranchToken temp = m_Token;
-		m_Token = null;
-		sendToMaster(new BranchTokenMessage(m_AssignedPackageID, temp));
+		if (m_Token != null) {
+			BranchToken temp = m_Token;
+			m_Token = null;
+			sendToMaster(new BranchTokenMessage(m_AssignedPackageID, temp));
+		}
 	}
 
 	
@@ -385,14 +400,13 @@ public class Tableau {
 		@Override
 		public void process(Clash msg) {
 			BranchPointSet clashCause = msg.getCause();
-			if (clashCause.isEmpty()) {
-				m_State = State.EXIT;
-			} else {
+			if (!clashCause.isEmpty()) {
 				BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
 				m_Graph.pruneTo(restoreTarget);
 				releaseToken();
-				m_State = State.CLASH_SYNC;
 			}
+			
+			m_State = State.CLASH;
 		}
 
 		@Override
@@ -460,10 +474,22 @@ public class Tableau {
 
 		@Override
 		public void process(SyncPing msg) {
+			m_LastPingRequest = msg;
 		}
 
 		@Override
 		public void process(ResumeExpansion msg) {
+			BranchPointSet clashCause = msg.getClashCause();
+			BranchPoint restoreTarget = clashCause.getLatestBranchPoint();
+			if (m_Graph.hasBranch(restoreTarget)) {
+				//Exactly one slave should be here
+				m_Token = BranchToken.make(restoreTarget);
+				Branch branch = m_Graph.getLastBranch();
+				branch.setLastClashCause(clashCause);
+				branch.tryNext();
+			}
+			
+			m_State = State.EXPAND;
 		}
 		
 	}

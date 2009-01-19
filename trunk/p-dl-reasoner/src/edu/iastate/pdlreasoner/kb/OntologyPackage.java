@@ -1,10 +1,9 @@
 package edu.iastate.pdlreasoner.kb;
 
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.ModelFactory;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.struct.MultiValuedMap;
-import edu.iastate.pdlreasoner.tableau.TableauManagerOld;
 
 public class OntologyPackage {
 
@@ -38,7 +37,4 @@ public class OntologyPackage {
 		return m_TBox;
 	}
 	
-	public TableauManagerOld getTableau() {
-		return new TableauManagerOld(this);
-	}
 }

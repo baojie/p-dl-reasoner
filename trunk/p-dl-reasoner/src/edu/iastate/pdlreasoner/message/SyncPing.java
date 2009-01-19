@@ -1,5 +1,8 @@
 package edu.iastate.pdlreasoner.message;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import edu.iastate.pdlreasoner.model.PackageID;
 
 
@@ -48,4 +51,9 @@ public class SyncPing implements MessageToSlave, MessageToMaster {
 		return m_Target.hashCode() ^ m_ID;
 	}
 
+	@Override
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
+	
 }
