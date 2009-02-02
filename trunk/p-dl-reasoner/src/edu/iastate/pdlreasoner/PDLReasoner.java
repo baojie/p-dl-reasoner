@@ -13,6 +13,10 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
 import java.net.URI;
 
 import org.jgroups.ChannelException;
+import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyCreationException;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
 import edu.iastate.pdlreasoner.kb.Ontology;
@@ -28,13 +32,14 @@ import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
 import edu.iastate.pdlreasoner.tableau.Tableau;
+import edu.iastate.pdlreasoner.util.URIUtil;
 
 
 public class PDLReasoner {
 
 	public static void main(String[] args) {
 		boolean isMaster = false;
-		if (args.length != 1) {
+		if (args.length != 2) {
 			printUsage();
 			System.exit(1);
 		}
@@ -48,7 +53,16 @@ public class PDLReasoner {
 			System.exit(1);
 		}
 		
-		Query query = getExample1();
+		String queryPath = args[1];
+		URI queryURI = URIUtil.toURI(queryPath);
+		
+		Query query = null;
+		try {
+			query = loadQuery(queryURI);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 		
 		if (isMaster) {
 			TableauMaster master = new TableauMaster();
@@ -75,7 +89,13 @@ public class PDLReasoner {
 	}
 	
 	private static void printUsage() {
-		System.out.println("Usage: java PDLReasoner [-m|-s]");
+		System.out.println("Usage: java PDLReasoner [-m|-s] query.owl");
+	}
+
+	private static Query loadQuery(URI queryURI) throws OWLOntologyCreationException {
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntology queryOntology = manager.loadOntology(queryURI);
+		return null;
 	}
 
 	private static Query getExample1() {
