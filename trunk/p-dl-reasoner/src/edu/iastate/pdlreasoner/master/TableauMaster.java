@@ -97,6 +97,10 @@ public class TableauMaster {
 			}
 		}
 		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Disconnecting and closing channel");
+		}
+		
 		m_Channel.disconnect();
 		m_Channel.close();	
 		return m_Result;
