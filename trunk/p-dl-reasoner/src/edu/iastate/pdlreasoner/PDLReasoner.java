@@ -13,16 +13,14 @@ import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
 import java.net.URI;
 
 import org.jgroups.ChannelException;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
 import edu.iastate.pdlreasoner.kb.Ontology;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
+import edu.iastate.pdlreasoner.kb.owlapi.QueryLoader;
 import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -58,7 +56,7 @@ public class PDLReasoner {
 		
 		Query query = null;
 		try {
-			query = loadQuery(queryURI);
+			query = QueryLoader.loadQuery(queryURI);
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -90,12 +88,6 @@ public class PDLReasoner {
 	
 	private static void printUsage() {
 		System.out.println("Usage: java PDLReasoner [-m|-s] query.owl");
-	}
-
-	private static Query loadQuery(URI queryURI) throws OWLOntologyCreationException {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology queryOntology = manager.loadOntology(queryURI);
-		return null;
 	}
 
 	private static Query getExample1() {
