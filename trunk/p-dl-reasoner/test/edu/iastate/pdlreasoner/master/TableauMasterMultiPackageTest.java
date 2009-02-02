@@ -52,8 +52,8 @@ public class TableauMasterMultiPackageTest {
 
 	@Test
 	public void understandability() {
-		Atom p0A = makeAtom(p[0], URI.create("#A"));
-		Atom p0B = makeAtom(p[0], URI.create("#B"));
+		Atom p0A = makeAtom(p[0], "A");
+		Atom p0B = makeAtom(p[0], "B");
 		
 		kb[0].addAxiom(p0A, Bottom.INSTANCE);
 		
@@ -73,8 +73,8 @@ public class TableauMasterMultiPackageTest {
 
 	@Test
 	public void pruneInterTableauxOnClash() {
-		Atom p0A = makeAtom(p[0], URI.create("#A"));
-		Atom p0B = makeAtom(p[0], URI.create("#B"));
+		Atom p0A = makeAtom(p[0], "A");
+		Atom p0B = makeAtom(p[0], "B");
 		
 		kb[0].addAxiom(p0A, Bottom.INSTANCE);
 		kb[0].addAxiom(p0B, Bottom.INSTANCE);

@@ -21,13 +21,12 @@ import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
 import edu.iastate.pdlreasoner.model.Concept;
-import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Negation;
 import edu.iastate.pdlreasoner.model.Or;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
-import edu.iastate.pdlreasoner.model.visitor.NNFConverter;
 
 public class NNFConverterTest {
 	
@@ -53,7 +52,7 @@ public class NNFConverterTest {
 		}
 		atoms = new Atom[5];
 		for (int i = 0; i < atoms.length; i++) {
-			atoms[i] = makeAtom(p[0], URI.create("#atom" + i));
+			atoms[i] = makeAtom(p[0], "atom" + i);
 		}
 		negatedAtoms = new Negation[atoms.length];
 		for (int i = 0; i < negatedAtoms.length; i++) {

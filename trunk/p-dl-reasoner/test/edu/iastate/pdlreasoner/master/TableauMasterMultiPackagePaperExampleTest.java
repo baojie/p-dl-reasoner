@@ -51,11 +51,11 @@ public class TableauMasterMultiPackagePaperExampleTest {
 	public void paperExample1() {
 		Top p0Top = makeTop(p[0]);
 		Role r = makeRole(URI.create("#r"));
-		Atom p0C = makeAtom(p[0], URI.create("#C"));
+		Atom p0C = makeAtom(p[0], "C");
 		
-		Atom p1D1 = makeAtom(p[1], URI.create("#D1"));
-		Atom p1D2 = makeAtom(p[1], URI.create("#D2"));
-		Atom p1D3 = makeAtom(p[1], URI.create("#D3"));
+		Atom p1D1 = makeAtom(p[1], "D1");
+		Atom p1D2 = makeAtom(p[1], "D2");
+		Atom p1D3 = makeAtom(p[1], "D3");
 		
 		kb[0].addAxiom(p0Top, p1D3);
 		
@@ -79,10 +79,10 @@ public class TableauMasterMultiPackagePaperExampleTest {
 	
 	@Test
 	public void paperExample2() {
-		Atom p0A = makeAtom(p[0], URI.create("#A"));
-		Atom p0B = makeAtom(p[0], URI.create("#B"));
-		Atom p1C = makeAtom(p[1], URI.create("#C"));
-		Atom p2D = makeAtom(p[2], URI.create("#D"));
+		Atom p0A = makeAtom(p[0], "A");
+		Atom p0B = makeAtom(p[0], "B");
+		Atom p1C = makeAtom(p[1], "C");
+		Atom p2D = makeAtom(p[2], "D");
 		
 		kb[0].addAxiom(p0A, p0B);
 		kb[1].addAxiom(p0B, p1C);
@@ -99,9 +99,9 @@ public class TableauMasterMultiPackagePaperExampleTest {
 
 	@Test
 	public void paperExample3() {
-		Atom p0B = makeAtom(p[0], URI.create("#B"));
-		Atom p0F = makeAtom(p[0], URI.create("#F"));
-		Atom p1P = makeAtom(p[1], URI.create("#P"));
+		Atom p0B = makeAtom(p[0], "B");
+		Atom p0F = makeAtom(p[0], "F");
+		Atom p1P = makeAtom(p[1], "P");
 		
 		kb[0].addAxiom(p0B, p0F);
 		kb[1].addAxiom(p1P, p0B);
@@ -117,10 +117,10 @@ public class TableauMasterMultiPackagePaperExampleTest {
 
 	@Test
 	public void paperExample4() {
-		Atom p0A = makeAtom(p[0], URI.create("#A"));
-		Atom p0C = makeAtom(p[0], URI.create("#C"));
+		Atom p0A = makeAtom(p[0], "A");
+		Atom p0C = makeAtom(p[0], "C");
 		Role p1r = makeRole(URI.create("#r"));
-		Atom p1B = makeAtom(p[1], URI.create("#B"));
+		Atom p1B = makeAtom(p[1], "B");
 		
 		kb[0].addAxiom(p0A, p0C);
 		kb[1].addAxiom(p0A, makeSomeValues(p1r, p1B));

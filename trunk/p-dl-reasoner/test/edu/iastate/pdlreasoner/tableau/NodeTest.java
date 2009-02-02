@@ -20,8 +20,8 @@ import org.junit.Test;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
-import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Negation;
+import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.tableau.graph.Edge;
@@ -46,7 +46,8 @@ public class NodeTest {
 		TableauGraph g = new TableauGraph(m_HomePackageID);
 		m_Node = g.makeRoot(BranchPointSet.EMPTY);
 		role = makeRole(URI.create("#role"));
-		atom = makeAtom(m_HomePackageID, URI.create("#atom"));
+		
+		atom = makeAtom(m_HomePackageID, "atom");
 		atomTC = makeOrigin(atom);
 		all = makeAllValues(role, atom);
 		allTC = makeOrigin(all);

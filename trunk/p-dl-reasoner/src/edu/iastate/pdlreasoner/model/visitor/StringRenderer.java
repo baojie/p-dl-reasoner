@@ -44,9 +44,7 @@ public class StringRenderer implements ConceptVisitor {
 	@Override
 	public void visit(Atom atom) {
 		m_Builder.append(atom.getContext())
-			.append("(")
-			.append(atom.getURI())
-			.append(")");
+			.append(atom.getFragment());
 	}
 
 	@Override

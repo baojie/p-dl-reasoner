@@ -50,7 +50,7 @@ public class TableauMasterSinglePackageTest {
 		top = makeTop(p);
 		atoms = new Atom[10];
 		for (int i = 0; i < atoms.length; i++) {
-			atoms[i] = makeAtom(p, URI.create("#atom" + i));
+			atoms[i] = makeAtom(p, "atom" + i);
 		}
 		negatedAtoms = new Negation[atoms.length];
 		for (int i = 0; i < negatedAtoms.length; i++) {

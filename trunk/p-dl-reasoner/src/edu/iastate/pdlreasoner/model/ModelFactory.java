@@ -12,8 +12,8 @@ public class ModelFactory {
 		return new Top(homePackageID);
 	}
 	
-	public static Atom makeAtom(PackageID homePackageID, URI uri) {
-		return new Atom(homePackageID, uri);
+	public static Atom makeAtom(PackageID homePackageID, String fragment) {
+		return new Atom(homePackageID, fragment);
 	}
 	
 	public static Role makeRole(URI uri) {

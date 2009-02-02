@@ -1,22 +1,20 @@
 package edu.iastate.pdlreasoner.model;
 
-import java.net.URI;
-
 import edu.iastate.pdlreasoner.model.visitor.ConceptVisitor;
 
 public class Atom extends ContextualizedConcept {
 	
 	private static final long serialVersionUID = 1L;
 
-	protected URI m_URI;
+	protected String m_Fragment;
 	
-	protected Atom(PackageID homePackageID, URI uri) {
+	protected Atom(PackageID homePackageID, String fragment) {
 		super(homePackageID);
-		m_URI = uri;
+		m_Fragment = fragment;
 	}
 
-	public URI getURI() {
-		return m_URI;
+	public String getFragment() {
+		return m_Fragment;
 	}
 
 	@Override
@@ -28,12 +26,12 @@ public class Atom extends ContextualizedConcept {
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Atom) || !super.equals(obj)) return false;
 		Atom other = (Atom) obj;
-		return m_URI.equals(other.m_URI);
+		return m_Fragment.equals(other.m_Fragment);
 	}
 	
 	@Override
 	public int hashCode() {
-		return super.hashCode() ^ m_URI.hashCode();
+		return super.hashCode() ^ m_Fragment.hashCode();
 	}
 	
 }
