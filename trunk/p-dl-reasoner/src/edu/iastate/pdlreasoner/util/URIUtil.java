@@ -30,5 +30,9 @@ public class URIUtil {
 		
 		return uri;
 	}
+	
+	public static URI filterFragment(URI uri) throws URISyntaxException {
+		return new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null);
+	}
 
 }

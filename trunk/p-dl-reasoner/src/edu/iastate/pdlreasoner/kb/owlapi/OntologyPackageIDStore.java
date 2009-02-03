@@ -7,6 +7,7 @@ import java.util.Map;
 import edu.iastate.pdlreasoner.model.ModelFactory;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
+import edu.iastate.pdlreasoner.util.URIUtil;
 
 public class OntologyPackageIDStore {
 
@@ -19,7 +20,7 @@ public class OntologyPackageIDStore {
 	public void addPackageID(URI uri) {
 		URI filteredURI = null;
 		try {
-			filteredURI = new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null);
+			filteredURI = URIUtil.filterFragment(uri);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -31,7 +32,14 @@ public class OntologyPackageIDStore {
 	}
 	
 	public PackageID getPackageID(URI uri) {
-		return m_Packages.get(uri);
+		URI filteredURI = null;
+		try {
+			filteredURI = URIUtil.filterFragment(uri);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		
+		return m_Packages.get(filteredURI);
 	}
 	
 }
