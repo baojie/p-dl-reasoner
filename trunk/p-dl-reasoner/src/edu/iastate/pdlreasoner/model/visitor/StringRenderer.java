@@ -15,7 +15,7 @@ import edu.iastate.pdlreasoner.model.Top;
 public class StringRenderer implements ConceptVisitor {
 	
 	private static final String BOTTOM = "_BOTTOM_";
-	private static final String TOP = "(_TOP_)";
+	private static final String TOP = "_TOP_";
 	private static final String NOT = "Not";
 	private static final String AND = "And";
 	private static final String OR = "Or";
@@ -37,13 +37,14 @@ public class StringRenderer implements ConceptVisitor {
 
 	@Override
 	public void visit(Top top) {
-		m_Builder.append(top.getContext())
-			.append(TOP);
+		m_Builder.append(TOP)
+			.append("(").append(top.getContext()).append(")");
 	}
 
 	@Override
 	public void visit(Atom atom) {
 		m_Builder.append(atom.getContext())
+			.append("#")
 			.append(atom.getFragment());
 	}
 

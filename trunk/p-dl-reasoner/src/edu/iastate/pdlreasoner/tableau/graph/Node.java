@@ -204,7 +204,7 @@ public class Node {
 		m_ClashCauses.add(BranchPointSet.unionDependencies(clashes));
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_Graph.getPackageID().toDebugString() + "clash found on node " + this + " = " + CollectionUtil.asSet(clashes));
+			LOGGER.debug(m_Graph.getPackageID().toStringWithBracket() + "clash found on node " + this + " = " + CollectionUtil.asSet(clashes));
 		}
 	}
 	
@@ -229,7 +229,7 @@ public class Node {
 			}
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_Graph.getPackageID().toDebugString() + "pruned and reopened node " + this + ": " + getLabels());
+				LOGGER.debug(m_Graph.getPackageID().toStringWithBracket() + "pruned and reopened node " + this + ": " + getLabels());
 			}
 		}
 	}

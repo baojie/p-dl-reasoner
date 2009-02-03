@@ -34,5 +34,11 @@ public class URIUtil {
 	public static URI filterFragment(URI uri) throws URISyntaxException {
 		return new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null);
 	}
+	
+	public static String getLastOfPath(URI uri) {
+		String path = uri.getPath();
+		int lastSlash = path.lastIndexOf('/');
+		return path.substring(lastSlash + 1);
+	}
 
 }

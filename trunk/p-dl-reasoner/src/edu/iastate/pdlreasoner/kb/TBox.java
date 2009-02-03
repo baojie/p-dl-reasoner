@@ -50,7 +50,7 @@ public class TBox {
 		}
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_HomePackage.getID().toDebugString() + "UC = " + m_UC);
+			LOGGER.debug(m_HomePackage.getID().toStringWithBracket() + "UC = " + m_UC);
 		}
 	}
 	

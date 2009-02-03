@@ -22,7 +22,7 @@ public class NodeFactory {
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(new StringBuilder()
-				.append(m_Graph.getPackageID().toDebugString())
+				.append(m_Graph.getPackageID().toStringWithBracket())
 				.append("new node (")
 				.append(n)
 				.append(", ")
@@ -38,7 +38,7 @@ public class NodeFactory {
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(new StringBuilder()
-				.append(m_Graph.getPackageID().toDebugString())
+				.append(m_Graph.getPackageID().toStringWithBracket())
 				.append("new node (")
 				.append(n)
 				.append(", ")

@@ -70,7 +70,7 @@ public class TableauGraph {
 		m_Roots.add(n);
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_PackageID.toDebugString() + "added root " + n + ", all roots = " + m_Roots);
+			LOGGER.debug(m_PackageID.toStringWithBracket() + "added root " + n + ", all roots = " + m_Roots);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class TableauGraph {
 		m_Branches.add(branch);
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_PackageID.toDebugString() + "added branch = " + branch);
+			LOGGER.debug(m_PackageID.toStringWithBracket() + "added branch = " + branch);
 		}
 	}
 	
@@ -112,8 +112,8 @@ public class TableauGraph {
 	
 	public void pruneTo(BranchPoint restoreTarget) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_PackageID.toDebugString() + "pruning starts with target = " + restoreTarget);
-			LOGGER.debug(m_PackageID.toDebugString() + "branches before pruning = " + m_Branches);
+			LOGGER.debug(m_PackageID.toStringWithBracket() + "pruning starts with target = " + restoreTarget);
+			LOGGER.debug(m_PackageID.toStringWithBracket() + "branches before pruning = " + m_Branches);
 		}
 		
 		pruneNodes(restoreTarget);
@@ -144,8 +144,8 @@ public class TableauGraph {
 		}
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_PackageID.toDebugString() + "pruning completed");
-			LOGGER.debug(m_PackageID.toDebugString() + "branches after pruning = " + m_Branches);
+			LOGGER.debug(m_PackageID.toStringWithBracket() + "pruning completed");
+			LOGGER.debug(m_PackageID.toStringWithBracket() + "branches after pruning = " + m_Branches);
 		}
 	}
 	
@@ -178,7 +178,7 @@ public class TableauGraph {
 			}
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_PackageID.toDebugString() + "removed node " + n);
+				LOGGER.debug(m_PackageID.toStringWithBracket() + "removed node " + n);
 			}
 		}
 		

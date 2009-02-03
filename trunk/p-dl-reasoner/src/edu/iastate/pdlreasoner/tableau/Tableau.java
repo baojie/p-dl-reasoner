@@ -232,7 +232,7 @@ public class Tableau {
 			hasChanged = hasChanged | expand(open.getLabelsFor(AllValues.class));
 			
 			if (LOGGER.isDebugEnabled() && hasChanged) {
-				LOGGER.debug(m_AssignedPackageID.toDebugString() + "applied deterministic rules on node " + open + ": " + open.getLabels());
+				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied deterministic rules on node " + open + ": " + open.getLabels());
 			}
 			
 			if (m_Token != null) {
@@ -257,7 +257,7 @@ public class Tableau {
 		if (clashCause == null) return;
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_AssignedPackageID.toDebugString() + "broadcasting clash " + clashCause);
+			LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "broadcasting clash " + clashCause);
 		}
 		
 		sendToMaster(new Clash(clashCause));
@@ -286,7 +286,7 @@ public class Tableau {
 		}
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_AssignedPackageID.toDebugString() + "applied UR on node " + n + ": " + n.getLabels());
+			LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied UR on node " + n + ": " + n.getLabels());
 		}
 	}
 	
@@ -313,7 +313,7 @@ public class Tableau {
 				BackwardConceptReport backward = new BackwardConceptReport(importSource, importTarget, m_Concept);
 				
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(m_AssignedPackageID.toDebugString() + "sending " + backward);
+					LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "sending " + backward);
 				}
 				
 				sendToMaster(backward);
@@ -326,7 +326,7 @@ public class Tableau {
 						ForwardConceptReport forward = new ForwardConceptReport(importSource, importTarget, m_Concept);
 
 						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug(m_AssignedPackageID.toDebugString() + "sending " + forward);
+							LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "sending " + forward);
 						}
 
 						sendToMaster(forward);
@@ -419,7 +419,7 @@ public class Tableau {
 			node.addLabel(msg.getConcept());
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_AssignedPackageID.toDebugString() + "applied forward concept report on node " + node + ": " + node.getLabels());
+				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied forward concept report on node " + node + ": " + node.getLabels());
 			}
 		}
 
@@ -431,7 +431,7 @@ public class Tableau {
 			node.addLabel(new TracedConcept(concept.getConcept(), unionDepends));
 
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_AssignedPackageID.toDebugString() + "applied backward concept report on node " + node + ": " + node.getLabels());
+				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied backward concept report on node " + node + ": " + node.getLabels());
 			}
 		}
 
@@ -454,7 +454,7 @@ public class Tableau {
 			root.addLabel(TracedConcept.makeOrigin(msg.getConcept()));
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_AssignedPackageID.toDebugString() + "starting with global root " + root + ": " + root.getLabels());
+				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "starting with global root " + root + ": " + root.getLabels());
 			}
 			
 			applyUniversalRestriction(root);
