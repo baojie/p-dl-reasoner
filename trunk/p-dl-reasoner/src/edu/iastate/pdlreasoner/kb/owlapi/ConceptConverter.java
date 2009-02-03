@@ -51,7 +51,7 @@ public class ConceptConverter {
 		m_CurrentPackageID = packageID;
 	}
 	
-	public Concept parse(OWLDescription desc) throws OWLDescriptionNotSupportedException {
+	public Concept convert(OWLDescription desc) throws OWLDescriptionNotSupportedException {
 		m_Converter.reset();
 		desc.accept(m_Converter);
 		Concept concept = m_Converter.getConcept();

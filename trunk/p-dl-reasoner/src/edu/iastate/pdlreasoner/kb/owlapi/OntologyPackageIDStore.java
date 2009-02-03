@@ -42,4 +42,9 @@ public class OntologyPackageIDStore {
 		return m_Packages.get(filteredURI);
 	}
 	
+	@Override
+	public String toString() {
+		return m_Packages.toString();
+	}
+	
 }

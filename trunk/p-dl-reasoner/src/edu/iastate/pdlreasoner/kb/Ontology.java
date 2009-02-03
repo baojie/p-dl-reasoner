@@ -12,16 +12,20 @@ public class Ontology {
 	//Caches
 	private ImportGraph m_ImportGraph;
 	
-	public Ontology(OntologyPackage[] packages) {
-		m_Packages = Arrays.asList(packages);
+	public Ontology(List<OntologyPackage> ontologyPackages) {
+		m_Packages = ontologyPackages;
 		
-		for (OntologyPackage pack : packages) {
+		for (OntologyPackage pack : ontologyPackages) {
 			pack.init();
 		}
 		
 		m_ImportGraph = new ImportGraph(m_Packages);
 	}
 	
+	public Ontology(OntologyPackage[] packages) {
+		this(Arrays.asList(packages));
+	}
+
 	public List<OntologyPackage> getPackages() {
 		return m_Packages;
 	}
