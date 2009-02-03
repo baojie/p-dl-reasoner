@@ -39,12 +39,12 @@ import edu.iastate.pdlreasoner.model.Role;
 public class ConceptConverter {
 
 	private OntologyPackageIDStore m_PackageIDStore;
-	private ConceptConverterImp m_Parser;
+	private ConceptConverterImp m_Converter;
 	private PackageID m_CurrentPackageID;
 	
 	public ConceptConverter(OntologyPackageIDStore packageIDStore) {
 		m_PackageIDStore = packageIDStore;
-		m_Parser = new ConceptConverterImp();
+		m_Converter = new ConceptConverterImp();
 	}
 	
 	public void setPackageID(PackageID packageID) {
@@ -52,9 +52,9 @@ public class ConceptConverter {
 	}
 	
 	public Concept parse(OWLDescription desc) throws OWLDescriptionNotSupportedException {
-		m_Parser.reset();
-		desc.accept(m_Parser);
-		Concept concept = m_Parser.getConcept();
+		m_Converter.reset();
+		desc.accept(m_Converter);
+		Concept concept = m_Converter.getConcept();
 		if (concept == null) throw new OWLDescriptionNotSupportedException(desc.toString() + " not supported.");
 
 		return concept;
