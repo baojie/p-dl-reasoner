@@ -19,7 +19,6 @@ import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
 import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
-import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
@@ -68,7 +67,7 @@ public class TableauMaster {
 	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException {
 		initChannel();
 		connectWithSlaves(query.getOntology().getPackages());
-		initMaster(query.getOntology().getImportGraph());
+		initMaster(query);
 		startExpansion(query);
 		
 		while (m_State != State.EXIT) {
@@ -183,11 +182,12 @@ public class TableauMaster {
 		}
 	}
 
-	private void initMaster(ImportGraph importGraph) {
-		m_InterTableauMan = new InterTableauManager(this, importGraph);
+	private void initMaster(Query query) {
+		m_InterTableauMan = new InterTableauManager(this, query.getOntology().getImportGraph());
 		m_ClashCauses = CollectionUtil.makeSet();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
 		m_Result = new QueryResult();
+		m_Result.setQuery(query);
 	}
 
 	private void startExpansion(Query query) throws ChannelNotConnectedException, ChannelClosedException {

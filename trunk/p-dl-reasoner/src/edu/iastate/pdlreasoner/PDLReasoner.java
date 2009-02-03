@@ -51,6 +51,11 @@ public class PDLReasoner {
 			System.exit(1);
 		}
 		
+		if (!query.isUnderstandableByWitness()) {
+			System.err.println("Error: Query is not understandable by the specified witness package.");
+			System.exit(1);
+		}
+		
 		if (isMaster) {
 			TableauMaster master = new TableauMaster();
 			QueryResult result = null;
@@ -76,7 +81,7 @@ public class PDLReasoner {
 	}
 	
 	private static void printUsage() {
-		System.out.println("Usage: java PDLReasoner [-m|-s] query.owl");
+		System.err.println("Usage: java PDLReasoner [-m|-s] query.owl");
 	}
 
 }

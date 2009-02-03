@@ -40,8 +40,9 @@ public class QueryLoader {
 		
 		Ontology ontology = loadOntology(manager, witness);
 		PackageID witnessID = m_PackageStore.getPackageID(witness.getURI());
-		Concept satConcept = loadQueryConcept(queryOntology, witnessID);
-		return new Query(ontology, satConcept, witnessID);
+		OWLSubClassAxiom axiom = loadQueryAxiom(queryOntology);
+		Concept satConcept = loadSatConcept(axiom, witnessID);
+		return new Query(ontology, axiom, satConcept, witnessID);
 	}
 
 	private Ontology loadOntology(OWLOntologyManager manager, OWLOntology witness) throws OWLDescriptionNotSupportedException {
@@ -90,12 +91,14 @@ public class QueryLoader {
 		return ontologyPackage;
 	}
 
-	private Concept loadQueryConcept(OWLOntology queryOntology, PackageID witnessID) throws IllegalQueryException, OWLDescriptionNotSupportedException {
-		m_ConceptConverter.setPackageID(witnessID);
-		
+	private OWLSubClassAxiom loadQueryAxiom(OWLOntology queryOntology) throws IllegalQueryException {
 		Set<OWLSubClassAxiom> axioms = queryOntology.getAxioms(AxiomType.SUBCLASS);
-		if (axioms.size() != 1) throw new IllegalQueryException("Only one query concept is supported.");
-		OWLSubClassAxiom axiom = axioms.iterator().next();
+		if (axioms.size() != 1) throw new IllegalQueryException("Only one axiom per query is supported.");
+		return axioms.iterator().next();
+	}
+
+	private Concept loadSatConcept(OWLSubClassAxiom axiom, PackageID witnessID) throws OWLDescriptionNotSupportedException {
+		m_ConceptConverter.setPackageID(witnessID);
 		Concept sub = m_ConceptConverter.convert(axiom.getSubClass());
 		Concept sup = m_ConceptConverter.convert(axiom.getSuperClass());
 		
