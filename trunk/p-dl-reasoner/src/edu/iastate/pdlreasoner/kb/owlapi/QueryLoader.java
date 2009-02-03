@@ -51,9 +51,9 @@ public class QueryLoader {
 		Set<OWLOntology> witnesses = manager.getImports(queryOntology);
 		if (witnesses.size() != 1) throw new IllegalQueryException("Query ontology must import exactly one witness ontology.");
 		OWLOntology witness = witnesses.iterator().next();
-		PackageID witnessID = m_PackageStore.getPackageID(witness.getURI());
 		
 		Ontology ontology = loadOntology(manager, witness);
+		PackageID witnessID = m_PackageStore.getPackageID(witness.getURI());
 		Concept satConcept = loadQueryConcept(queryOntology, witnessID);
 		return new Query(ontology, satConcept, witnessID);
 	}
