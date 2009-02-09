@@ -44,7 +44,8 @@ public class NodeTest {
 		m_HomePackageID = makePackageID(URI.create("#package"));
 		m_ForeignPackageID = makePackageID(URI.create("#package2"));
 		TableauGraph g = new TableauGraph(m_HomePackageID);
-		m_Node = g.makeRoot(BranchPointSet.EMPTY);
+		m_Node = g.makeNode(BranchPointSet.EMPTY);
+		g.addRoot(m_Node);
 		role = makeRole(URI.create("#role"));
 		
 		atom = makeAtom(m_HomePackageID, "atom");
