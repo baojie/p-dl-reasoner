@@ -60,6 +60,12 @@ public class SimulatedChannel extends Channel {
 	}
 
 	@Override
+	public boolean flushSupported() {
+		return false;
+	}
+
+	
+	@Override
 	public void blockOk() {
 		throw new UnsupportedOperationException();
 	}
@@ -67,11 +73,6 @@ public class SimulatedChannel extends Channel {
 	@Override
 	public Map<String, Object> dumpStats() {
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean flushSupported() {
-		return false;
 	}
 
 	@Override

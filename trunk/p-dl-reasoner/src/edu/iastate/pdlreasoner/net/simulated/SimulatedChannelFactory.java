@@ -15,6 +15,7 @@ public class SimulatedChannelFactory implements ChannelFactory {
 		return null;
 	}
 
+	
 	@Override
 	public Channel createChannel(Object arg0) throws ChannelException {
 		throw new UnsupportedOperationException();
