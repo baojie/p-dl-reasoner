@@ -22,7 +22,7 @@ public class Ontology {
 		m_ImportGraph = new ImportGraph(m_Packages);
 	}
 	
-	public Ontology(OntologyPackage[] packages) {
+	public Ontology(OntologyPackage... packages) {
 		this(Arrays.asList(packages));
 	}
 

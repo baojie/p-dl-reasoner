@@ -3,91 +3,74 @@ package edu.iastate.pdlreasoner.master;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makePackageID;
+import static edu.iastate.pdlreasoner.model.ModelFactory.makeTop;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.net.URI;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.iastate.pdlreasoner.exception.IllegalQueryException;
+import edu.iastate.pdlreasoner.PDLReasonerCentralizedWrapper;
+import edu.iastate.pdlreasoner.kb.Ontology;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
-import edu.iastate.pdlreasoner.master.TableauMasterOld;
+import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.model.Atom;
 import edu.iastate.pdlreasoner.model.Bottom;
-import edu.iastate.pdlreasoner.model.PackageID;
+import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.Or;
+import edu.iastate.pdlreasoner.model.PackageID;
+import edu.iastate.pdlreasoner.model.Top;
 
 public class TableauMasterMultiPackageTest {
 
-	private PackageID[] p;
-	private OntologyPackage[] kb;
-	private TableauMasterOld m_TableauMaster;
+	private PackageID[] pID;
+	private OntologyPackage[] p;
+	private Top[] top;
 	
 	@Before
 	public void setUp() {
-		p = new PackageID[3];
+		pID = new PackageID[3];
+		for (int i = 0; i < pID.length; i++) {
+			pID[i] = makePackageID(URI.create("p" + i));
+		}
+		
+		p = new OntologyPackage[pID.length];
 		for (int i = 0; i < p.length; i++) {
-			p[i] = makePackageID(URI.create("#package" + i));
+			p[i] = new OntologyPackage(pID[i]);
 		}
 		
-		kb = new OntologyPackage[p.length];
-		for (int i = 0; i < kb.length; i++) {
-			kb[i] = new OntologyPackage(p[i]);
+		top = new Top[pID.length];
+		for (int i = 0; i < p.length; i++) {
+			top[i] = makeTop(pID[i]);
 		}
-		
-		m_TableauMaster = new TableauMasterOld();
+	}
+	
+	private boolean runQuery(Concept satConcept, PackageID witness) {
+		Query query = new Query(new Ontology(p), null, satConcept, witness);
+		PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
+		return reasoner.run(query).isSatisfiable();
 	}
 
 	@Test
 	public void empty() {
-		m_TableauMaster.addPackage(kb[0]);
-		m_TableauMaster.addPackage(kb[1]);
-		m_TableauMaster.init();
-		assertTrue(m_TableauMaster.isConsistent(p[0]));
-		assertTrue(m_TableauMaster.isConsistent(p[1]));
-	}
-
-	@Test
-	public void understandability() {
-		Atom p0A = makeAtom(p[0], "A");
-		Atom p0B = makeAtom(p[0], "B");
-		
-		kb[0].addAxiom(p0A, Bottom.INSTANCE);
-		
-		for (int i = 0; i <= 1; i++) {
-			m_TableauMaster.addPackage(kb[i]);
-		}
-		
-		m_TableauMaster.init();
-		Or AorB = makeOr(p0A, p0B);
-		
-		try {
-			m_TableauMaster.isSatisfiable(AorB, p[1]);
-			fail("Expected IllegalQueryException");
-		} catch (IllegalQueryException ex) {
-		}
+		assertTrue(runQuery(top[0],pID[0]));
+		assertTrue(runQuery(top[1],pID[1]));
 	}
 
 	@Test
 	public void pruneInterTableauxOnClash() {
-		Atom p0A = makeAtom(p[0], "A");
-		Atom p0B = makeAtom(p[0], "B");
+		Atom p0A = makeAtom(pID[0], "A");
+		Atom p0B = makeAtom(pID[0], "B");
 		
-		kb[0].addAxiom(p0A, Bottom.INSTANCE);
-		kb[0].addAxiom(p0B, Bottom.INSTANCE);
-		kb[1].addAxiom(Bottom.INSTANCE, p0A);
+		p[0].addAxiom(p0A, Bottom.INSTANCE);
+		p[0].addAxiom(p0B, Bottom.INSTANCE);
+		p[1].addAxiom(Bottom.INSTANCE, p0A);
 		
-		for (int i = 0; i <= 1; i++) {
-			m_TableauMaster.addPackage(kb[i]);
-		}
-		
-		m_TableauMaster.init();
 		Or query = makeOr(p0A, p0B);
-		assertFalse(m_TableauMaster.isSatisfiable(query, p[0]));
-		assertFalse(m_TableauMaster.isSatisfiable(query, p[1]));
+		assertFalse(runQuery(query, pID[0]));
+		assertFalse(runQuery(query, pID[1]));
 	}
 
 }
