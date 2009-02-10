@@ -3,6 +3,9 @@ package edu.iastate.pdlreasoner;
 import java.net.URI;
 
 import org.jgroups.ChannelException;
+import org.jgroups.ChannelFactory;
+import org.jgroups.JChannel;
+import org.jgroups.JChannelFactory;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
@@ -18,7 +21,10 @@ import edu.iastate.pdlreasoner.util.URIUtil;
 
 public class PDLReasoner {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ChannelException {
+		ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
+		
+		
 		boolean isMaster = false;
 		if (args.length != 2) {
 			printUsage();
@@ -57,7 +63,7 @@ public class PDLReasoner {
 		}
 		
 		if (isMaster) {
-			TableauMaster master = new TableauMaster();
+			TableauMaster master = new TableauMaster(channelFactory);
 			QueryResult result = null;
 			
 			try {
@@ -70,7 +76,7 @@ public class PDLReasoner {
 			
 			System.out.println(result);
 		} else {
-			Tableau slave = new Tableau();
+			Tableau slave = new Tableau(channelFactory);
 
 			try {
 				slave.run(query);

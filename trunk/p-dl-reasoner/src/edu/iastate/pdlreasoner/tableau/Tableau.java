@@ -10,8 +10,8 @@ import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.ChannelClosedException;
 import org.jgroups.ChannelException;
+import org.jgroups.ChannelFactory;
 import org.jgroups.ChannelNotConnectedException;
-import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 
@@ -21,6 +21,7 @@ import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.message.BackwardConceptReport;
+import edu.iastate.pdlreasoner.message.BranchTokenMessage;
 import edu.iastate.pdlreasoner.message.Clash;
 import edu.iastate.pdlreasoner.message.Exit;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
@@ -29,11 +30,10 @@ import edu.iastate.pdlreasoner.message.MakePreImage;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
+import edu.iastate.pdlreasoner.message.ReopenAtoms;
 import edu.iastate.pdlreasoner.message.ResumeExpansion;
 import edu.iastate.pdlreasoner.message.SyncPing;
-import edu.iastate.pdlreasoner.message.ReopenAtoms;
 import edu.iastate.pdlreasoner.message.TableauSlaveMessageProcessor;
-import edu.iastate.pdlreasoner.message.BranchTokenMessage;
 import edu.iastate.pdlreasoner.model.AllValues;
 import edu.iastate.pdlreasoner.model.And;
 import edu.iastate.pdlreasoner.model.Atom;
@@ -63,6 +63,7 @@ public class Tableau {
 	private static enum State { ENTRY, READY, EXPAND, CLASH, EXIT }
 	
 	//Constants once set
+	private ChannelFactory m_ChannelFactory;
 	private Query m_Query;
 	private Channel m_Channel;
 	private Address m_Self;
@@ -83,7 +84,8 @@ public class Tableau {
 	private ConceptExpander m_ConceptExpander;
 	private TableauSlaveMessageProcessor m_MessageProcessor;
 	
-	public Tableau() {
+	public Tableau(ChannelFactory channelFactory) {
+		m_ChannelFactory = channelFactory;
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
 		m_State = State.ENTRY;
 	}
@@ -160,7 +162,7 @@ public class Tableau {
 	}
 
 	private void initChannel() throws ChannelException {
-		m_Channel = new JChannel();
+		m_Channel = m_ChannelFactory.createChannel();
 		m_Channel.connect(ChannelUtil.getSessionName());
 		m_Channel.setReceiver(new ReceiverAdapter() {
 				public void receive(Message msg) {

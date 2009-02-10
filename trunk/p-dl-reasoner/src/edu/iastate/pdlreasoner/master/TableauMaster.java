@@ -12,8 +12,8 @@ import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.ChannelClosedException;
 import org.jgroups.ChannelException;
+import org.jgroups.ChannelFactory;
 import org.jgroups.ChannelNotConnectedException;
-import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
@@ -45,6 +45,7 @@ public class TableauMaster {
 	
 	private static enum State { ENTRY, EXPAND, CLASH, EXIT }
 	
+	private ChannelFactory m_ChannelFactory;
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
 	private Channel m_Channel;
@@ -59,7 +60,8 @@ public class TableauMaster {
 	//Processors
 	private TableauMasterMessageProcessor m_MessageProcessor;
 	
-	public TableauMaster() {
+	public TableauMaster(ChannelFactory channelFactory) {
+		m_ChannelFactory = channelFactory;
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
 		m_State = State.ENTRY;
 	}
@@ -147,7 +149,7 @@ public class TableauMaster {
 	}
 
 	private void initChannel() throws ChannelException {
-		m_Channel = new JChannel();
+		m_Channel = m_ChannelFactory.createChannel();
 		m_Channel.connect(ChannelUtil.getSessionName());
 		m_Channel.setReceiver(new ReceiverAdapter() {
 				public void receive(Message msg) {
