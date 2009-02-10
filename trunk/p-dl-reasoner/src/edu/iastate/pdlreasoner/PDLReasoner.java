@@ -22,10 +22,8 @@ import edu.iastate.pdlreasoner.util.URIUtil;
 public class PDLReasoner {
 
 	public static void main(String[] args) throws ChannelException {
-		ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
-		
-		
 		boolean isMaster = false;
+		boolean isCentralized = false;
 		if (args.length != 2) {
 			printUsage();
 			System.exit(1);
@@ -35,6 +33,8 @@ public class PDLReasoner {
 			isMaster = true;
 		} else if ("-s".equalsIgnoreCase(args[0])) {
 			isMaster = false;
+		} else if ("-c".equalsIgnoreCase(args[0])) {
+			isCentralized = true;
 		} else {
 			printUsage();
 			System.exit(1);
@@ -62,32 +62,44 @@ public class PDLReasoner {
 			System.exit(1);
 		}
 		
-		if (isMaster) {
-			TableauMaster master = new TableauMaster(channelFactory);
-			QueryResult result = null;
-			
-			try {
-				result = master.run(query);
-			} catch (ChannelException e) {
-				e.printStackTrace();
-			} catch (NotEnoughSlavesException e) {
-				e.printStackTrace();
-			}
-			
+		if (isCentralized) {
+			PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
+			QueryResult result = reasoner.run(query);
 			System.out.println(result);
+			
 		} else {
-			Tableau slave = new Tableau(channelFactory);
-
-			try {
-				slave.run(query);
-			} catch (ChannelException e) {
-				e.printStackTrace();
+			ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
+			
+			if (isMaster) {
+				TableauMaster master = new TableauMaster(channelFactory);
+				QueryResult result = null;
+				
+				try {
+					result = master.run(query);
+				} catch (ChannelException e) {
+					e.printStackTrace();
+				} catch (NotEnoughSlavesException e) {
+					e.printStackTrace();
+				}
+				
+				System.out.println(result);
+			} else {
+				Tableau slave = new Tableau(channelFactory);
+	
+				try {
+					slave.run(query);
+				} catch (ChannelException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 	
 	private static void printUsage() {
-		System.err.println("Usage: java PDLReasoner [-m|-s] query.owl");
+		System.err.println("Usage: java PDLReasoner [-m|-s|-c] query.owl");
+		System.err.println("       -m  Execute query as a master reasoner");
+		System.err.println("       -s  Execute query as a slave reasoner");
+		System.err.println("       -c  Execute query as a centralized reasoner");
 	}
 
 }
