@@ -14,7 +14,7 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 
 public class PDLReasonerCentralizedWrapper {
 
-	private static final long SLEEP_TIME = 200;
+	private static final long SLEEP_TIME = 100;
 	
 	private SimulatedChannelFactory m_ChannelFactory;
 	private List<Thread> m_Slaves;
@@ -39,6 +39,7 @@ public class PDLReasonerCentralizedWrapper {
 		
 		while (m_ChannelFactory.getAllChannelAddresses().size() != numSlaves) {
 			try {
+				System.out.println("Sleeping...");
 				Thread.sleep(SLEEP_TIME);
 			} catch (InterruptedException e) {
 			}
