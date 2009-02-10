@@ -1,6 +1,7 @@
 package edu.iastate.pdlreasoner.net.simulated;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -15,40 +16,49 @@ import org.jgroups.Message;
 import org.jgroups.Receiver;
 import org.jgroups.TimeoutException;
 import org.jgroups.View;
+import org.jgroups.ViewId;
 import org.jgroups.stack.ProtocolStack;
 
 public class SimulatedChannel extends Channel {
 	
+	private SimulatedChannelFactory m_Creator;
+	private Address m_LocalAddress;
+	private Receiver m_Receiver;
+
+	public SimulatedChannel(SimulatedChannelFactory creator) {
+		m_Creator = creator;
+		m_LocalAddress = new SimulatedAddress();
+	}
+	
 	@Override
 	public void setReceiver(Receiver r) {
-		//
+		m_Receiver = r;
 	}
 
 	@Override
 	public void send(Message msg) throws ChannelNotConnectedException, ChannelClosedException {
-		//
+		SimulatedChannel dstChannel = m_Creator.getChannel(msg.getDest());
+		dstChannel.m_Receiver.receive(msg);
 	}
 
 	@Override
 	public void send(Address dst, Address src, Serializable obj) throws ChannelNotConnectedException, ChannelClosedException {
-		//
+		send(new Message(dst, src, obj));
 	}
 
 	@Override
 	public void connect(String clusterName) throws ChannelException {
-		//
 	}
 
 	@Override
 	public Address getLocalAddress() {
-		//
-		return null;
+		return m_LocalAddress;
 	}
 
 	@Override
 	public View getView() {
-		//
-		return null;
+		Collection<Address> allAddresses = m_Creator.getAllChannelAddresses();
+		return new View(new ViewId(m_LocalAddress), new Vector<Address>(allAddresses));
 	}
 
 	@Override

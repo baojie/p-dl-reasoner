@@ -2,17 +2,40 @@ package edu.iastate.pdlreasoner.net.simulated;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 
+import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.ChannelException;
 import org.jgroups.ChannelFactory;
 import org.w3c.dom.Element;
 
+import edu.iastate.pdlreasoner.util.CollectionUtil;
+
 public class SimulatedChannelFactory implements ChannelFactory {
 
+	private Map<Address,SimulatedChannel> m_Channels;
+	
+	public SimulatedChannelFactory() {
+		m_Channels = CollectionUtil.makeMap();
+	}
+	
+	public SimulatedChannel getChannel(Address add) {
+		return m_Channels.get(add);
+	}
+	
+	public Collection<Address> getAllChannelAddresses() {
+		return m_Channels.keySet();
+	}
+	
 	@Override
 	public Channel createChannel() throws ChannelException {
-		return null;
+		SimulatedChannel channel = new SimulatedChannel(this);
+		synchronized (m_Channels) {
+			m_Channels.put(channel.getLocalAddress(), channel);
+		}
+		return channel;
 	}
 
 	
