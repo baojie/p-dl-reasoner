@@ -39,7 +39,6 @@ public class PDLReasonerCentralizedWrapper {
 		
 		while (m_ChannelFactory.getAllChannelAddresses().size() != numSlaves) {
 			try {
-				System.out.println("Sleeping...");
 				Thread.sleep(SLEEP_TIME);
 			} catch (InterruptedException e) {
 			}
