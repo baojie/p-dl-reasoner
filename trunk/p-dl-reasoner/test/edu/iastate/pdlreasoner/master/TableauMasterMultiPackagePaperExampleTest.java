@@ -88,11 +88,11 @@ public class TableauMasterMultiPackagePaperExampleTest {
 				makeSomeValues(r, p0C),
 				makeAllValues(r, makeNegation(pID[0], p0C))
 			);
-		Or bigOr = makeOr(bigAnd, makeNegation(pID[1], p1D2));
+		Or bigOr = makeOr(bigAnd, makeNegation(pID[0], p1D2));
 		p[0].addAxiom(p0Top, bigOr);
 		
 		p[1].addAxiom(p1D1, p1D2);
-
+		p = new OntologyPackage[] {p[0], p[1]};
 		assertTrue(runQuery(top[0], pID[0]));
 	}
 	

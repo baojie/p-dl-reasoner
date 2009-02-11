@@ -217,6 +217,9 @@ public class TableauMaster {
 			LOGGER.debug("All prunings completed, resuming expansion.");
 		}
 		
+		//Make sure all tableaux are pruned, especially if the messages processed during synchronization
+		//depend on some branch on or after the clashCause
+		broadcast(new Clash(clashCause));
 		broadcast(new ResumeExpansion(clashCause));
 		m_State = State.EXPAND;
 	}
@@ -234,6 +237,7 @@ public class TableauMaster {
 		public void process(Clash msg) {
 			BranchPointSet clashCause = msg.getCause();
 			if (m_ClashCauses.add(clashCause)) {
+				//Send clash messages early so tableaux can prepare for synchronization
 				broadcast(msg);
 				m_State = State.CLASH;
 			}
