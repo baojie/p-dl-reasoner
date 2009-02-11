@@ -23,7 +23,7 @@ import edu.iastate.pdlreasoner.model.Or;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Top;
 
-public class TableauMasterMultiPackageTest {
+public class MultiPackageTest {
 
 	private PackageID[] pID;
 	private OntologyPackage[] p;

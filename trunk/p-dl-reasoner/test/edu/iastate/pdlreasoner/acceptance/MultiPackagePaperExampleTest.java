@@ -31,7 +31,7 @@ import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.Top;
 
-public class TableauMasterMultiPackagePaperExampleTest {
+public class MultiPackagePaperExampleTest {
 
 	private PackageID[] pID;
 	private OntologyPackage[] p;

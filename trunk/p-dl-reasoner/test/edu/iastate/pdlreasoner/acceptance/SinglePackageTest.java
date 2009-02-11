@@ -33,7 +33,7 @@ import edu.iastate.pdlreasoner.model.Role;
 import edu.iastate.pdlreasoner.model.SomeValues;
 import edu.iastate.pdlreasoner.model.Top;
 
-public class TableauMasterSinglePackageTest {
+public class SinglePackageTest {
 
 	private PackageID pID;
 	private OntologyPackage p;
