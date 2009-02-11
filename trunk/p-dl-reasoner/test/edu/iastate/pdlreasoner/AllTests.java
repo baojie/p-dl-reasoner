@@ -3,10 +3,10 @@ package edu.iastate.pdlreasoner;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import edu.iastate.pdlreasoner.acceptance.TableauMasterMultiPackagePaperExampleTest;
+import edu.iastate.pdlreasoner.acceptance.TableauMasterMultiPackageTest;
+import edu.iastate.pdlreasoner.acceptance.TableauMasterSinglePackageTest;
 import edu.iastate.pdlreasoner.kb.TBoxTest;
-import edu.iastate.pdlreasoner.master.TableauMasterMultiPackagePaperExampleTest;
-import edu.iastate.pdlreasoner.master.TableauMasterMultiPackageTest;
-import edu.iastate.pdlreasoner.master.TableauMasterSinglePackageTest;
 import edu.iastate.pdlreasoner.model.visitor.NNFConverterTest;
 import edu.iastate.pdlreasoner.struct.RingTest;
 import edu.iastate.pdlreasoner.tableau.NodeTest;

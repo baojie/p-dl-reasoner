@@ -1,4 +1,4 @@
-package edu.iastate.pdlreasoner.master;
+package edu.iastate.pdlreasoner.acceptance;
 
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeAtom;
 import static edu.iastate.pdlreasoner.model.ModelFactory.makeOr;
