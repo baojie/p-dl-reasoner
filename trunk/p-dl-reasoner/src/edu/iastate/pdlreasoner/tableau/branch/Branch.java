@@ -71,12 +71,16 @@ public class Branch {
 	public void reopenConceptOnNode() {
 		TracedConceptSet tcSet = m_Node.getLabelsFor(m_Concept.getConcept().getClass());
 		tcSet.reopen(m_Concept);
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Reopening branch concept " + m_Concept + " on node " + m_Node);
+		}
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder()
-			.append("<")
+			.append("\n<")
 			.append(m_Node).append(", ")
 			.append(m_Concept).append(", ")
 			.append(m_ThisPoint).append(", ")
