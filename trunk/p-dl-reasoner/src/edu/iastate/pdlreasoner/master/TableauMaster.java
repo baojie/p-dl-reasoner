@@ -18,7 +18,6 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
-import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
@@ -42,6 +41,7 @@ import edu.iastate.pdlreasoner.util.CollectionUtil;
 public class TableauMaster {
 
 	private static final Logger LOGGER = Logger.getLogger(TableauMaster.class);
+	private static final long SLEEP_TIME = 1000;
 	
 	private static enum State { ENTRY, EXPAND, CLASH, EXIT }
 	
@@ -66,7 +66,7 @@ public class TableauMaster {
 		m_State = State.ENTRY;
 	}
 	
-	public QueryResult run(Query query) throws ChannelException, NotEnoughSlavesException {
+	public QueryResult run(Query query) throws ChannelException {
 		initChannel();
 		connectWithSlaves(query.getOntology().getPackages());
 		initMaster(query);
@@ -164,18 +164,24 @@ public class TableauMaster {
 		m_Self = m_Channel.getLocalAddress();
 	}
 
-	private void connectWithSlaves(List<OntologyPackage> packages) throws NotEnoughSlavesException {
+	private void connectWithSlaves(List<OntologyPackage> packages) {
+		while (true) {
+			View view = m_Channel.getView();
+			int numSlaves = view.getMembers().size() - 1;
+			if (numSlaves >= packages.size()) {
+				break;
+			}
+			
+			try {
+				System.out.println("Waiting for more slaves... " + numSlaves + "/" + packages.size());
+				Thread.sleep(SLEEP_TIME);
+			} catch (InterruptedException e) {
+			}
+		}
+		
 		View view = m_Channel.getView();
 		List<Address> m_SlaveAdds = CollectionUtil.makeList(view.getMembers());
 		m_SlaveAdds.remove(m_Self);
-		if (m_SlaveAdds.size() < packages.size()) {
-			m_Channel.disconnect();
-			m_Channel.close();
-			throw new NotEnoughSlavesException("Ontology has "
-					+ packages.size() + " packages but only "
-					+ m_SlaveAdds.size() + " slaves are available.");
-		}
-
 		m_Tableaux = new TableauTopology(packages, m_SlaveAdds);
 		m_SyncMan = new SyncManager(this, m_Tableaux);
 		

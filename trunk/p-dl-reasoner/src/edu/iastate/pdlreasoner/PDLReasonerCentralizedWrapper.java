@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.jgroups.ChannelException;
 
-import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.master.TableauMaster;
@@ -49,8 +48,6 @@ public class PDLReasonerCentralizedWrapper {
 		try {
 			result = master.run(query);
 		} catch (ChannelException e) {
-			e.printStackTrace();
-		} catch (NotEnoughSlavesException e) {
 			e.printStackTrace();
 		}
 		

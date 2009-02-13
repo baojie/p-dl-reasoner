@@ -9,7 +9,6 @@ import org.jgroups.JChannelFactory;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 
 import edu.iastate.pdlreasoner.exception.IllegalQueryException;
-import edu.iastate.pdlreasoner.exception.NotEnoughSlavesException;
 import edu.iastate.pdlreasoner.exception.OWLDescriptionNotSupportedException;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
@@ -77,8 +76,6 @@ public class PDLReasoner {
 				try {
 					result = master.run(query);
 				} catch (ChannelException e) {
-					e.printStackTrace();
-				} catch (NotEnoughSlavesException e) {
 					e.printStackTrace();
 				}
 				
