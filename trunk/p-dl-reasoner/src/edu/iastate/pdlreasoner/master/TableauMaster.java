@@ -37,11 +37,12 @@ import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
+import edu.iastate.pdlreasoner.util.Timers;
 
 public class TableauMaster {
 
 	private static final Logger LOGGER = Logger.getLogger(TableauMaster.class);
-	private static final long SLEEP_TIME = 1000;
+	private static final long SLEEP_TIME = 2000;
 	
 	private static enum State { ENTRY, EXPAND, CLASH, EXIT }
 	
@@ -67,8 +68,12 @@ public class TableauMaster {
 	}
 	
 	public QueryResult run(Query query) throws ChannelException {
+		Timers.start("network");
 		initChannel();
 		connectWithSlaves(query.getOntology().getPackages());
+		Timers.stop("network");
+		
+		Timers.start("reason");
 		initMaster(query);
 		startExpansion(query);
 		
@@ -102,8 +107,13 @@ public class TableauMaster {
 			LOGGER.debug("Disconnecting and closing channel");
 		}
 		
+		Timers.stop("reason");
+		
+		Timers.start("network");
 		m_Channel.disconnect();
 		m_Channel.close();	
+		Timers.stop("network");
+		
 		return m_Result;
 	}
 	
@@ -173,8 +183,10 @@ public class TableauMaster {
 			}
 			
 			try {
+				Timers.stop("network");
 				System.out.println("Waiting for more slaves... " + numSlaves + "/" + packages.size());
 				Thread.sleep(SLEEP_TIME);
+				Timers.start("network");
 			} catch (InterruptedException e) {
 			}
 		}

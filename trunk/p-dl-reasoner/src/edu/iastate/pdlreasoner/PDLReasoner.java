@@ -15,32 +15,54 @@ import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.kb.owlapi.QueryLoader;
 import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.tableau.Tableau;
+import edu.iastate.pdlreasoner.util.Timers;
 import edu.iastate.pdlreasoner.util.URIUtil;
 
 
 public class PDLReasoner {
+	
+	private boolean m_IsMaster;
+	private boolean m_IsCentralized;
+	private String m_QueryPath;
+	private boolean m_DoProfiling;
 
 	public static void main(String[] args) throws ChannelException {
-		boolean isMaster = false;
-		boolean isCentralized = false;
-		if (args.length != 2) {
-			printUsage();
-			System.exit(1);
+		PDLReasoner reasoner = new PDLReasoner();
+		for (int i = 0; i < args.length; i++) {
+			String arg = args[i].trim();
+
+			if (arg.equalsIgnoreCase("-m")) {
+				reasoner.m_IsMaster = true;
+			} else if (arg.equalsIgnoreCase("-s")) {
+				reasoner.m_IsMaster = false;
+			} else if (arg.equalsIgnoreCase("-c")) {
+				reasoner.m_IsCentralized = true;
+			} else if (arg.equalsIgnoreCase("-t")) {
+				reasoner.m_DoProfiling = true;
+			} else {
+				if (i != args.length - 1) {
+					printUsage();
+					System.exit(1);
+				}
+				
+				reasoner.m_QueryPath = arg;
+			}
 		}
 		
-		if ("-m".equalsIgnoreCase(args[0])) {
-			isMaster = true;
-		} else if ("-s".equalsIgnoreCase(args[0])) {
-			isMaster = false;
-		} else if ("-c".equalsIgnoreCase(args[0])) {
-			isCentralized = true;
-		} else {
-			printUsage();
-			System.exit(1);
-		}
-		
-		String queryPath = args[1];
-		URI queryURI = URIUtil.toURI(queryPath);
+		reasoner.run();
+	}
+	
+	private static void printUsage() {
+		System.err.println("Usage: java PDLReasoner -m|-s|-c [-t] query.owl");
+		System.err.println("       -m  Execute query as a master reasoner");
+		System.err.println("       -s  Execute query as a slave reasoner");
+		System.err.println("       -c  Execute query as a centralized reasoner");
+		System.err.println("       -t  Record and print timings");
+	}
+
+	private void run() throws ChannelException {
+		Timers.start("load");
+		URI queryURI = URIUtil.toURI(m_QueryPath);
 		
 		Query query = null;
 		try {
@@ -61,7 +83,9 @@ public class PDLReasoner {
 			System.exit(1);
 		}
 		
-		if (isCentralized) {
+		Timers.stop("load");
+		
+		if (m_IsCentralized) {
 			PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
 			QueryResult result = reasoner.run(query);
 			System.out.println(result);
@@ -69,7 +93,7 @@ public class PDLReasoner {
 		} else {
 			ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
 			
-			if (isMaster) {
+			if (m_IsMaster) {
 				TableauMaster master = new TableauMaster(channelFactory);
 				QueryResult result = null;
 				
@@ -90,13 +114,10 @@ public class PDLReasoner {
 				}
 			}
 		}
-	}
-	
-	private static void printUsage() {
-		System.err.println("Usage: java PDLReasoner [-m|-s|-c] query.owl");
-		System.err.println("       -m  Execute query as a master reasoner");
-		System.err.println("       -s  Execute query as a slave reasoner");
-		System.err.println("       -c  Execute query as a centralized reasoner");
+		
+		if (m_DoProfiling && (m_IsCentralized || m_IsMaster)) {
+			System.out.println(Timers.printAll());
+		}
 	}
 
 }
