@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.model.AxiomType;
-import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -30,6 +29,7 @@ public class QueryLoader {
 	
 	private OntologyPackageIDStore m_PackageStore;
 	private ConceptConverter m_ConceptConverter;
+	private OntologyConverter m_OntologyConverter;
 
 	public Query loadQuery(URI queryURI) throws OWLOntologyCreationException, IllegalQueryException, OWLDescriptionNotSupportedException {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -51,7 +51,7 @@ public class QueryLoader {
 		
 		List<OntologyPackage> ontologyPackages = CollectionUtil.makeList();
 		for (OWLOntology ontology : importClosure) {
-			OntologyPackage ontologyPackage = loadOntologyPackage(ontology);
+			OntologyPackage ontologyPackage = m_OntologyConverter.convert(ontology);
 			ontologyPackages.add(ontologyPackage);
 		}
 		
@@ -71,26 +71,9 @@ public class QueryLoader {
 		}
 		
 		m_ConceptConverter = new ConceptConverter(m_PackageStore);
+		m_OntologyConverter = new OntologyConverter(m_PackageStore, m_ConceptConverter);
 	}
 	
-	private OntologyPackage loadOntologyPackage(OWLOntology ontology) throws OWLDescriptionNotSupportedException {
-		PackageID packageID = m_PackageStore.getPackageID(ontology.getURI());
-		m_ConceptConverter.setPackageID(packageID);
-		
-		OntologyPackage ontologyPackage = new OntologyPackage(packageID);
-		for (OWLSubClassAxiom axiom : ontology.getAxioms(AxiomType.SUBCLASS)) {
-			OWLDescription owlSub = axiom.getSubClass();
-			OWLDescription owlSup = axiom.getSuperClass();
-			if (owlSup.isOWLThing()) continue;
-			
-			Concept sub = m_ConceptConverter.convert(owlSub);
-			Concept sup = m_ConceptConverter.convert(owlSup);
-			ontologyPackage.addAxiom(sub, sup);
-		}
-		
-		return ontologyPackage;
-	}
-
 	private OWLSubClassAxiom loadQueryAxiom(OWLOntology queryOntology) throws IllegalQueryException {
 		Set<OWLSubClassAxiom> axioms = queryOntology.getAxioms(AxiomType.SUBCLASS);
 		if (axioms.size() != 1) throw new IllegalQueryException("Only one axiom per query is supported.");

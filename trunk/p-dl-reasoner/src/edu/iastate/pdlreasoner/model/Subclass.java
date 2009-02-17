@@ -1,5 +1,8 @@
 package edu.iastate.pdlreasoner.model;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 public class Subclass {
 
 	private Concept m_Sub;
@@ -17,4 +20,10 @@ public class Subclass {
 	public Concept getSup() {
 		return m_Sup;
 	}
+	
+	@Override
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
+	
 }
