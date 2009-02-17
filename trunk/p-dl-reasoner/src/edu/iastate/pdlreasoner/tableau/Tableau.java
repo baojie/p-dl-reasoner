@@ -123,20 +123,28 @@ public class Tableau {
 				if (isComplete()) {
 					replyPing();
 					//Block, until we get a new message
+					if (LOGGER.isInfoEnabled()) {
+						LOGGER.info("Blocked in EXPAND");
+					}
 					processOneTableauMessage();
 				}
 				break;
 			
 			case CLASH:
-				while (!m_MessageQueue.isEmpty()) {
+				while (m_State == State.CLASH && !m_MessageQueue.isEmpty()) {
 					processOneTableauMessage();
 				}
-				//New messages may generate clashes
+				if (m_State != State.CLASH) break;
+				
+				//Messages may generate new clashes
 				checkForClash();
 				
 				replyPing();
 				
 				//Block, the only way to get out of CLASH_SYNC is to get a ResumeExpansion Or an Exit
+				if (LOGGER.isInfoEnabled()) {
+					LOGGER.info("Blocked in CLASH");
+				}
 				processOneTableauMessage();
 				break;
 			}
@@ -213,8 +221,8 @@ public class Tableau {
 		Message msg = takeOneMessage();
 		MessageToSlave tabMsg = (MessageToSlave) msg.getObject();
 		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Received " + tabMsg);
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Received " + tabMsg);
 		}
 		
 		tabMsg.execute(m_MessageProcessor);

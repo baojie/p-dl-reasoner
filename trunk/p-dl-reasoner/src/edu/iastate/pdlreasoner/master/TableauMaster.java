@@ -145,8 +145,8 @@ public class TableauMaster {
 		Message msg = takeOneMessage();
 		MessageToMaster tabMsg = (MessageToMaster) msg.getObject();
 		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Received " + tabMsg);
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Received " + tabMsg);
 		}
 		
 		tabMsg.execute(m_MessageProcessor);
