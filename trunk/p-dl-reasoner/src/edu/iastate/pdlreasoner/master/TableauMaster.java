@@ -190,7 +190,7 @@ public class TableauMaster {
 			
 			try {
 				Timers.stop("network");
-				System.out.println("Waiting for more slaves... " + numSlaves + "/" + packages.size());
+				System.err.println("Waiting for more slaves... " + numSlaves + "/" + packages.size());
 				Thread.sleep(SLEEP_TIME);
 				Timers.start("network");
 			} catch (InterruptedException e) {
