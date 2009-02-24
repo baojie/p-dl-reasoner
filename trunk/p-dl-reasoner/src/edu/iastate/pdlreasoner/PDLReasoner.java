@@ -118,7 +118,7 @@ public class PDLReasoner {
 			if (m_DoProfiling) {
 				System.out.print(Timers.printAll());
 				System.out.print(Profiler.INSTANCE.printAll());
-				System.out.print(result.toShortString());;
+				System.out.println(result.toShortString());;
 			} else {
 				System.out.println(result);
 			}
