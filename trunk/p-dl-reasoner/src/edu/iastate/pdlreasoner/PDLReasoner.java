@@ -15,6 +15,7 @@ import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.kb.owlapi.QueryLoader;
 import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.tableau.Tableau;
+import edu.iastate.pdlreasoner.util.Profiler;
 import edu.iastate.pdlreasoner.util.Timers;
 import edu.iastate.pdlreasoner.util.URIUtil;
 
@@ -85,17 +86,16 @@ public class PDLReasoner {
 		
 		Timers.stop("load");
 		
+		QueryResult result = null;
 		if (m_IsCentralized) {
 			PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
-			QueryResult result = reasoner.run(query);
-			System.out.println(result);
+			result = reasoner.run(query);
 			
 		} else {
 			ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
 			
 			if (m_IsMaster) {
 				TableauMaster master = new TableauMaster(channelFactory);
-				QueryResult result = null;
 				
 				try {
 					result = master.run(query);
@@ -103,7 +103,6 @@ public class PDLReasoner {
 					e.printStackTrace();
 				}
 				
-				System.out.println(result);
 			} else {
 				Tableau slave = new Tableau(channelFactory);
 	
@@ -115,8 +114,14 @@ public class PDLReasoner {
 			}
 		}
 		
-		if (m_DoProfiling && (m_IsCentralized || m_IsMaster)) {
-			System.out.println(Timers.printAll());
+		if (m_IsCentralized || m_IsMaster) {
+			if (m_DoProfiling) {
+				System.out.print(Timers.printAll());
+				System.out.print(Profiler.INSTANCE.printAll());
+				System.out.print(result.toShortString());;
+			} else {
+				System.out.println(result);
+			}
 		}
 	}
 

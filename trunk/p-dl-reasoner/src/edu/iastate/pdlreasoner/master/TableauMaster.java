@@ -37,6 +37,7 @@ import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
+import edu.iastate.pdlreasoner.util.Profiler;
 import edu.iastate.pdlreasoner.util.Timers;
 
 public class TableauMaster {
@@ -129,6 +130,8 @@ public class TableauMaster {
 		}
 		
 		m_SyncMan.intercept(destID, msg);
+		
+		Profiler.INSTANCE.countMessage();
 	}
 
 	private Message takeOneMessage() {
@@ -138,6 +141,9 @@ public class TableauMaster {
 				msg = m_MessageQueue.take();
 			} catch (InterruptedException e) {}
 		} while (msg == null);
+		
+		Profiler.INSTANCE.countMessage();
+		
 		return msg;
 	}
 
@@ -223,6 +229,8 @@ public class TableauMaster {
 	}
 	
 	private void resume() {
+		Profiler.INSTANCE.countClash();	
+		
 		BranchPointSet clashCause = Collections.min(m_ClashCauses, BranchPointSet.ORDER_BY_LATEST_BRANCH_POINT);
 		m_ClashCauses.clear();
 		if (clashCause.isEmpty()) {

@@ -17,6 +17,13 @@ public class QueryResult {
 		return m_IsSat;
 	}
 	
+	public String toShortString() {
+		return new StringBuilder()
+			.append(String.valueOf(!m_IsSat))
+			.append(",")
+			.append(m_Query.getQuery()).toString();
+	}
+	
 	@Override
 	public String toString() {
 		return new StringBuilder()

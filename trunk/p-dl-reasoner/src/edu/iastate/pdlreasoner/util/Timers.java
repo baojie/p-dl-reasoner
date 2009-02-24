@@ -29,9 +29,9 @@ public class Timers {
 		for (String key : keys) {
 			Timer timer = m_Timers.get(key);
 			builder.append(key)
-				.append("\t")
+				.append("=")
 				.append(timer.getTotalTime())
-				.append("\t");
+				.append(",");
 		}
 		
 		return builder.toString();
