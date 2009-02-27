@@ -30,7 +30,9 @@ public class SimulatedChannelFactory implements ChannelFactory {
 	}
 	
 	public void removeChannel(Address localAddress) {
-		m_Channels.remove(localAddress);
+		synchronized (m_Channels) {
+			m_Channels.remove(localAddress);
+		}
 	}
 
 	
