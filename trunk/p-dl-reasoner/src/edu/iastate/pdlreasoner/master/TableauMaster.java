@@ -184,7 +184,7 @@ public class TableauMaster {
 	private void waitForSlavesToDisconnect() {
 		while (true) {
 			View view = m_Channel.getView();
-			int numSlaves = view.getMembers().size();
+			int numSlaves = view.getMembers().size() - 1;
 			if (numSlaves == 0) {
 				break;
 			}
