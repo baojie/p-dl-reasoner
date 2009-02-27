@@ -43,7 +43,7 @@ import edu.iastate.pdlreasoner.util.Timers;
 public class TableauMaster {
 
 	private static final Logger LOGGER = Logger.getLogger(TableauMaster.class);
-	private static final long SLEEP_TIME = 2000;
+	private static final long SLEEP_TIME = 500;
 	
 	private static enum State { ENTRY, EXPAND, CLASH, EXIT }
 	
