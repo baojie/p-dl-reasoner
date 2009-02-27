@@ -111,6 +111,7 @@ public class TableauMaster {
 		Timers.stop("reason");
 		
 		Timers.start("network");
+		waitForSlavesToDisconnect();
 		m_Channel.disconnect();
 		m_Channel.close();	
 		Timers.stop("network");
@@ -178,6 +179,24 @@ public class TableauMaster {
 				}
 			});
 		m_Self = m_Channel.getLocalAddress();
+	}
+
+	private void waitForSlavesToDisconnect() {
+		while (true) {
+			View view = m_Channel.getView();
+			int numSlaves = view.getMembers().size();
+			if (numSlaves == 0) {
+				break;
+			}
+			
+			try {
+				Timers.stop("network");
+				System.err.println("Waiting for slaves to disconnect... " + numSlaves);
+				Thread.sleep(SLEEP_TIME);
+				Timers.start("network");
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 	private void connectWithSlaves(List<OntologyPackage> packages) {
