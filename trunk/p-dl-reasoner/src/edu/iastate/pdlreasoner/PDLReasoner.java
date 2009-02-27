@@ -14,6 +14,7 @@ import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.kb.owlapi.QueryLoader;
 import edu.iastate.pdlreasoner.master.TableauMaster;
+import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.tableau.Tableau;
 import edu.iastate.pdlreasoner.util.Profiler;
 import edu.iastate.pdlreasoner.util.Timers;
@@ -85,6 +86,8 @@ public class PDLReasoner {
 		}
 		
 		Timers.stop("load");
+		
+		ChannelUtil.setSessionName(m_QueryPath);
 		
 		QueryResult result = null;
 		if (m_IsCentralized) {
