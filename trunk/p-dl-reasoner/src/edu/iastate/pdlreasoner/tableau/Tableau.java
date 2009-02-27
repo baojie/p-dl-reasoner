@@ -426,6 +426,13 @@ public class Tableau {
 		@Override
 		public void process(ForwardConceptReport msg) {
 			Node node = m_Graph.get(msg.getImportTarget());
+			if (node == null) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + " node has been pruned for a forward concept report.");
+				}
+				return;
+			}
+
 			node.addLabel(msg.getConcept());
 			
 			if (LOGGER.isDebugEnabled()) {
@@ -436,6 +443,13 @@ public class Tableau {
 		@Override
 		public void process(BackwardConceptReport msg) {
 			Node node = m_Graph.get(msg.getImportSource());
+			if (node == null) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + " node has been pruned for a backward concept report.");
+				}
+				return;
+			}
+			
 			TracedConcept concept = msg.getConcept();
 			BranchPointSet unionDepends = BranchPointSet.union(node.getDependency(), concept.getDependency());
 			node.addLabel(new TracedConcept(concept.getConcept(), unionDepends));
