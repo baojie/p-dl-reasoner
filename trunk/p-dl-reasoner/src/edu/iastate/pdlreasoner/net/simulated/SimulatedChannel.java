@@ -63,6 +63,7 @@ public class SimulatedChannel extends Channel {
 
 	@Override
 	public void disconnect() {
+		m_Creator.removeChannel(m_LocalAddress);
 	}
 
 	@Override

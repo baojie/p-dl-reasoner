@@ -29,6 +29,11 @@ public class SimulatedChannelFactory implements ChannelFactory {
 		return m_Channels.keySet();
 	}
 	
+	public void removeChannel(Address localAddress) {
+		m_Channels.remove(localAddress);
+	}
+
+	
 	@Override
 	public Channel createChannel() throws ChannelException {
 		SimulatedChannel channel = new SimulatedChannel(this);
@@ -84,4 +89,5 @@ public class SimulatedChannelFactory implements ChannelFactory {
 		throw new UnsupportedOperationException();
 	}
 
+	
 }
