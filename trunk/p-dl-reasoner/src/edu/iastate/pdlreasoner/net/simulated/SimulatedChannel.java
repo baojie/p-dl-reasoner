@@ -1,5 +1,10 @@
 package edu.iastate.pdlreasoner.net.simulated;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +42,21 @@ public class SimulatedChannel extends Channel {
 
 	@Override
 	public void send(Message msg) throws ChannelNotConnectedException, ChannelClosedException {
+		//Simulate Serialization
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oOut = new ObjectOutputStream(baos);
+			oOut.writeObject(msg.getObject());
+			oOut.close();
+			byte[] byteArray = baos.toByteArray();
+			ObjectInputStream oIn = new ObjectInputStream(new ByteArrayInputStream(byteArray));
+			oIn.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 		SimulatedChannel dstChannel = m_Creator.getChannel(msg.getDest());
 		dstChannel.m_Receiver.receive(msg);
 	}
