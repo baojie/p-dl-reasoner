@@ -162,6 +162,10 @@ public class Tableau {
 		Message channelMsg = new Message(m_Master, m_Self, msg);
 		try {
 			m_Channel.send(channelMsg);
+			
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("Sent " + msg);
+			}
 		} catch (ChannelNotConnectedException e) {
 			throw new RuntimeException(e);
 		} catch (ChannelClosedException e) {
