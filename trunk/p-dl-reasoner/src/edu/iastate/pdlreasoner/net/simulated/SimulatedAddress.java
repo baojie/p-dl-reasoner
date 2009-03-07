@@ -21,7 +21,7 @@ public class SimulatedAddress implements Address {
 	}
 
 	@Override
-	public int compareTo(Address o) {
+	public int compareTo(Object o) {
 		return hashCode() - o.hashCode();
 	}
 

@@ -22,7 +22,6 @@ import org.jgroups.Receiver;
 import org.jgroups.TimeoutException;
 import org.jgroups.View;
 import org.jgroups.ViewId;
-import org.jgroups.stack.ProtocolStack;
 
 public class SimulatedChannel extends Channel {
 	
@@ -139,11 +138,6 @@ public class SimulatedChannel extends Channel {
 
 	@Override
 	public Object getOpt(int arg0) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public ProtocolStack getProtocolStack() {
 		throw new UnsupportedOperationException();
 	}
 
