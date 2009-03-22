@@ -44,6 +44,8 @@ public class OntologyConverter {
 			axiom.accept(axiomConverter);
 		}
 		
+		ontologyPackage.init();
+		
 		return ontologyPackage;
 	}
 

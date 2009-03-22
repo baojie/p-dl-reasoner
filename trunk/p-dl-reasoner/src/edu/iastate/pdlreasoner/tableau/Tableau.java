@@ -90,8 +90,8 @@ public class Tableau {
 		m_State = State.ENTRY;
 	}
 	
-	public void run(Query query) throws ChannelException {
-		m_Query = query;
+	public void run(OntologyPackage ontology) throws ChannelException {
+		m_Query = ontology;
 		initChannel();
 		
 		while (m_State != State.EXIT) {
