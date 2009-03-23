@@ -184,9 +184,11 @@ public class PDLReasoner {
 				}
 				
 			} else {
+				Timers.start("load");
 				OntologyPackage ontology = loadOntology(m_OntologyPath);
 				Tableau slave = new Tableau(channelFactory);
-	
+				Timers.stop("load");
+				
 				try {
 					slave.run(ontology);
 				} catch (ChannelException e) {
