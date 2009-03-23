@@ -2,6 +2,7 @@ package edu.iastate.pdlreasoner.kb;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -19,12 +20,12 @@ public class ImportGraph extends MultiLabeledDirectedGraph<PackageID,Concept> {
 
 	private static final long serialVersionUID = 1L;
 
-	public ImportGraph(List<OntologyPackage> packages) {
-		for (OntologyPackage pack : packages) {
-			PackageID homePackageID = pack.getID();
-			MultiValuedMap<PackageID, Concept> externalConcepts = pack.getExternalConcepts();
-			for (Entry<PackageID, Set<Concept>> entry : externalConcepts.entrySet()) {
-				addLabels(entry.getKey(), homePackageID, entry.getValue());
+	public ImportGraph(Map<PackageID, MultiValuedMap<PackageID, Concept>> allExternalConcepts) {
+		for (Entry<PackageID, MultiValuedMap<PackageID, Concept>> entry : allExternalConcepts.entrySet()) {
+			PackageID homePackageID = entry.getKey();
+			MultiValuedMap<PackageID, Concept> externalConcepts = entry.getValue();
+			for (Entry<PackageID, Set<Concept>> packageEntry : externalConcepts.entrySet()) {
+				addLabels(packageEntry.getKey(), homePackageID, packageEntry.getValue());
 			}
 		}
 		

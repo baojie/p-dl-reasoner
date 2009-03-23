@@ -1,5 +1,6 @@
 package edu.iastate.pdlreasoner.tableau;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -17,7 +18,6 @@ import org.jgroups.ReceiverAdapter;
 
 import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
-import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.TBox;
 import edu.iastate.pdlreasoner.master.graph.GlobalNodeID;
 import edu.iastate.pdlreasoner.message.BackwardConceptReport;
@@ -27,7 +27,6 @@ import edu.iastate.pdlreasoner.message.Exit;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MakePreImage;
-import edu.iastate.pdlreasoner.message.MessageToMaster;
 import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
 import edu.iastate.pdlreasoner.message.ReopenAtoms;
@@ -64,14 +63,13 @@ public class Tableau {
 	
 	//Constants once set
 	private ChannelFactory m_ChannelFactory;
-	private Query m_Query;
 	private Channel m_Channel;
 	private Address m_Self;
 	private Address m_Master;
-	private PackageID m_AssignedPackageID;
-	private OntologyPackage m_AssignedPackage;
-	private ImportGraph m_ImportGraph;
+	private OntologyPackage m_Ontology;
+	private PackageID m_OntologyID;
 	private TBox m_TBox;
+	private ImportGraph m_ImportGraph;
 	
 	//Variables
 	private BlockingQueue<Message> m_MessageQueue;
@@ -91,7 +89,9 @@ public class Tableau {
 	}
 	
 	public void run(OntologyPackage ontology) throws ChannelException {
-		m_Query = ontology;
+		m_Ontology = ontology;
+		m_OntologyID = ontology.getID();
+		m_TBox = ontology.getTBox();
 		initChannel();
 		
 		while (m_State != State.EXIT) {
@@ -100,7 +100,13 @@ public class Tableau {
 			case ENTRY:
 				msg = takeOneMessage();
 				m_Master = msg.getSrc();
-				m_AssignedPackageID = (PackageID) msg.getObject();
+				
+				sendToMaster(m_Ontology.getID());
+				sendToMaster(m_Ontology.getExternalConcepts());
+				
+				msg = takeOneMessage();
+				m_ImportGraph = (ImportGraph) msg.getObject();
+				
 				initTableau();
 				m_State = State.READY;
 				break;
@@ -158,7 +164,7 @@ public class Tableau {
 		m_Channel.close();
 	}
 
-	public void sendToMaster(MessageToMaster msg) {
+	public void sendToMaster(Serializable msg) {
 		Message channelMsg = new Message(m_Master, m_Self, msg);
 		try {
 			m_Channel.send(channelMsg);
@@ -189,18 +195,8 @@ public class Tableau {
 		m_Self = m_Channel.getLocalAddress(); 
 	}
 
-	private void initTableau() {
-		m_ImportGraph = m_Query.getOntology().getImportGraph();
-		
-		for (OntologyPackage pack : m_Query.getOntology().getPackages()) {
-			if (pack.getID().equals(m_AssignedPackageID)) {
-				m_AssignedPackage = pack;
-				break;
-			}
-		}
-		
-		m_TBox = m_AssignedPackage.getTBox();
-		m_Graph = new TableauGraph(m_AssignedPackageID);
+	private void initTableau() {		
+		m_Graph = new TableauGraph(m_OntologyID);
 		m_Token = null;
 		m_LastPingRequest = null;
 		m_ConceptExpander = new ConceptExpander();
@@ -246,7 +242,7 @@ public class Tableau {
 			hasChanged = hasChanged | expand(open.getLabelsFor(AllValues.class));
 			
 			if (LOGGER.isDebugEnabled() && hasChanged) {
-				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied deterministic rules on node " + open + ": " + open.getLabels());
+				LOGGER.debug(m_OntologyID.toStringWithBracket() + "applied deterministic rules on node " + open + ": " + open.getLabels());
 			}
 			
 			if (m_Token != null) {
@@ -271,7 +267,7 @@ public class Tableau {
 		if (clashCause == null) return;
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "broadcasting clash " + clashCause);
+			LOGGER.debug(m_OntologyID.toStringWithBracket() + "broadcasting clash " + clashCause);
 		}
 		
 		sendToMaster(new Clash(clashCause));
@@ -288,7 +284,7 @@ public class Tableau {
 		if (m_Token != null) {
 			BranchToken temp = m_Token;
 			m_Token = null;
-			sendToMaster(new BranchTokenMessage(m_AssignedPackageID, temp));
+			sendToMaster(new BranchTokenMessage(m_OntologyID, temp));
 		}
 	}
 
@@ -300,7 +296,7 @@ public class Tableau {
 		}
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied UR on node " + n + ": " + n.getLabels());
+			LOGGER.debug(m_OntologyID.toStringWithBracket() + "applied UR on node " + n + ": " + n.getLabels());
 		}
 	}
 	
@@ -321,18 +317,18 @@ public class Tableau {
 
 		private void visitAtomOrTop(ContextualizedConcept c) {
 			PackageID context = c.getContext();
-			if (!m_AssignedPackageID.equals(context)) {
+			if (!m_OntologyID.equals(context)) {
 				GlobalNodeID importSource = GlobalNodeID.makeWithUnknownID(context);
 				GlobalNodeID importTarget = m_Node.getGlobalNodeID();
 				BackwardConceptReport backward = new BackwardConceptReport(importSource, importTarget, m_Concept);
 				
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "sending " + backward);
+					LOGGER.debug(m_OntologyID.toStringWithBracket() + "sending " + backward);
 				}
 				
 				sendToMaster(backward);
 			} else {
-				List<PackageID> importers = m_ImportGraph.getImportersOf(m_AssignedPackageID, c);
+				List<PackageID> importers = m_ImportGraph.getImportersOf(m_OntologyID, c);
 				if (importers != null) {
 					GlobalNodeID importSource = m_Node.getGlobalNodeID();
 					for (PackageID importer : importers) {
@@ -340,7 +336,7 @@ public class Tableau {
 						ForwardConceptReport forward = new ForwardConceptReport(importSource, importTarget, m_Concept);
 
 						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "sending " + forward);
+							LOGGER.debug(m_OntologyID.toStringWithBracket() + "sending " + forward);
 						}
 
 						sendToMaster(forward);
@@ -432,7 +428,7 @@ public class Tableau {
 			Node node = m_Graph.get(msg.getImportTarget());
 			if (node == null) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + " node has been pruned for a forward concept report.");
+					LOGGER.debug(m_OntologyID.toStringWithBracket() + " node has been pruned for a forward concept report.");
 				}
 				return;
 			}
@@ -440,7 +436,7 @@ public class Tableau {
 			node.addLabel(msg.getConcept());
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied forward concept report on node " + node + ": " + node.getLabels());
+				LOGGER.debug(m_OntologyID.toStringWithBracket() + "applied forward concept report on node " + node + ": " + node.getLabels());
 			}
 		}
 
@@ -449,7 +445,7 @@ public class Tableau {
 			Node node = m_Graph.get(msg.getImportSource());
 			if (node == null) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + " node has been pruned for a backward concept report.");
+					LOGGER.debug(m_OntologyID.toStringWithBracket() + " node has been pruned for a backward concept report.");
 				}
 				return;
 			}
@@ -459,7 +455,7 @@ public class Tableau {
 			node.addLabel(new TracedConcept(concept.getConcept(), unionDepends));
 
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "applied backward concept report on node " + node + ": " + node.getLabels());
+				LOGGER.debug(m_OntologyID.toStringWithBracket() + "applied backward concept report on node " + node + ": " + node.getLabels());
 			}
 		}
 
@@ -482,7 +478,7 @@ public class Tableau {
 			root.addLabel(TracedConcept.makeOrigin(msg.getConcept()));
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(m_AssignedPackageID.toStringWithBracket() + "starting with global root " + root + ": " + root.getLabels());
+				LOGGER.debug(m_OntologyID.toStringWithBracket() + "starting with global root " + root + ": " + root.getLabels());
 			}
 			
 			applyUniversalRestriction(root);

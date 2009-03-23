@@ -25,8 +25,9 @@ import edu.iastate.pdlreasoner.util.URIUtil;
 
 public class PDLReasoner {
 	
-	private boolean m_IsMaster;
 	private boolean m_IsCentralized;
+	private boolean m_IsMaster;
+	private int m_NumSlaves;
 	private String m_OntologyPath;
 	private String m_QueryPath;
 	private String m_Witness;
@@ -39,6 +40,12 @@ public class PDLReasoner {
 
 			if (arg.equalsIgnoreCase("-m")) {
 				reasoner.m_IsMaster = true;
+				if (++i >= args.length) {
+					printUsage();
+					System.exit(1);
+				}
+				
+				reasoner.m_NumSlaves = Integer.parseInt(args[i]);
 			} else if (arg.equalsIgnoreCase("-s")) {
 				reasoner.m_IsMaster = false;
 				if (++i >= args.length) {
@@ -68,7 +75,7 @@ public class PDLReasoner {
 	private static void printUsage() {
 		System.err.println("Usage: java PDLReasoner [OPTIONS] query.owl witnessURI");
 		System.err.println("  OPTIONS:");
-		System.err.println("       -m               Execute as master");
+		System.err.println("       -m N             Execute as master and waits for N slaves");
 		System.err.println("       -s ontology.owl  Execute as slave with an ontology");
 		//System.err.println("       -c  Execute query as a centralized reasoner");
 		System.err.println("       -t               Record and print timings");
@@ -111,7 +118,7 @@ public class PDLReasoner {
 				TableauMaster master = new TableauMaster(channelFactory);
 				
 				try {
-					result = master.run(query);
+					result = master.run(query, m_NumSlaves);
 				} catch (ChannelException e) {
 					e.printStackTrace();
 				}

@@ -16,7 +16,7 @@ public class SyncManager {
 	private Map<PackageID,SyncPing> m_LastResponses;
 	private boolean m_IsInVerifyingPhase;
 	
-	public SyncManager(TableauMaster tableauMaster, TableauTopology tabs) {
+	public SyncManager(TableauMaster tableauMaster, Iterable<PackageID> tabs) {
 		m_TableauMaster = tableauMaster;
 		m_LastRequests = CollectionUtil.makeMap();
 		m_LastResponses = CollectionUtil.makeMap();

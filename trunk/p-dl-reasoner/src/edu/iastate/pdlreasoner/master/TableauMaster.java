@@ -3,6 +3,7 @@ package edu.iastate.pdlreasoner.master;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,7 +19,7 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
-import edu.iastate.pdlreasoner.kb.OntologyPackage;
+import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.message.BackwardConceptReport;
@@ -28,13 +29,16 @@ import edu.iastate.pdlreasoner.message.Exit;
 import edu.iastate.pdlreasoner.message.ForwardConceptReport;
 import edu.iastate.pdlreasoner.message.MakeGlobalRoot;
 import edu.iastate.pdlreasoner.message.MessageToMaster;
-import edu.iastate.pdlreasoner.message.MessageToSlave;
 import edu.iastate.pdlreasoner.message.Null;
 import edu.iastate.pdlreasoner.message.ResumeExpansion;
 import edu.iastate.pdlreasoner.message.SyncPing;
 import edu.iastate.pdlreasoner.message.TableauMasterMessageProcessor;
+import edu.iastate.pdlreasoner.model.Concept;
 import edu.iastate.pdlreasoner.model.PackageID;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
+import edu.iastate.pdlreasoner.struct.BiMap;
+import edu.iastate.pdlreasoner.struct.MultiValuedMap;
+import edu.iastate.pdlreasoner.struct.Ring;
 import edu.iastate.pdlreasoner.tableau.branch.BranchPointSet;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
 import edu.iastate.pdlreasoner.util.Profiler;
@@ -53,7 +57,9 @@ public class TableauMaster {
 	private Channel m_Channel;
 	private Address m_Self;
 	
-	private TableauTopology m_Tableaux;
+	private BiMap<Address, PackageID> m_Slaves;
+	private Ring<PackageID> m_Tableaux;
+	private ImportGraph m_ImportGraph;
 	private InterTableauManager m_InterTableauMan;
 	private SyncManager m_SyncMan;
 	private Set<BranchPointSet> m_ClashCauses;
@@ -66,20 +72,26 @@ public class TableauMaster {
 		m_ChannelFactory = channelFactory;
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
 		m_State = State.ENTRY;
+		m_Slaves = new BiMap<Address, PackageID>();
 	}
 	
-	public QueryResult run(Query query) throws ChannelException {
+	public QueryResult run(Query query, int numSlaves) throws ChannelException {		
 		Timers.start("network");
 		initChannel();
-		connectWithSlaves(query.getOntology().getPackages());
+		waitForSlavesToConnect(numSlaves);
 		Timers.stop("network");
-		
 		Timers.start("reason");
-		initMaster(query);
-		startExpansion(query);
 		
 		while (m_State != State.EXIT) {
 			switch (m_State) {
+			case ENTRY:
+				getSlaveData(numSlaves);
+				broadcast(m_ImportGraph);
+				initMaster(query);
+				startExpansion(query);
+				
+				break;
+				
 			case EXPAND:
 				m_SyncMan.restartSync();
 				while (m_State == State.EXPAND && (!m_MessageQueue.isEmpty() || !m_SyncMan.isSynchronized())) {
@@ -120,7 +132,7 @@ public class TableauMaster {
 	}
 	
 	public void send(PackageID destID, Serializable msg) {
-		Address dest = m_Tableaux.get(destID);
+		Address dest = m_Slaves.getA(destID);
 		Message channelMsg = new Message(dest, m_Self, msg);
 		try {
 			m_Channel.send(channelMsg);
@@ -163,7 +175,7 @@ public class TableauMaster {
 		tabMsg.execute(m_MessageProcessor);
 	}
 	
-	private void broadcast(MessageToSlave msg) {
+	private void broadcast(Serializable msg) {
 		for (PackageID packageID : m_Tableaux) {
 			send(packageID, msg);
 		}
@@ -203,17 +215,17 @@ public class TableauMaster {
 		}
 	}
 
-	private void connectWithSlaves(List<OntologyPackage> packages) {
+	private void waitForSlavesToConnect(int numSlaves) {
 		while (true) {
 			View view = m_Channel.getView();
-			int numSlaves = view.getMembers().size() - 1;
-			if (numSlaves >= packages.size()) {
+			int currentNumSlaves = view.getMembers().size() - 1;
+			if (currentNumSlaves >= numSlaves) {
 				break;
 			}
 			
 			try {
 				Timers.stop("network");
-				System.err.println("Waiting for more slaves... " + numSlaves + "/" + packages.size());
+				System.err.println("Waiting for more slaves... " + currentNumSlaves + "/" + numSlaves);
 				Thread.sleep(SLEEP_TIME);
 				Timers.start("network");
 			} catch (InterruptedException e) {
@@ -221,18 +233,46 @@ public class TableauMaster {
 		}
 		
 		View view = m_Channel.getView();
-		List<Address> m_SlaveAdds = CollectionUtil.makeList(view.getMembers());
-		m_SlaveAdds.remove(m_Self);
-		m_Tableaux = new TableauTopology(packages, m_SlaveAdds);
-		m_SyncMan = new SyncManager(this, m_Tableaux);
+		List<Address> slaveAdds = CollectionUtil.makeList(view.getMembers());
+		slaveAdds.remove(m_Self);
 		
-		for (PackageID packageID : m_Tableaux) {
-			send(packageID, packageID);
+		for (Address slave : slaveAdds) {
+			Message channelMsg = new Message(slave, m_Self, Null.INSTANCE);
+			try {
+				m_Channel.send(channelMsg);
+			} catch (ChannelNotConnectedException e) {
+				throw new RuntimeException(e);
+			} catch (ChannelClosedException e) {
+				throw new RuntimeException(e);
+			}
 		}
+	}	
+
+	@SuppressWarnings("unchecked")
+	private void getSlaveData(int numSlaves) {
+		Map<PackageID, MultiValuedMap<PackageID, Concept>> allExternalConcepts = CollectionUtil.makeMap();
+		
+		while (allExternalConcepts.size() != numSlaves) {
+			Message msg = takeOneMessage();
+			Address src = msg.getSrc();
+			Object obj = msg.getObject();
+			if (obj instanceof PackageID) {
+				PackageID packageID = (PackageID) obj;
+				m_Slaves.add(src, packageID);
+			} else {
+				MultiValuedMap<PackageID, Concept> externalConcepts = (MultiValuedMap<PackageID, Concept>) obj;
+				PackageID packageID = m_Slaves.getB(src);
+				allExternalConcepts.put(packageID, externalConcepts);
+			}
+		}
+		
+		m_Tableaux = new Ring<PackageID>(allExternalConcepts.keySet());
+		m_SyncMan = new SyncManager(this, m_Tableaux);
+		m_ImportGraph = new ImportGraph(allExternalConcepts);
 	}
 
 	private void initMaster(Query query) {
-		m_InterTableauMan = new InterTableauManager(this, query.getOntology().getImportGraph());
+		m_InterTableauMan = new InterTableauManager(this, m_ImportGraph);
 		m_ClashCauses = CollectionUtil.makeSet();
 		m_MessageProcessor = new TableauMessageProcessorImpl();
 		m_Result = new QueryResult();

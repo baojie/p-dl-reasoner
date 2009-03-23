@@ -3,10 +3,11 @@ package edu.iastate.pdlreasoner.struct;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Ring<E> {
+public class Ring<E> implements Iterable<E> {
 	
 	private Map<E, E> m_Ring;
 
@@ -23,6 +24,11 @@ public class Ring<E> {
 	
 	public E getNext(E e) {
 		return m_Ring.get(e);
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		return m_Ring.keySet().iterator();
 	}
 	
 }
