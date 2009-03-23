@@ -157,8 +157,10 @@ public class PDLReasoner {
 		
 		QueryResult result = null;
 		if (m_IsCentralized) {
+			Timers.start("load");
 			Query query = loadQuery(m_QueryPath, m_WitnessPath);
 			List<OntologyPackage> ontologies = loadOntologies(m_OntologyListPath);
+			Timers.stop("load");
 			
 			PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
 			result = reasoner.run(query, ontologies);
@@ -167,8 +169,10 @@ public class PDLReasoner {
 			ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
 			
 			if (m_IsMaster) {
+				Timers.start("load");
 				Query query = loadQuery(m_QueryPath, m_WitnessPath);
 				TableauMaster master = new TableauMaster(channelFactory);
+				Timers.stop("load");
 				
 				try {
 					result = master.run(query, m_NumSlaves);
