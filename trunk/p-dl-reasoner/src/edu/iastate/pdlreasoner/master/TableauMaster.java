@@ -257,6 +257,10 @@ public class TableauMaster {
 		m_Tableaux = new Ring<PackageID>(allExternalConcepts.keySet());
 		m_SyncMan = new SyncManager(this, m_Tableaux);
 		m_ImportGraph = new ImportGraph(allExternalConcepts);
+		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.info("Import Graph=" + m_ImportGraph);
+		}
 	}
 
 	private void initMaster(Query query) {
@@ -314,7 +318,7 @@ public class TableauMaster {
 			if (numSlaves == 0) {
 				break;
 			}
-			
+			System.err.println(view.getMembers());
 			try {
 				Timers.stop("network");
 				System.err.println("Waiting for slaves to disconnect... " + numSlaves);

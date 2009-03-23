@@ -32,7 +32,7 @@ public class PackageID implements Serializable {
 	
 	@Override
 	public String toString() {
-		return m_ShortURI;
+		return m_URI.toString();//m_ShortURI;
 	}
 
 	@Override

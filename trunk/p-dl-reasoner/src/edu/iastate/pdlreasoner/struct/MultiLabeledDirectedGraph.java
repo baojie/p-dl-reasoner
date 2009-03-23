@@ -1,5 +1,6 @@
 package edu.iastate.pdlreasoner.struct;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.jgrapht.EdgeFactory;
@@ -10,11 +11,7 @@ public class MultiLabeledDirectedGraph<V,L> extends SimpleDirectedGraph<V,MultiL
 	private static final long serialVersionUID = 1L;
 
 	public MultiLabeledDirectedGraph() {
-		super(new EdgeFactory<V,MultiLabeledEdge<L>>() {
-				public MultiLabeledEdge<L> createEdge(V source, V target) {
-					return new MultiLabeledEdge<L>();
-				}
-			});
+		super(new MultiLabeledEdgeFactory<V,L>());
 	}
 	
 	public void addLabels(V source, V target, Set<L> labels) {
@@ -27,4 +24,13 @@ public class MultiLabeledDirectedGraph<V,L> extends SimpleDirectedGraph<V,MultiL
 		
 		edge.addLabels(labels);
 	}
+	
+	private static final class MultiLabeledEdgeFactory<V,L> implements EdgeFactory<V, MultiLabeledEdge<L>>, Serializable {
+		private static final long serialVersionUID = 1L;
+
+		public MultiLabeledEdge<L> createEdge(V source, V target) {
+			return new MultiLabeledEdge<L>();
+		}
+	}
+
 }

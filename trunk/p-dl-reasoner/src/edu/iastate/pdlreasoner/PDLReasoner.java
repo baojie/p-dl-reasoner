@@ -34,6 +34,11 @@ public class PDLReasoner {
 	private boolean m_DoProfiling;
 
 	public static void main(String[] args) throws ChannelException {
+		if (args.length == 0) {
+			printUsage();
+			System.exit(1);
+		}
+		
 		PDLReasoner reasoner = new PDLReasoner();
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i].trim();
@@ -65,7 +70,8 @@ public class PDLReasoner {
 				}
 				
 				reasoner.m_QueryPath = arg;
-				reasoner.m_Witness = args[i + 1].trim();
+				i++;
+				reasoner.m_Witness = args[i].trim();
 			}
 		}
 		

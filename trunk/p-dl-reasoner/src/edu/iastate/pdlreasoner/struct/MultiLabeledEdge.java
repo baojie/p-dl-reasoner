@@ -1,9 +1,12 @@
 package edu.iastate.pdlreasoner.struct;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MultiLabeledEdge<T> {
+public class MultiLabeledEdge<T> implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private Set<T> m_Labels;
 	
