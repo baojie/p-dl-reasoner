@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.jgroups.ChannelException;
 
+import edu.iastate.pdlreasoner.exception.IllegalQueryException;
+import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
 import edu.iastate.pdlreasoner.master.TableauMaster;
@@ -23,12 +25,11 @@ public class PDLReasonerCentralizedWrapper {
 		m_Slaves = CollectionUtil.makeList();
 	}
 	
-	public QueryResult run(Query query) {
-		
-		int numSlaves = query.getOntology().getPackages().size();
-		for (int i = 0; i < numSlaves; i++) {
+	public QueryResult run(Query query, List<OntologyPackage> ontologies) {
+		int numSlaves = ontologies.size();
+		for (OntologyPackage ontology : ontologies) {
 			Tableau slave = new Tableau(m_ChannelFactory);
-			TableauRunner slaveRunner = new TableauRunner(slave, query);
+			TableauRunner slaveRunner = new TableauRunner(slave, ontology);
 			m_Slaves.add(new Thread(slaveRunner));
 		}
 		
@@ -46,8 +47,10 @@ public class PDLReasonerCentralizedWrapper {
 		TableauMaster master = new TableauMaster(m_ChannelFactory);
 		QueryResult result = null;
 		try {
-			result = master.run(query);
+			result = master.run(query, numSlaves);
 		} catch (ChannelException e) {
+			e.printStackTrace();
+		} catch (IllegalQueryException e) {
 			e.printStackTrace();
 		}
 		
@@ -67,17 +70,17 @@ public class PDLReasonerCentralizedWrapper {
 	private static class TableauRunner implements Runnable {
 
 		private Tableau m_Tableau;
-		private Query m_Query;
+		private OntologyPackage m_Ontology;
 
-		public TableauRunner(Tableau tab, Query query) {
+		public TableauRunner(Tableau tab, OntologyPackage ontology) {
 			m_Tableau = tab;
-			m_Query = query;
+			m_Ontology = ontology;
 		}
 		
 		@Override
 		public void run() {
 			try {
-				m_Tableau.run(m_Query);
+				m_Tableau.run(m_Ontology);
 			} catch (ChannelException e) {
 				e.printStackTrace();
 			}

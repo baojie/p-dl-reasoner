@@ -1,6 +1,11 @@
 package edu.iastate.pdlreasoner;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import org.jgroups.ChannelException;
 import org.jgroups.ChannelFactory;
@@ -18,6 +23,7 @@ import edu.iastate.pdlreasoner.kb.owlapi.QueryLoader;
 import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.net.ChannelUtil;
 import edu.iastate.pdlreasoner.tableau.Tableau;
+import edu.iastate.pdlreasoner.util.CollectionUtil;
 import edu.iastate.pdlreasoner.util.Profiler;
 import edu.iastate.pdlreasoner.util.Timers;
 import edu.iastate.pdlreasoner.util.URIUtil;
@@ -25,15 +31,18 @@ import edu.iastate.pdlreasoner.util.URIUtil;
 
 public class PDLReasoner {
 	
-	private boolean m_IsCentralized;
 	private boolean m_IsMaster;
 	private int m_NumSlaves;
 	private String m_OntologyPath;
+	
+	private boolean m_IsCentralized;
+	private String m_OntologyListPath;
+	
 	private String m_QueryPath;
-	private String m_Witness;
+	private String m_WitnessPath;
 	private boolean m_DoProfiling;
 
-	public static void main(String[] args) throws ChannelException {
+	public static void main(String[] args) throws ChannelException, IOException {
 		if (args.length == 0) {
 			printUsage();
 			System.exit(1);
@@ -59,8 +68,14 @@ public class PDLReasoner {
 				}
 				
 				reasoner.m_OntologyPath = args[i].trim();
-//			} else if (arg.equalsIgnoreCase("-c")) {
-//				reasoner.m_IsCentralized = true;
+			} else if (arg.equalsIgnoreCase("-c")) {
+				reasoner.m_IsCentralized = true;
+				if (++i >= args.length) {
+					printUsage();
+					System.exit(1);
+				}
+				
+				reasoner.m_OntologyListPath = args[i].trim();
 			} else if (arg.equalsIgnoreCase("-t")) {
 				reasoner.m_DoProfiling = true;
 			} else {
@@ -71,7 +86,7 @@ public class PDLReasoner {
 				
 				reasoner.m_QueryPath = arg;
 				i++;
-				reasoner.m_Witness = args[i].trim();
+				reasoner.m_WitnessPath = args[i].trim();
 			}
 		}
 		
@@ -81,41 +96,78 @@ public class PDLReasoner {
 	private static void printUsage() {
 		System.err.println("Usage: java PDLReasoner [OPTIONS] query.owl witnessURI");
 		System.err.println("  OPTIONS:");
-		System.err.println("       -m N             Execute as master and waits for N slaves");
-		System.err.println("       -s ontology.owl  Execute as slave with an ontology");
-		//System.err.println("       -c  Execute query as a centralized reasoner");
-		System.err.println("       -t               Record and print timings");
+		System.err.println("       -m N              Execute as master and waits for N slaves");
+		System.err.println("       -s ontology.owl   Execute as slave with an ontology");
+		System.err.println("       -c ontology_list  Execute query as a centralized, multi-threaded reasoner");
+		System.err.println("       -t                Record and print timings");
 	}
 
-	private void run() throws ChannelException {
+	private static Query loadQuery(String queryPath, String witnessPath) {
+		URI queryURI = URIUtil.toURI(queryPath);
+		URI witnessURI = URIUtil.toURI(witnessPath);
+		
+		Query query = null;
+		try {
+			query = new QueryLoader().loadQuery(queryURI, witnessURI);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (IllegalQueryException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (OWLDescriptionNotSupportedException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return query;
+	}
+
+	private static OntologyPackage loadOntology(String ontologyPath) {
+		URI ontologyURI = URIUtil.toURI(ontologyPath);
+		
+		OntologyPackage ontology = null;
+		try {
+			ontology = new OntologyLoader().loadOntology(ontologyURI);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (OWLDescriptionNotSupportedException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		return ontology;
+	}
+	
+	private static List<OntologyPackage> loadOntologies(String ontologyListPath) throws IOException {
+		List<OntologyPackage> ontologies = CollectionUtil.makeList();
+		
+		BufferedReader in = new BufferedReader(new FileReader(new File(ontologyListPath)));
+		String line;
+		while ((line = in.readLine()) != null) {
+			ontologies.add(loadOntology(line));
+		}
+		in.close();
+		
+		return ontologies;
+	}
+
+	private void run() throws ChannelException, IOException {
 		ChannelUtil.setSessionName(m_QueryPath);
 		
 		QueryResult result = null;
 		if (m_IsCentralized) {
-//			PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
-//			result = reasoner.run(query);
+			Query query = loadQuery(m_QueryPath, m_WitnessPath);
+			List<OntologyPackage> ontologies = loadOntologies(m_OntologyListPath);
+			
+			PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
+			result = reasoner.run(query, ontologies);
 			
 		} else {
 			ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
 			
 			if (m_IsMaster) {
-				URI queryURI = URIUtil.toURI(m_QueryPath);
-				URI witnessURI = URIUtil.toURI(m_Witness);
-				
-				Query query = null;
-				try {
-					query = new QueryLoader().loadQuery(queryURI, witnessURI);
-				} catch (OWLOntologyCreationException e) {
-					e.printStackTrace();
-					System.exit(1);
-				} catch (IllegalQueryException e) {
-					e.printStackTrace();
-					System.exit(1);
-				} catch (OWLDescriptionNotSupportedException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-
+				Query query = loadQuery(m_QueryPath, m_WitnessPath);
 				TableauMaster master = new TableauMaster(channelFactory);
 				
 				try {
@@ -128,19 +180,7 @@ public class PDLReasoner {
 				}
 				
 			} else {
-				URI ontologyURI = URIUtil.toURI(m_OntologyPath);
-				
-				OntologyPackage ontology = null;
-				try {
-					ontology = new OntologyLoader().loadOntology(ontologyURI);
-				} catch (OWLOntologyCreationException e) {
-					e.printStackTrace();
-					System.exit(1);
-				} catch (OWLDescriptionNotSupportedException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-				
+				OntologyPackage ontology = loadOntology(m_OntologyPath);
 				Tableau slave = new Tableau(channelFactory);
 	
 				try {
@@ -163,5 +203,5 @@ public class PDLReasoner {
 			}
 		}
 	}
-
+	
 }

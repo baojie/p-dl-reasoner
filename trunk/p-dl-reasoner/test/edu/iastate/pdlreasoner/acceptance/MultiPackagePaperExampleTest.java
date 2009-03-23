@@ -13,12 +13,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.PDLReasonerCentralizedWrapper;
-import edu.iastate.pdlreasoner.kb.Ontology;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.model.And;
@@ -66,9 +66,12 @@ public class MultiPackagePaperExampleTest {
 	}
 	
 	private boolean runQuery(Concept satConcept, PackageID witness) {
-		Query query = new Query(new Ontology(p), null, satConcept, witness);
+		for (OntologyPackage oneP : p) {
+			oneP.init();
+		}
+		Query query = new Query(null, satConcept, witness);
 		PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
-		return reasoner.run(query).isSatisfiable();
+		return reasoner.run(query, Arrays.asList(p)).isSatisfiable();
 	}
 	
 	@Test

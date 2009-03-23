@@ -13,12 +13,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.iastate.pdlreasoner.PDLReasonerCentralizedWrapper;
-import edu.iastate.pdlreasoner.kb.Ontology;
 import edu.iastate.pdlreasoner.kb.OntologyPackage;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.model.AllValues;
@@ -59,9 +59,10 @@ public class SinglePackageTest {
 	}
 	
 	private boolean runQuery(Concept satConcept) {
-		Query query = new Query(new Ontology(p), null, satConcept, pID);
+		p.init();
+		Query query = new Query(null, satConcept, pID);
 		PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
-		return reasoner.run(query).isSatisfiable();
+		return reasoner.run(query, Collections.singletonList(p)).isSatisfiable();
 	}
 	
 	@Test

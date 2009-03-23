@@ -318,7 +318,7 @@ public class TableauMaster {
 			if (numSlaves == 0) {
 				break;
 			}
-			System.err.println(view.getMembers());
+			
 			try {
 				Timers.stop("network");
 				System.err.println("Waiting for slaves to disconnect... " + numSlaves);
