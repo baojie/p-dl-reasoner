@@ -19,6 +19,7 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
+import edu.iastate.pdlreasoner.exception.IllegalQueryException;
 import edu.iastate.pdlreasoner.kb.ImportGraph;
 import edu.iastate.pdlreasoner.kb.Query;
 import edu.iastate.pdlreasoner.kb.QueryResult;
@@ -75,7 +76,7 @@ public class TableauMaster {
 		m_Slaves = new BiMap<Address, PackageID>();
 	}
 	
-	public QueryResult run(Query query, int numSlaves) throws ChannelException {		
+	public QueryResult run(Query query, int numSlaves) throws ChannelException, IllegalQueryException {		
 		Timers.start("network");
 		initChannel();
 		waitForSlavesToConnect(numSlaves);
@@ -86,6 +87,11 @@ public class TableauMaster {
 			switch (m_State) {
 			case ENTRY:
 				getSlaveData(numSlaves);
+				
+				if (!query.isUnderstandableByWitness(m_ImportGraph)) {
+					throw new IllegalQueryException("Query is not understandable by the specified witness package.");
+				}
+				
 				broadcast(m_ImportGraph);
 				initMaster(query);
 				startExpansion(query);
@@ -197,24 +203,6 @@ public class TableauMaster {
 		m_Self = m_Channel.getLocalAddress();
 	}
 
-	private void waitForSlavesToDisconnect() {
-		while (true) {
-			View view = m_Channel.getView();
-			int numSlaves = view.getMembers().size() - 1;
-			if (numSlaves == 0) {
-				break;
-			}
-			
-			try {
-				Timers.stop("network");
-				System.err.println("Waiting for slaves to disconnect... " + numSlaves);
-				Thread.sleep(SLEEP_TIME);
-				Timers.start("network");
-			} catch (InterruptedException e) {
-			}
-		}
-	}
-
 	private void waitForSlavesToConnect(int numSlaves) {
 		while (true) {
 			View view = m_Channel.getView();
@@ -317,6 +305,24 @@ public class TableauMaster {
 		m_Result.setIsSatisfiable(result);
 		broadcast(Exit.INSTANCE);
 		m_State = State.EXIT;
+	}
+
+	private void waitForSlavesToDisconnect() {
+		while (true) {
+			View view = m_Channel.getView();
+			int numSlaves = view.getMembers().size() - 1;
+			if (numSlaves == 0) {
+				break;
+			}
+			
+			try {
+				Timers.stop("network");
+				System.err.println("Waiting for slaves to disconnect... " + numSlaves);
+				Thread.sleep(SLEEP_TIME);
+				Timers.start("network");
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 	

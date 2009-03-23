@@ -109,18 +109,16 @@ public class PDLReasoner {
 					e.printStackTrace();
 					System.exit(1);
 				}
-				
-//				if (!query.isUnderstandableByWitness()) {
-//					System.err.println("Error: Query is not understandable by the specified witness package.");
-//					System.exit(1);
-//				}
-				
+
 				TableauMaster master = new TableauMaster(channelFactory);
 				
 				try {
 					result = master.run(query, m_NumSlaves);
 				} catch (ChannelException e) {
 					e.printStackTrace();
+				} catch (IllegalQueryException e) {
+					System.err.println(e);
+					System.exit(1);
 				}
 				
 			} else {
