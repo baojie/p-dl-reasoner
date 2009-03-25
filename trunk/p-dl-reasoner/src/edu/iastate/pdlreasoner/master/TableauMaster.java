@@ -78,8 +78,10 @@ public class TableauMaster {
 	
 	public QueryResult run(Query query, int numSlaves) throws ChannelException, IllegalQueryException {		
 		Timers.start("network");
+		
 		initChannel();
 		waitForSlavesToConnect(numSlaves);
+		
 		Timers.stop("network");
 		Timers.start("reason");
 		
@@ -122,17 +124,15 @@ public class TableauMaster {
 			}
 		}
 		
+		Timers.stop("reason");
+		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
 		}
 		
-		Timers.stop("reason");
-		
-		Timers.start("network");
 		waitForSlavesToDisconnect();
 		m_Channel.disconnect();
 		m_Channel.close();	
-		Timers.stop("network");
 		
 		return m_Result;
 	}
@@ -159,11 +159,14 @@ public class TableauMaster {
 
 	private Message takeOneMessage() {
 		Message msg = null;
+		
+		Timers.start("wait");
 		do {
 			try {
 				msg = m_MessageQueue.take();
 			} catch (InterruptedException e) {}
 		} while (msg == null);
+		Timers.stop("wait");
 		
 		Profiler.INSTANCE.countMessage();
 		

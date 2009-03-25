@@ -54,6 +54,7 @@ import edu.iastate.pdlreasoner.tableau.branch.BranchToken;
 import edu.iastate.pdlreasoner.tableau.graph.Edge;
 import edu.iastate.pdlreasoner.tableau.graph.Node;
 import edu.iastate.pdlreasoner.tableau.graph.TableauGraph;
+import edu.iastate.pdlreasoner.util.Timers;
 
 public class Tableau {
 	
@@ -89,10 +90,15 @@ public class Tableau {
 	}
 	
 	public void run(OntologyPackage ontology) throws ChannelException {
+		Timers.start("network");
+		
 		m_Ontology = ontology;
 		m_OntologyID = ontology.getID();
 		m_TBox = ontology.getTBox();
 		initChannel();
+		
+		Timers.stop("network");
+		Timers.start("reason");
 		
 		while (m_State != State.EXIT) {
 			Message msg = null;
@@ -156,6 +162,8 @@ public class Tableau {
 			}
 		}
 		
+		Timers.stop("reason");
+		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
 		}
@@ -209,11 +217,15 @@ public class Tableau {
 	
 	private Message takeOneMessage() {
 		Message msg = null;
+		
+		Timers.start("wait");
 		do {
 			try {
 				msg = m_MessageQueue.take();
 			} catch (InterruptedException e) {}
 		} while (msg == null);
+		Timers.stop("wait");
+		
 		return msg;
 	}
 
