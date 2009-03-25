@@ -45,6 +45,12 @@ public class CollectionUtil {
 		return set;
 	}
 	
+	public static <T> Set<T> intersect(Collection<? extends T> a, Collection<? extends T> b) {
+		Set<T> intersection = new HashSet<T>(a);
+		intersection.retainAll(b);
+		return intersection;
+	}
+	
 	public static <T> boolean isSubsetOf(Collection<T> a, Collection<T> b) {
 		return (a.size() <= b.size()) && (b.containsAll(a));
 	}
