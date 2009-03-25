@@ -63,6 +63,7 @@ public class Tableau {
 	private static enum State { ENTRY, READY, EXPAND, CLASH, EXIT }
 	
 	//Constants once set
+	private Timers m_Timers;
 	private ChannelFactory m_ChannelFactory;
 	private Channel m_Channel;
 	private Address m_Self;
@@ -84,21 +85,26 @@ public class Tableau {
 	private TableauSlaveMessageProcessor m_MessageProcessor;
 	
 	public Tableau(ChannelFactory channelFactory) {
+		m_Timers = new Timers();
 		m_ChannelFactory = channelFactory;
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
 		m_State = State.ENTRY;
 	}
 	
+	public void setTimers(Timers timers) {
+		m_Timers = timers;
+	}
+	
 	public void run(OntologyPackage ontology) throws ChannelException {
-		Timers.start("network");
+		m_Timers.start("network");
 		
 		m_Ontology = ontology;
 		m_OntologyID = ontology.getID();
 		m_TBox = ontology.getTBox();
 		initChannel();
 		
-		Timers.stop("network");
-		Timers.start("reason");
+		m_Timers.stop("network");
+		m_Timers.start("reason");
 		
 		while (m_State != State.EXIT) {
 			Message msg = null;
@@ -162,7 +168,7 @@ public class Tableau {
 			}
 		}
 		
-		Timers.stop("reason");
+		m_Timers.stop("reason");
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
@@ -218,13 +224,13 @@ public class Tableau {
 	private Message takeOneMessage() {
 		Message msg = null;
 		
-		Timers.start("wait");
+		m_Timers.start("wait");
 		do {
 			try {
 				msg = m_MessageQueue.take();
 			} catch (InterruptedException e) {}
 		} while (msg == null);
-		Timers.stop("wait");
+		m_Timers.stop("wait");
 		
 		return msg;
 	}

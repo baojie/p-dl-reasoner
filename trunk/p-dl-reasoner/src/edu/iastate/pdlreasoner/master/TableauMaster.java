@@ -52,6 +52,7 @@ public class TableauMaster {
 	
 	private static enum State { ENTRY, EXPAND, CLASH, EXIT }
 	
+	private Timers m_Timers;
 	private ChannelFactory m_ChannelFactory;
 	private BlockingQueue<Message> m_MessageQueue;
 	private State m_State;
@@ -70,20 +71,25 @@ public class TableauMaster {
 	private TableauMasterMessageProcessor m_MessageProcessor;
 	
 	public TableauMaster(ChannelFactory channelFactory) {
+		m_Timers = new Timers();
 		m_ChannelFactory = channelFactory;
 		m_MessageQueue = new LinkedBlockingQueue<Message>();
 		m_State = State.ENTRY;
 		m_Slaves = new BiMap<Address, PackageID>();
 	}
-	
+
+	public void setTimers(Timers timers) {
+		m_Timers = timers;
+	}
+
 	public QueryResult run(Query query, int numSlaves) throws ChannelException, IllegalQueryException {		
-		Timers.start("network");
+		m_Timers.start("network");
 		
 		initChannel();
 		waitForSlavesToConnect(numSlaves);
 		
-		Timers.stop("network");
-		Timers.start("reason");
+		m_Timers.stop("network");
+		m_Timers.start("reason");
 		
 		while (m_State != State.EXIT) {
 			switch (m_State) {
@@ -124,7 +130,7 @@ public class TableauMaster {
 			}
 		}
 		
-		Timers.stop("reason");
+		m_Timers.stop("reason");
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
@@ -160,13 +166,13 @@ public class TableauMaster {
 	private Message takeOneMessage() {
 		Message msg = null;
 		
-		Timers.start("wait");
+		m_Timers.start("wait");
 		do {
 			try {
 				msg = m_MessageQueue.take();
 			} catch (InterruptedException e) {}
 		} while (msg == null);
-		Timers.stop("wait");
+		m_Timers.stop("wait");
 		
 		Profiler.INSTANCE.countMessage();
 		
@@ -215,10 +221,10 @@ public class TableauMaster {
 			}
 			
 			try {
-				Timers.stop("network");
+				m_Timers.stop("network");
 				System.err.println("Waiting for more slaves... " + currentNumSlaves + "/" + numSlaves);
 				Thread.sleep(SLEEP_TIME);
-				Timers.start("network");
+				m_Timers.start("network");
 			} catch (InterruptedException e) {
 			}
 		}
@@ -323,10 +329,10 @@ public class TableauMaster {
 			}
 			
 			try {
-				Timers.stop("network");
+				m_Timers.stop("network");
 				System.err.println("Waiting for slaves to disconnect... " + numSlaves);
 				Thread.sleep(SLEEP_TIME);
-				Timers.start("network");
+				m_Timers.start("network");
 			} catch (InterruptedException e) {
 			}
 		}
@@ -369,5 +375,5 @@ public class TableauMaster {
 		}
 		
 	}
-	
+
 }

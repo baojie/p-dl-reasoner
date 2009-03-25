@@ -155,24 +155,28 @@ public class PDLReasoner {
 	private void run() throws ChannelException, IOException {
 		ChannelUtil.setSessionName(m_QueryPath);
 		
+		Timers timers = new Timers();
 		QueryResult result = null;
 		if (m_IsCentralized) {
-			Timers.start("load");
+			timers.start("load");
 			Query query = loadQuery(m_QueryPath, m_WitnessPath);
 			List<OntologyPackage> ontologies = loadOntologies(m_OntologyListPath);
-			Timers.stop("load");
+			timers.stop("load");
 			
 			PDLReasonerCentralizedWrapper reasoner = new PDLReasonerCentralizedWrapper();
+			reasoner.setTimers(timers);
 			result = reasoner.run(query, ontologies);
 			
 		} else {
 			ChannelFactory channelFactory = new JChannelFactory(JChannel.DEFAULT_PROTOCOL_STACK);
 			
 			if (m_IsMaster) {
-				Timers.start("load");
+				timers.start("load");
 				Query query = loadQuery(m_QueryPath, m_WitnessPath);
+				timers.stop("load");
+				
 				TableauMaster master = new TableauMaster(channelFactory);
-				Timers.stop("load");
+				master.setTimers(timers);
 				
 				try {
 					result = master.run(query, m_NumSlaves);
@@ -184,10 +188,12 @@ public class PDLReasoner {
 				}
 				
 			} else {
-				Timers.start("load");
+				timers.start("load");
 				OntologyPackage ontology = loadOntology(m_OntologyPath);
+				timers.stop("load");
+				
 				Tableau slave = new Tableau(channelFactory);
-				Timers.stop("load");
+				slave.setTimers(timers);
 				
 				try {
 					slave.run(ontology);
@@ -201,7 +207,7 @@ public class PDLReasoner {
 			if (m_DoProfiling) {
 				System.out.print(m_QueryPath);
 				System.out.print(",");
-				System.out.print(Timers.printAll());
+				System.out.print(timers.printAll());
 				System.out.print(Profiler.INSTANCE.printAll());
 				System.out.println(result.toShortString());;
 			} else {

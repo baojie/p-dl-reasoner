@@ -6,9 +6,9 @@ import java.util.Map;
 
 public class Timers {
 
-	private static Map<String,Timer> m_Timers = CollectionUtil.makeMap();
+	private Map<String,Timer> m_Timers = CollectionUtil.makeMap();
 	
-	public static void start(String name) {
+	public void start(String name) {
 		Timer timer = m_Timers.get(name);
 		if (timer == null) {
 			timer = new Timer();
@@ -18,11 +18,11 @@ public class Timers {
 		timer.start();
 	}
 	
-	public static void stop(String name) {
+	public void stop(String name) {
 		m_Timers.get(name).stop();
 	}
 	
-	public static String printAll() {
+	public String printAll() {
 		StringBuilder builder = new StringBuilder();
 		List<String> keys = CollectionUtil.makeList(m_Timers.keySet());
 		Collections.sort(keys);

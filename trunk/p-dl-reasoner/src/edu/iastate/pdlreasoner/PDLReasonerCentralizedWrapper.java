@@ -12,19 +12,26 @@ import edu.iastate.pdlreasoner.master.TableauMaster;
 import edu.iastate.pdlreasoner.net.simulated.SimulatedChannelFactory;
 import edu.iastate.pdlreasoner.tableau.Tableau;
 import edu.iastate.pdlreasoner.util.CollectionUtil;
+import edu.iastate.pdlreasoner.util.Timers;
 
 public class PDLReasonerCentralizedWrapper {
 
 	private static final long SLEEP_TIME = 100;
 	
+	private Timers m_MasterTimers;
 	private SimulatedChannelFactory m_ChannelFactory;
 	private List<Thread> m_Slaves;
-
+	
 	public PDLReasonerCentralizedWrapper() {
+		m_MasterTimers = new Timers();
 		m_ChannelFactory = new SimulatedChannelFactory();
 		m_Slaves = CollectionUtil.makeList();
 	}
-	
+
+	public void setTimers(Timers timers) {
+		m_MasterTimers = timers;
+	}
+
 	public QueryResult run(Query query, List<OntologyPackage> ontologies) {
 		int numSlaves = ontologies.size();
 		for (OntologyPackage ontology : ontologies) {
@@ -45,6 +52,7 @@ public class PDLReasonerCentralizedWrapper {
 		}
 		
 		TableauMaster master = new TableauMaster(m_ChannelFactory);
+		master.setTimers(m_MasterTimers);
 		QueryResult result = null;
 		try {
 			result = master.run(query, numSlaves);
@@ -87,5 +95,5 @@ public class PDLReasonerCentralizedWrapper {
 		}
 		
 	}
-	
+
 }
