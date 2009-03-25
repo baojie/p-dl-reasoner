@@ -329,10 +329,8 @@ public class TableauMaster {
 			}
 			
 			try {
-				m_Timers.stop("network");
 				System.err.println("Waiting for slaves to disconnect... " + numSlaves);
 				Thread.sleep(SLEEP_TIME);
-				m_Timers.start("network");
 			} catch (InterruptedException e) {
 			}
 		}
