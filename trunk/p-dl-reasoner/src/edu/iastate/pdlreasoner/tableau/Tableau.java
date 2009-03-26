@@ -62,6 +62,10 @@ public class Tableau {
 	
 	private static enum State { ENTRY, READY, EXPAND, CLASH, EXIT }
 	
+	private static String TIME_NETWORK = "network";
+	private static String TIME_REASON = "reason";
+	private static String TIME_WAIT = "wait";
+	
 	//Constants once set
 	private Timers m_Timers;
 	private ChannelFactory m_ChannelFactory;
@@ -96,15 +100,14 @@ public class Tableau {
 	}
 	
 	public void run(OntologyPackage ontology) throws ChannelException {
-		m_Timers.start("network");
+		m_Timers.start(TIME_NETWORK);
 		
 		m_Ontology = ontology;
 		m_OntologyID = ontology.getID();
 		m_TBox = ontology.getTBox();
 		initChannel();
 		
-		m_Timers.stop("network");
-		m_Timers.start("reason");
+		m_Timers.stop(TIME_NETWORK);
 		
 		while (m_State != State.EXIT) {
 			Message msg = null;
@@ -113,7 +116,8 @@ public class Tableau {
 				msg = takeOneMessage();
 				m_Master = msg.getSrc();
 				
-				m_Timers.reset("wait");
+				m_Timers.reset(TIME_WAIT);
+				m_Timers.start(TIME_REASON);
 				
 				sendToMaster(m_Ontology.getID());
 				sendToMaster(m_Ontology.getExternalConcepts());
@@ -170,7 +174,7 @@ public class Tableau {
 			}
 		}
 		
-		m_Timers.stop("reason");
+		m_Timers.stop(TIME_REASON);
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
@@ -226,13 +230,14 @@ public class Tableau {
 	private Message takeOneMessage() {
 		Message msg = null;
 		
-		m_Timers.start("wait");
+		boolean isQueueEmpty = m_MessageQueue.isEmpty();
+		if (isQueueEmpty) m_Timers.start(TIME_WAIT);
 		do {
 			try {
 				msg = m_MessageQueue.take();
 			} catch (InterruptedException e) {}
 		} while (msg == null);
-		m_Timers.stop("wait");
+		if (isQueueEmpty) m_Timers.stop(TIME_WAIT);
 		
 		return msg;
 	}

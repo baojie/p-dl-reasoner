@@ -52,6 +52,10 @@ public class TableauMaster {
 	
 	private static enum State { ENTRY, EXPAND, CLASH, EXIT }
 	
+	private static String TIME_NETWORK = "network";
+	private static String TIME_REASON = "reason";
+	private static String TIME_WAIT = "wait";
+	
 	private Timers m_Timers;
 	private ChannelFactory m_ChannelFactory;
 	private BlockingQueue<Message> m_MessageQueue;
@@ -83,13 +87,13 @@ public class TableauMaster {
 	}
 
 	public QueryResult run(Query query, int numSlaves) throws ChannelException, IllegalQueryException {		
-		m_Timers.start("network");
+		m_Timers.start(TIME_NETWORK);
 		
 		initChannel();
 		waitForSlavesToConnect(numSlaves);
 		
-		m_Timers.stop("network");
-		m_Timers.start("reason");
+		m_Timers.stop(TIME_NETWORK);
+		m_Timers.start(TIME_REASON);
 		
 		while (m_State != State.EXIT) {
 			switch (m_State) {
@@ -130,7 +134,7 @@ public class TableauMaster {
 			}
 		}
 		
-		m_Timers.stop("reason");
+		m_Timers.stop(TIME_REASON);
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
@@ -166,13 +170,14 @@ public class TableauMaster {
 	private Message takeOneMessage() {
 		Message msg = null;
 		
-		m_Timers.start("wait");
+		boolean isQueueEmpty = m_MessageQueue.isEmpty();
+		if (isQueueEmpty) m_Timers.start(TIME_WAIT);
 		do {
 			try {
 				msg = m_MessageQueue.take();
 			} catch (InterruptedException e) {}
 		} while (msg == null);
-		m_Timers.stop("wait");
+		if (isQueueEmpty) m_Timers.stop(TIME_WAIT);
 		
 		Profiler.INSTANCE.countMessage();
 		
@@ -221,10 +226,10 @@ public class TableauMaster {
 			}
 			
 			try {
-				m_Timers.stop("network");
+				m_Timers.stop(TIME_NETWORK);
 				System.err.println("Waiting for more slaves... " + currentNumSlaves + "/" + numSlaves);
 				Thread.sleep(SLEEP_TIME);
-				m_Timers.start("network");
+				m_Timers.start(TIME_NETWORK);
 			} catch (InterruptedException e) {
 			}
 		}

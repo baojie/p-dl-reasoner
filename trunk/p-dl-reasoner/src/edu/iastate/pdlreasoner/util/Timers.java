@@ -49,11 +49,11 @@ public class Timers {
 		
 		public void start() {
 			m_IsTiming = true;
-			m_StartTime = System.currentTimeMillis();
+			m_StartTime = System.nanoTime();
 		}
 		
 		public void stop() {
-			long stopTime = System.currentTimeMillis();
+			long stopTime = System.nanoTime();
 			if (!m_IsTiming) throw new IllegalStateException("Stopping a timer that had not been started.");
 			
 			m_IsTiming = false;
