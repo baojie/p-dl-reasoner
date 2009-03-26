@@ -22,6 +22,10 @@ public class Timers {
 		m_Timers.get(name).stop();
 	}
 	
+	public void reset(String name) {
+		m_Timers.get(name).reset();
+	}
+	
 	public String printAll() {
 		StringBuilder builder = new StringBuilder();
 		List<String> keys = CollectionUtil.makeList(m_Timers.keySet());
@@ -56,10 +60,14 @@ public class Timers {
 			m_TotalTime += stopTime - m_StartTime;
 		}
 		
+		public void reset() {
+			m_TotalTime = 0L;
+		}
+
 		public long getTotalTime() {
 			return m_TotalTime;
 		}
 		
 	}
-	
+
 }

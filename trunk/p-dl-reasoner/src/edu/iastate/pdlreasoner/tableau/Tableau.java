@@ -113,6 +113,8 @@ public class Tableau {
 				msg = takeOneMessage();
 				m_Master = msg.getSrc();
 				
+				m_Timers.reset("wait");
+				
 				sendToMaster(m_Ontology.getID());
 				sendToMaster(m_Ontology.getExternalConcepts());
 				
