@@ -203,16 +203,14 @@ public class PDLReasoner {
 			}
 		}
 		
-		if (m_IsCentralized || m_IsMaster) {
-			if (m_DoProfiling) {
-				System.out.print(m_QueryPath);
-				System.out.print(",");
-				System.out.print(timers.printAll());
-				System.out.print(Profiler.INSTANCE.printAll());
-				System.out.println(result.toShortString());;
-			} else {
-				System.out.println(result);
-			}
+		if (m_DoProfiling) {
+			System.out.print(m_QueryPath);
+			System.out.print(",");
+			System.out.print(timers.printAll());
+			System.out.print(Profiler.INSTANCE.printAll());
+			System.out.println(result.toShortString());;
+		} else if (m_IsCentralized || m_IsMaster) {
+			System.out.println(result);
 		}
 	}
 	

@@ -229,6 +229,8 @@ public class TableauMaster {
 			}
 		}
 		
+		System.err.println("All slaves joined.");
+		
 		View view = m_Channel.getView();
 		List<Address> slaveAdds = CollectionUtil.makeList(view.getMembers());
 		slaveAdds.remove(m_Self);
