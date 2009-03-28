@@ -203,7 +203,6 @@ public class TableauMaster {
 
 	private void initChannel() throws ChannelException {
 		m_Channel = m_ChannelFactory.createChannel();
-		m_Channel.connect(ChannelUtil.getSessionName());
 		m_Channel.setReceiver(new ReceiverAdapter() {
 				public void receive(Message msg) {
 					while (true) {
@@ -214,6 +213,7 @@ public class TableauMaster {
 					}
 				}
 			});
+		m_Channel.connect(ChannelUtil.getSessionName());
 		m_Self = m_Channel.getLocalAddress();
 	}
 
