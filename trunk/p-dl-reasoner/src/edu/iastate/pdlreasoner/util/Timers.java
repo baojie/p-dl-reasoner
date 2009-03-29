@@ -23,7 +23,10 @@ public class Timers {
 	}
 	
 	public void reset(String name) {
-		m_Timers.get(name).reset();
+		Timer timer = m_Timers.get(name);
+		if (timer != null) {
+			timer.reset();
+		}
 	}
 	
 	public String printAll() {
