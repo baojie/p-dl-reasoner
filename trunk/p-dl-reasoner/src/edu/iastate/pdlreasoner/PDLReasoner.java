@@ -209,7 +209,7 @@ public class PDLReasoner {
 			System.out.print(timers.printAll());
 			System.out.print(Profiler.INSTANCE.printAll());
 			
-			if (m_IsMaster) {
+			if (m_IsCentralized || m_IsMaster) {
 				System.out.println(result.toShortString());;
 			} else {
 				System.out.println();
