@@ -1,0 +1,491 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY micro "micro.owl#" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="micro.owl#"
+     xml:base="micro.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+     xmlns:micro="micro.owl#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about=""/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- micro.owl#appliesTo -->
+
+    <owl:ObjectProperty rdf:about="#appliesTo"/>
+    
+
+
+    <!-- micro.owl#conducts -->
+
+    <owl:ObjectProperty rdf:about="#conducts"/>
+    
+
+
+    <!-- micro.owl#conflictsWith -->
+
+    <owl:ObjectProperty rdf:about="#conflictsWith"/>
+    
+
+
+    <!-- micro.owl#executes -->
+
+    <owl:ObjectProperty rdf:about="#executes"/>
+    
+
+
+    <!-- micro.owl#hasAuthor -->
+
+    <owl:ObjectProperty rdf:about="#hasAuthor"/>
+    
+
+
+    <!-- micro.owl#hasMembers -->
+
+    <owl:ObjectProperty rdf:about="#hasMembers"/>
+    
+
+
+    <!-- micro.owl#isAuthorOf -->
+
+    <owl:ObjectProperty rdf:about="#isAuthorOf"/>
+    
+
+
+    <!-- micro.owl#isConductedBy -->
+
+    <owl:ObjectProperty rdf:about="#isConductedBy"/>
+    
+
+
+    <!-- micro.owl#isExecutedBy -->
+
+    <owl:ObjectProperty rdf:about="#isExecutedBy"/>
+    
+
+
+    <!-- micro.owl#isMemberOf -->
+
+    <owl:ObjectProperty rdf:about="#isMemberOf"/>
+    
+
+
+    <!-- micro.owl#isOrganizedBy -->
+
+    <owl:ObjectProperty rdf:about="#isOrganizedBy"/>
+    
+
+
+    <!-- micro.owl#isPartOf -->
+
+    <owl:ObjectProperty rdf:about="#isPartOf"/>
+    
+
+
+    <!-- micro.owl#isSubmittedBy -->
+
+    <owl:ObjectProperty rdf:about="#isSubmittedBy"/>
+    
+
+
+    <!-- micro.owl#organizes -->
+
+    <owl:ObjectProperty rdf:about="#organizes"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- micro.owl#Activity -->
+
+    <owl:Class rdf:about="#Activity">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isConductedBy"/>
+                <owl:someValuesFrom rdf:resource="#Author"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isPartOf"/>
+                <owl:someValuesFrom rdf:resource="#Conference"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#ActivitySubmissionForm -->
+
+    <owl:Class rdf:about="#ActivitySubmissionForm">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasAuthor"/>
+                <owl:someValuesFrom rdf:resource="#Author"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isSubmittedBy"/>
+                <owl:allValuesFrom rdf:resource="#Author"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Author -->
+
+    <owl:Class rdf:about="#Author">
+        <rdfs:subClassOf rdf:resource="#Person"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#conflictsWith"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="#Author"/>
+                            <rdf:Description rdf:about="#Organizer"/>
+                            <rdf:Description rdf:about="#OutsideReferee"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isAuthorOf"/>
+                <owl:someValuesFrom rdf:resource="#ActivitySubmissionForm"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#conducts"/>
+                <owl:someValuesFrom rdf:resource="#Activity"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="#Organizer"/>
+        <owl:disjointWith rdf:resource="#OutsideReferee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#CommitteeMember -->
+
+    <owl:Class rdf:about="#CommitteeMember">
+        <rdfs:subClassOf rdf:resource="#Organizer"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isMemberOf"/>
+                <owl:someValuesFrom rdf:resource="#OrganizingCommittee"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Conference -->
+
+    <owl:Class rdf:about="#Conference">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isOrganizedBy"/>
+                <owl:allValuesFrom rdf:resource="#OrganizingCommittee"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#DoubleBlindReview -->
+
+    <owl:Class rdf:about="#DoubleBlindReview">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#appliesTo"/>
+                <owl:allValuesFrom rdf:resource="#Lecture"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#isExecutedBy"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="#OutsideReferee"/>
+                            <rdf:Description rdf:about="#Reviewer"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#FinanceChair -->
+
+    <owl:Class rdf:about="#FinanceChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#GeneralCoChair -->
+
+    <owl:Class rdf:about="#GeneralCoChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Lecture -->
+
+    <owl:Class rdf:about="#Lecture">
+        <rdfs:subClassOf rdf:resource="#Activity"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Organizer -->
+
+    <owl:Class rdf:about="#Organizer">
+        <rdfs:subClassOf rdf:resource="#Person"/>
+        <owl:disjointWith rdf:resource="#OutsideReferee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#OrganizingCommittee -->
+
+    <owl:Class rdf:about="#OrganizingCommittee">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#hasMembers"/>
+                <owl:allValuesFrom rdf:resource="#CommitteeMember"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#organizes"/>
+                <owl:someValuesFrom rdf:resource="#Conference"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#OutsideReferee -->
+
+    <owl:Class rdf:about="#OutsideReferee">
+        <rdfs:subClassOf rdf:resource="#Person"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Paper -->
+
+    <owl:Class rdf:about="#Paper">
+        <rdfs:subClassOf rdf:resource="#ActivitySubmissionForm"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#appliesTo"/>
+                <owl:allValuesFrom rdf:resource="#Lecture"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#PaperSubmissionChair -->
+
+    <owl:Class rdf:about="#PaperSubmissionChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Person -->
+
+    <owl:Class rdf:about="#Person"/>
+    
+
+
+    <!-- micro.owl#ProgramCoChair -->
+
+    <owl:Class rdf:about="#ProgramCoChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#PublicationsChair -->
+
+    <owl:Class rdf:about="#PublicationsChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#PublicityWebChair -->
+
+    <owl:Class rdf:about="#PublicityWebChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#QualitatvieLecture -->
+
+    <owl:Class rdf:about="#QualitatvieLecture">
+        <rdfs:subClassOf rdf:resource="#Lecture"/>
+        <owl:disjointWith rdf:resource="#TraditionalLecture"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#RegistrationChair -->
+
+    <owl:Class rdf:about="#RegistrationChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Reviewer -->
+
+    <owl:Class rdf:about="#Reviewer">
+        <rdfs:subClassOf rdf:resource="#Organizer"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#executes"/>
+                <owl:someValuesFrom rdf:resource="#DoubleBlindReview"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#SteeringCommittee -->
+
+    <owl:Class rdf:about="#SteeringCommittee">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#StudentAdvocate -->
+
+    <owl:Class rdf:about="#StudentAdvocate">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#TraditionalLecture -->
+
+    <owl:Class rdf:about="#TraditionalLecture">
+        <rdfs:subClassOf rdf:resource="#Lecture"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#Tutorial -->
+
+    <owl:Class rdf:about="#Tutorial">
+        <rdfs:subClassOf rdf:resource="#Activity"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#TutorialProposal -->
+
+    <owl:Class rdf:about="#TutorialProposal">
+        <rdfs:subClassOf rdf:resource="#ActivitySubmissionForm"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#appliesTo"/>
+                <owl:allValuesFrom rdf:resource="#Tutorial"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#WorkShop -->
+
+    <owl:Class rdf:about="#WorkShop">
+        <rdfs:subClassOf rdf:resource="#Activity"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#WorkshopTutorialChair -->
+
+    <owl:Class rdf:about="#WorkshopTutorialChair">
+        <rdfs:subClassOf rdf:resource="#OrganizingCommittee"/>
+    </owl:Class>
+    
+
+
+    <!-- micro.owl#WorksopProposal -->
+
+    <owl:Class rdf:about="#WorksopProposal">
+        <rdfs:subClassOf rdf:resource="#ActivitySubmissionForm"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#appliesTo"/>
+                <owl:allValuesFrom rdf:resource="#WorkShop"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#Thing -->
+
+    <owl:Class rdf:about="&owl;Thing"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 2.2.1.974) http://owlapi.sourceforge.net -->
+
