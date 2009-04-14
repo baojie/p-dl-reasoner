@@ -39,11 +39,10 @@ public class OntologyMaker {
 		m_TotalAdditions = (int) (m_Classes.size() * COVERAGE[TOTAL_PACKAGES - 1]) * (TOTAL_PACKAGES - 1);
 		
 		for (int c = 0; c < COVERAGE.length; c++) {
-			List<List<OWLClass>> coveredClasses = makeCoveredClasses(COVERAGE[c]);
-			for (Ontology o : makeChain(COVERAGE[c], coveredClasses)) {
+			for (Ontology o : makeChain(COVERAGE[c])) {
 				o.saveAsFile();
 			}
-			for (Ontology o : makeStar(COVERAGE[c], coveredClasses)) {
+			for (Ontology o : makeStar(COVERAGE[c])) {
 				o.saveAsFile();
 			}
 		}
@@ -79,17 +78,17 @@ public class OntologyMaker {
 		return queryClasses;
 	}
 
-	private static List<Ontology> makeChain(double percentage, List<List<OWLClass>> coveredClasses) {
+	private static List<Ontology> makeChain(double percentage) {
 		String prefix = m_Prefix + "_c" + String.valueOf((int)(percentage * 100)) + "_";
-		final int PADDING_AXIOMS_PER_ONTOLOGY = (m_TotalAdditions - coveredClasses.get(0).size() * (TOTAL_PACKAGES - 1)) / (TOTAL_PACKAGES - 1);
+		final int PADDING_AXIOMS_PER_ONTOLOGY = (m_TotalAdditions - (int) (m_Classes.size() * percentage) * (TOTAL_PACKAGES - 1)) / (TOTAL_PACKAGES - 1);
 		List<Ontology> ontologies = new ArrayList<Ontology>();
 		for (int i = 0; i < TOTAL_PACKAGES; i++) {
 			Ontology o = new Ontology(prefix + i);
 			if (i < TOTAL_PACKAGES - 1) {
 				o.addImports(prefix + (i + 1));
 			
-				List<OWLClass> thisOnt = coveredClasses.get(i);
-				List<OWLClass> nextOnt = coveredClasses.get(i + 1);
+				List<OWLClass> thisOnt = makeCoveredClasses(percentage);
+				List<OWLClass> nextOnt = makeCoveredClasses(percentage);
 				for (int c = 0; c < thisOnt.size(); c++) {
 					o.addAxiom(thisOnt.get(c), prefix + (i + 1), nextOnt.get(c));
 				}
@@ -103,17 +102,17 @@ public class OntologyMaker {
 		return ontologies;
 	}
 		
-	private static List<Ontology> makeStar(double percentage, List<List<OWLClass>> coveredClasses) {
+	private static List<Ontology> makeStar(double percentage) {
 		String prefix = m_Prefix + "_s" + (int)(percentage * 100) + "_";
-		final int PADDING_AXIOMS = m_TotalAdditions - coveredClasses.get(0).size() * (TOTAL_PACKAGES - 1);
+		final int PADDING_AXIOMS = m_TotalAdditions - (int) (m_Classes.size() * percentage) * (TOTAL_PACKAGES - 1);
 		List<Ontology> ontologies = new ArrayList<Ontology>();
 		{
 			Ontology o = new Ontology(prefix + "0");
 			for (int i = 1; i < TOTAL_PACKAGES; i++) {
 				o.addImports(prefix + i);
 				
-				List<OWLClass> thisOnt = coveredClasses.get(0);
-				List<OWLClass> nextOnt = coveredClasses.get(i);
+				List<OWLClass> thisOnt = makeCoveredClasses(percentage);
+				List<OWLClass> nextOnt = makeCoveredClasses(percentage);
 				for (int c = 0; c < thisOnt.size(); c++) {
 					o.addAxiom(thisOnt.get(c), prefix + i, nextOnt.get(c));
 				}
@@ -132,20 +131,16 @@ public class OntologyMaker {
 		return ontologies;
 	}
 
-	private static List<List<OWLClass>> makeCoveredClasses(double percentage) {
+	private static List<OWLClass> makeCoveredClasses(double percentage) {
 		int totalCovered = (int) (m_Classes.size() * percentage);
-		List<List<OWLClass>> packages = new ArrayList<List<OWLClass>>();
-		for (int p = 0; p < TOTAL_PACKAGES; p++) {
-			List<OWLClass> coveredClasses = new ArrayList<OWLClass>();
-			while (coveredClasses.size() < totalCovered) {
-				OWLClass clazz = m_Classes.get(m_Ran.nextInt(m_Classes.size()));
-				if (!coveredClasses.contains(clazz)) {
-					coveredClasses.add(clazz);
-				}
+		List<OWLClass> coveredClasses = new ArrayList<OWLClass>();
+		while (coveredClasses.size() < totalCovered) {
+			OWLClass clazz = m_Classes.get(m_Ran.nextInt(m_Classes.size()));
+			if (!coveredClasses.contains(clazz)) {
+				coveredClasses.add(clazz);
 			}
-			packages.add(coveredClasses);
 		}
-		return packages;
+		return coveredClasses;
 	}
 
 	private static void loadClasses(String file) throws OWLOntologyCreationException {
