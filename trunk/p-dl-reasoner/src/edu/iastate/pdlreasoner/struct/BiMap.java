@@ -30,4 +30,9 @@ public class BiMap<A, B> {
 		return m_AB.size();
 	}
 	
+	@Override
+	public String toString() {
+		return m_AB.toString() + "\n" + m_BA.toString();
+	}
+	
 }
