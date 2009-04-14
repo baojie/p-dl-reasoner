@@ -52,7 +52,7 @@ public class QueryMaker {
 		lWriter.close();
 	}
 
-	private static final String BASE = "java -jar pdlreasoner.jar -t ";
+	private static final String BASE = "java -Xms1024m -Xmx1024m -jar pdlreasoner.jar -t ";
 	
 	private static String getQueryOntology(String caseName, int q) {
 		return "q_" + caseName + "_" + q + ".owl";

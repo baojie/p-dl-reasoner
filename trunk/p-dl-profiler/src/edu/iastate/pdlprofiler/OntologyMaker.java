@@ -61,7 +61,6 @@ public class OntologyMaker {
 					String name = "q_" + topoAndCoverage + "_" + i;
 					Ontology query = new Ontology(name);
 					String witness = m_Prefix + "_" + topoAndCoverage + "_0";
-					query.addImports(witness);
 					query.addSubNothingAxiom(witness, queryClasses.get(i));
 					query.saveAdditionalAsFile();
 				}
@@ -255,7 +254,10 @@ public class OntologyMaker {
 			out.write("     xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n");
 			out.write("     xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n");
 			out.write("     xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n");
-			if (!m_Imports.isEmpty()) {
+			
+			if (m_Imports.isEmpty()) {
+				out.write("    <owl:Ontology rdf:about=\"\"/>\n");
+			} else {
 				out.write("    <owl:Ontology rdf:about=\"\">\n");
 				for (String i : m_Imports) {
 					out.write("        <owl:imports rdf:resource=\"" + getFileName(i) + "\"/>\n");
