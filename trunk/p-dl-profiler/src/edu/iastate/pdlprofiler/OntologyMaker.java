@@ -60,6 +60,7 @@ public class OntologyMaker {
 					String name = "q_" + topoAndCoverage + "_" + i;
 					Ontology query = new Ontology(name);
 					String witness = m_Prefix + "_" + topoAndCoverage + "_0";
+					query.addImports(witness);
 					query.addSubNothingAxiom(witness, queryClasses.get(i));
 					query.saveAdditionalAsFile();
 				}
