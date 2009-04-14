@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class QueryMaker {
 	
-	private static final String PREFIX = "pizza";
+	private static final String PREFIX = "micro";
 	private static final double[] COVERAGE = new double[] {0.2, 0.4, 0.6, 0.8};
 	private static final String[] TOPOLOGY = new String[] {"c", "s"};
 	private static final int TOTAL_PACKAGES = 4;
