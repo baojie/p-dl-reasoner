@@ -63,6 +63,7 @@ public class Tableau {
 	private static enum State { ENTRY, READY, EXPAND, CLASH, EXIT }
 	
 	private static String TIME_NETWORK = "network";
+	private static String TIME_RESPONSE = "response";
 	private static String TIME_REASON = "reason";
 	private static String TIME_WAIT = "wait";
 	
@@ -117,7 +118,7 @@ public class Tableau {
 				m_Master = msg.getSrc();
 				
 				m_Timers.reset(TIME_WAIT);
-				m_Timers.start(TIME_REASON);
+				m_Timers.start(TIME_RESPONSE);
 				
 				sendToMaster(m_Ontology.getID());
 				sendToMaster(m_Ontology.getExternalConcepts());
@@ -140,9 +141,11 @@ public class Tableau {
 				}
 				if (m_State != State.EXPAND) break;
 				
+				m_Timers.start(TIME_REASON);
 				expandGraph();
 				checkForClash();
 				releaseToken();
+				m_Timers.stop(TIME_REASON);
 				
 				if (isComplete()) {
 					replyPing();
@@ -160,10 +163,11 @@ public class Tableau {
 				}
 				if (m_State != State.CLASH) break;
 				
+				m_Timers.start(TIME_REASON);
 				//Messages may generate new clashes
 				checkForClash();
-				
 				replyPing();
+				m_Timers.stop(TIME_REASON);
 				
 				//Block, the only way to get out of CLASH_SYNC is to get a ResumeExpansion Or an Exit
 				if (LOGGER.isInfoEnabled()) {
@@ -174,7 +178,7 @@ public class Tableau {
 			}
 		}
 		
-		m_Timers.stop(TIME_REASON);
+		m_Timers.stop(TIME_RESPONSE);
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
@@ -250,7 +254,9 @@ public class Tableau {
 			LOGGER.info("Received " + tabMsg);
 		}
 		
+		m_Timers.start(TIME_REASON);
 		tabMsg.execute(m_MessageProcessor);
+		m_Timers.stop(TIME_REASON);
 	}
 
 	private void expandGraph() {

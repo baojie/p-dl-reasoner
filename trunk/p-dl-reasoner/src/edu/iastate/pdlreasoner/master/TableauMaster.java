@@ -53,6 +53,7 @@ public class TableauMaster {
 	private static enum State { ENTRY, EXPAND, CLASH, EXIT }
 	
 	private static String TIME_NETWORK = "network";
+	private static String TIME_RESPONSE = "response";
 	private static String TIME_REASON = "reason";
 	private static String TIME_WAIT = "wait";
 	
@@ -93,7 +94,7 @@ public class TableauMaster {
 		waitForSlavesToConnect(numSlaves);
 		
 		m_Timers.stop(TIME_NETWORK);
-		m_Timers.start(TIME_REASON);
+		m_Timers.start(TIME_RESPONSE);
 		
 		while (m_State != State.EXIT) {
 			switch (m_State) {
@@ -129,12 +130,14 @@ public class TableauMaster {
 				
 				if (m_State != State.CLASH) break;
 				
+				m_Timers.start(TIME_REASON);
 				resume();
+				m_Timers.stop(TIME_REASON);
 				break;
 			}
 		}
 		
-		m_Timers.stop(TIME_REASON);
+		m_Timers.stop(TIME_RESPONSE);
 		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Disconnecting and closing channel");
@@ -192,7 +195,9 @@ public class TableauMaster {
 			LOGGER.info("Received " + tabMsg);
 		}
 		
+		m_Timers.start(TIME_REASON);
 		tabMsg.execute(m_MessageProcessor);
+		m_Timers.stop(TIME_REASON);
 	}
 	
 	private void broadcast(Serializable msg) {
