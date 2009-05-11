@@ -18,7 +18,6 @@ public class RunRecord {
 			record.m_Slaves[i] = Record.parse(sLine[i]);
 		}
 		
-		record.estimateDistributedReasonMessageTime();
 		return record;
 	}
 	
@@ -48,22 +47,6 @@ public class RunRecord {
 		m_Master.divideBy(q);
 		for (int i = 0; i < m_Slaves.length; i++) {
 			m_Slaves[i].divideBy(q);
-		}
-	}
-
-	private void estimateDistributedReasonMessageTime() {
-		m_Central.m_WaitTime = 0.0;
-		m_Central.m_ReasonTime = m_Central.m_ReasonMessageWaitTime;
-		
-		double totalDistributedReasonMessageTime = m_Master.getReasonMessageTime();
-		for (int i = 0; i < m_Slaves.length; i++) {
-			totalDistributedReasonMessageTime += m_Slaves[i].getReasonMessageTime();
-		}
-		
-		double centralizedReasonTime = m_Central.m_ReasonMessageWaitTime;
-		m_Master.m_ReasonTime = centralizedReasonTime * m_Master.getReasonMessageTime() / totalDistributedReasonMessageTime;
-		for (int i = 0; i < m_Slaves.length; i++) {
-			m_Slaves[i].m_ReasonTime = centralizedReasonTime * m_Slaves[i].getReasonMessageTime() / totalDistributedReasonMessageTime;
 		}
 	}
 
